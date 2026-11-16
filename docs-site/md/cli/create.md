@@ -1,0 +1,76 @@
+# pso create
+
+> Create a workspace, an orchestrator, a Spring Boot service, or a frontend project: the application shell (fei) or a microfrontend (mei)
+
+Create a workspace, an orchestrator, a Spring Boot service, or a frontend project: the application shell (fei) or a microfrontend (mei).
+
+## Usage
+
+```text
+pso create workspace <name> | orchestrator <name> | service <name> --runtime spring-boot | fei <name> | mei <name> [--host <fei>] [--register] [--install] [--port <1024-65535>] [--prefix /path] [--db postgres] [--dry-run] [--force] [--json]
+```
+
+## Flags
+
+| Flag | What it does |
+|---|---|
+| `--runtime` | See the usage line and the task guide for this option. |
+| `--host` | See the usage line and the task guide for this option. |
+| `--register` | See the usage line and the task guide for this option. |
+| `--install` | See the usage line and the task guide for this option. |
+| `--port` | Assign the service port instead of the next generated default. |
+| `--prefix` | Set the Spring service's URL prefix. |
+| `--db` | Generate PostgreSQL support for a Spring service. |
+| `--dry-run` | Preview the files and registration without writing them. |
+| `--force` | Allow replacement of conflicting generated files after reviewing them. |
+| `--json` | Print machine-readable command output. |
+
+## Examples
+
+```bash
+pso create workspace shop
+cd shop
+pso create orchestrator gateway
+pso create service catalog
+pso create service orders --db postgres
+pso create fei shop --install
+pso create mei customers --register --install
+```
+
+## What it changes
+
+- `workspace` creates `shop/pso.workspace.json`; it does not start a process.
+- `orchestrator` and `service` create projects and register their names, ports and roles in the workspace file.
+- `--db postgres` adds the Spring data dependency, datasource configuration and a Flyway migration template.
+
+## Illustrative output
+
+This sample shows the shape of the result. Names, ports, digests and timings may differ in your workspace.
+
+```text evidence="illustrative"
+created    gateway/src/main.ts
+created    gateway/package.json
+...
+registered "gateway" in pso.workspace.json (port 3000)
+```
+
+## Verify the result
+
+- Open `pso.workspace.json` to confirm the declared services and ports.
+- Run `pso validate` for structural checks, then `pso services:list` to see the registry. Neither command proves that a service is running.
+
+## Failure cases
+
+- `A workspace has exactly one public entry point`: a second orchestrator is refused.
+- `Invalid service name`: names are kebab-case; `../x` and absolute paths are rejected before anything is written.
+- Existing files with different content are reported as conflicts and left untouched unless you pass `--force`.
+
+## Exit codes
+
+`0` on success, `1` when the command ran and failed. See the [exit code table](cli/index.md#exit-codes).
+
+## See also
+
+- [getting-started/first-workspace](getting-started/first-workspace.md)
+- [getting-started/first-orchestrator](getting-started/first-orchestrator.md)
+- [getting-started/first-microservice](getting-started/first-microservice.md)

@@ -1,0 +1,14 @@
+# DevOps instructions
+
+> Development environment, builds, Docker, deployment, health and what is unverified.
+
+- **Run:** `pso dev` (`--only a,b`, `--install`, `--smoke`). It validates, checks ports, starts in dependency order, waits for health, writes `.pso/registry.json` and `.pso/logs/`, stops cleanly on Ctrl+C. Every service gets its OWN environment, lowest to highest: `<workspace>/.env.<environment>` (shared), `<service>/.env`, `<service>/.env.<environment>`, then the environment of the command; `PORT`, `HOST`, `PSO_WORKSPACE`, `PSO_SERVICE` come from the workspace file. `<workspace>/.env` belongs to Docker Compose and is not read. JWT settings go in `<orchestrator>/.env` and each service's `.env` (git-ignored). `pso dev` turns on development error details (`PSO_LOG_ERROR_DETAILS`).
+- **Build:** `pso build` compiles Node services, packs them, builds Spring jars and records SHA-256 checksums in `.pso/artifacts/manifest.json`. `pso test`, `pso lint`.
+- **Docker:** `pso docker:init` generates Dockerfiles, `docker-compose.yml`, `.dockerignore`, `.env.example` and `.github/workflows/ci.yml`. Compose publishes only the orchestrator on `127.0.0.1`; required `PSO_JWT_*` variables use `${VAR:?}`. `pso docker:build` needs a running Docker daemon. **Running the containers is unverified**; do not claim a stack works without running it.
+- **Deploy:** `pso deploy:plan --target native --dir <path> --release X.Y.Z` is read-only. `pso deploy ... --yes` and `pso rollback --dir <path> --yes` change state and need the user's explicit authorization. A SNAPSHOT build is refused: the rule reads the service's own `<version>` and `<pso.version>`; `--allow-snapshot` marks a development deployment and is never accepted with `PSO_ENV=production`. `--health-url` triggers verification and automatic rollback.
+- **Health:** orchestrator `/health/live`, `/health/ready`; Spring `/actuator/health`.
+- **Never** put secrets in images, Compose files, workflows or `.env.example` values.
+- Development identity provider: `pso idp:dev init | token | serve` (a key generated on the developer's machine, a JWKS server, `docker-compose.idp.yml`). Development only: never configure it for production (`pso security:check --env production` reports SEC013).
+- Development infrastructure (a database, a broker) goes in its own Compose file such as `infra/postgres.compose.yml`; `docker-compose.yml` in the workspace root is the file `pso docker:init` generates and never overwrites when it is not its own.
+- Linux: the TLS keys in `./tls` are owner-only; set `PSO_CONTAINER_USER=$(id -u):$(id -g)` in `.env`.
+- Not implemented: applying a deployment to Kubernetes, ECS, Container Apps or Cloud Run (`pso deploy:init` only generates descriptors) and inbound TLS termination in the orchestrator. OpenTelemetry export IS implemented (opt-in through `OTEL_EXPORTER_OTLP_ENDPOINT`).
