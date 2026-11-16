@@ -14,10 +14,10 @@ On the authorized PSO Web development machine, compile the existing portal and e
 
 ```powershell
 npx tsc -b packages/cli
-node scripts/publish-docs.mjs --out publication-work/<new-run> --repo publication-work/docs-repo
+node scripts/publish-docs.mjs --out publication-work/<new-run> --repo publication-work/docs-repo --denylist <private-indicator-file>
 ```
 
-The script builds the portal into an isolated directory, runs the PSD security scanner, checks static file types and internal links, and copies only the validated `docs-site/` tree into this checkout. It fails if the output directory is not empty or if the checkout's origin is not `DevMboo/pso-web-docs`. Review `security-scan.json` and the diff before committing.
+The script builds the portal into an isolated directory, runs the PSD security scanner with the maintainer's private indicator list, checks static file types and internal links, and copies only the validated `docs-site/` tree into this checkout. It fails if the output directory is not empty, the private indicator list is missing, or the checkout's origin is not `DevMboo/pso-web-docs`. Keep the indicator list outside both repositories. Review `security-scan.json` and the diff before committing.
 
 ```powershell
 git -C publication-work/docs-repo add docs-site scripts/validate-site.mjs
