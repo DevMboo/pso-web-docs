@@ -4,6 +4,8 @@
 
 > Status: PARTIALLY implemented — read the limitations.
 
+**PSO Web — Cloud Ecosystem Framework**
+
 **One ecosystem. Independent teams. Unified architecture.**
 
 **Build independently. Integrate seamlessly. Operate securely.**

@@ -33,6 +33,7 @@ for (const file of files) {
   const body = readFileSync(file, 'utf8');
   for (const [label, re] of forbidden) if (re.test(body)) problems.push(`${rel}: ${label}`);
   if (!file.endsWith('.html') && !file.endsWith('.css')) continue;
+  if (file.endsWith('.html') && [...body.matchAll(/<h1(?:\s|>)/gi)].length > 1) problems.push(`${rel}: multiple h1 headings`);
   const refs = file.endsWith('.html')
     ? [...body.matchAll(/\b(?:href|src)\s*=\s*["']([^"']+)["']/gi)].map(m => m[1])
     : [...body.matchAll(/url\(\s*["']?([^)'"\s]+)["']?\s*\)/gi)].map(m => m[1]);

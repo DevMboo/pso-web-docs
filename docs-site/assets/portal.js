@@ -34,7 +34,7 @@
   /* ---------- navigation ---------- */
   var sidebar = $("#sidebar"), menuBtn = $(".menu-btn");
   function setNav(open) { if (!sidebar || !menuBtn) return; sidebar.classList.toggle("is-open", open); menuBtn.setAttribute("aria-expanded", String(open)); menuBtn.setAttribute("aria-label", open ? "Close navigation" : "Open navigation"); }
-  if (menuBtn) {
+  if (menuBtn && sidebar) {
     menuBtn.addEventListener("click", function () { setNav(!sidebar.classList.contains("is-open")); });
     document.addEventListener("keydown", function (e) { if (e.key === "Escape" && sidebar.classList.contains("is-open")) { setNav(false); menuBtn.focus(); } });
     if (sidebar) sidebar.addEventListener("click", function (e) { if (e.target.closest && e.target.closest("a")) setNav(false); });
