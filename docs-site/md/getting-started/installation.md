@@ -5,7 +5,7 @@
 > Status: PARTIALLY implemented — read the limitations.
 
 > [!NOTE]
-> **Private Developer Preview — Security validation in progress.** The protected Windows x64 installer is not available for download. See [Downloads](downloads/index.md) for requirements, recipient enrollment and release verification. The checkout instructions below apply only to developers who already have authorized source access.
+> **Private evaluation pre-release — security assessment incomplete.** The Windows x64 installer is available to authorized users of the private release repository. Only the existing validation recipient can install this encrypted candidate. See [Downloads](downloads/index.md) for the release, verification and recipient enrollment. The checkout instructions below apply to developers who already have authorized source access.
 
 > [!WARNING]
 > The `@pso/*` packages are **not published**. `npm install -g @pso/cli` is the intended future command, but the package name has not been checked for availability and nothing was published. Today you install from a checkout, or from a signed package you build yourself ([distribution](devops/distribution-and-installation.md)).
