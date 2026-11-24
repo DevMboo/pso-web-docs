@@ -4,6 +4,8 @@
 
 **PSO AI Context** is a set of generated instructions that tell an AI coding assistant how PSO works: the architecture, directory conventions, the module and route contracts, decorator semantics, the CLI commands that really exist, the security model and the rules for generating code.
 
+For the current `0.2.0-rc.2` distribution, select the official modular TypeScript orchestrator (`src/.app/`, `src/modules/`, `src/shared/`) and layered Java service (`application/`, `infrastructure/`, `shared/`) unless the project is explicitly a 0.1 legacy project. New projects include the functional Product CRUD by default; `--template empty` omits it. The [structure migration guide](architecture/structure-migration.md) explains how to inspect an older project without moving its files.
+
 ## Why it exists
 
 An assistant that knows only how other frameworks work will do what they do: expose a controller because it has `@Get`, disable a guard to get past a `401`, or invent a `pso` command. PSO's whole point is that exposure is explicit and security is deny-by-default, so the assistant has to know the rules *before* it edits your project.
@@ -13,7 +15,7 @@ An assistant that knows only how other frameworks work will do what they do: exp
 | Piece | Content |
 |---|---|
 | **Core rules** (always included) | identity and version, the exposure invariant, the working procedure, security rules, generation rules, validation, common mistakes, what does not exist |
-| **Framework contexts** | architecture, orchestrator, module and route conventions, Spring Boot, security, CLI, dispatch status, DevOps, documentation references |
+| **Framework contexts** | official and legacy structures, orchestrator modules and routes, layered Spring Boot services, security, CLI generators, infrastructure, multiple FEIs, dispatch status, DevOps, documentation references |
 | **Task contexts** | create an orchestrator / microservice / REST module, add a protected route or DTO, configure JWT, connect services, install dispatch, configure Docker, diagnose an error |
 | **Project facts** (CLI only) | workspace services, modules, declared routes, installed features, extracted mechanically and treated as untrusted data |
 

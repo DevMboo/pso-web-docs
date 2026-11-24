@@ -1,18 +1,18 @@
 # pso deploy
 
-> Apply a deployment (requires --yes); verifies checksums and health, rolls back on failed verification
+> Apply a deployment (requires --yes); verifies checksums and health, rolls back on failed verification. --env deploys an environment of pso.infra.json (Docker target: build, record, start, verify through the edge, automatic rollback; bundle target: a reviewable bundle for the operator); --dry-run only plans
 
-Apply a deployment (requires --yes); verifies checksums and health, rolls back on failed verification.
+Apply a deployment (requires --yes); verifies checksums and health, rolls back on failed verification. --env deploys an environment of pso.infra.json (Docker target: build, record, start, verify through the edge, automatic rollback; bundle target: a reviewable bundle for the operator); --dry-run only plans.
 
 ## Usage
 
 ```text
-pso deploy --target native --dir <path> [--release 1.0.0] [--health-url url ...] [--health-timeout 30] [--allow-snapshot] --yes [--json] | --target compose --yes [--json]
+pso deploy --target native --dir <path> [--release 1.0.0] [--health-url url ...] [--health-timeout 30] [--allow-snapshot] --yes [--json] | --target compose --yes [--json] | --env <name> [--dry-run] [--timeout 300] [--yes] [--json]
 ```
 
 ## Flags
 
-`--target`, `--dir`, `--release`, `--health-url`, `--health-timeout`, `--allow-snapshot`, `--yes`, `--json`.
+`--target`, `--dir`, `--release`, `--health-url`, `--health-timeout`, `--allow-snapshot`, `--yes`, `--json`, `--env`, `--dry-run`, `--timeout`.
 
 ## Examples
 

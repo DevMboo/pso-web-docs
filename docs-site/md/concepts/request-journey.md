@@ -2,6 +2,14 @@
 
 > A guided map of the core concepts, from a path on disk to a secured route, service response and diagnostic.
 
+<!-- pso:structure-note -->
+> [!NOTE]
+> Examples on this page use the 0.1 orchestrator layout (`src/routes/<module>/`, `src/guards/`, `src/contracts/`), which existing
+> projects keep. In the official structure of new projects the same files are in `src/modules/<module>/` (`routes/ROUTES.pso.ts`,
+> `controllers/`, `services/`, `providers/`, `dto/`) and in `src/.app/` (`guards/`, `middlewares/`, `filters/`, `contracts/`); what the
+> page describes works the same way. See [TypeScript orchestrator structure](architecture/typescript-orchestrator.md).
+
+
 Consider `GET /products` in a workspace with a TypeScript gateway and a Spring `catalog` service. PSO gives each part a separate question to answer. Follow them in order when learning the framework or diagnosing a request.
 
 | Layer | The question it answers | Where to look | How to check |

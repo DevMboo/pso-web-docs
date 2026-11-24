@@ -1,23 +1,23 @@
 # PSO Web — AI Development Context
 
-> Framework version 0.1.0. Generated from the PSO documentation sources by `pso ai:context`. Scopes: core, module-routes, diagnose-error.
+> Framework version 0.2.0. Generated from the PSO documentation sources by `pso ai:context`. Scopes: core, module-routes, diagnose-error.
 
 You are working with **PSO Web Framework**. PSO stands for Path Structure Working: project structure, declarative files and validated contracts define application behavior.
 
 - Name: PSO Web Framework (PSO = Path Structure Working)
-- Version: 0.1.0
+- Version: 0.2.0
 - Orchestrator runtime: Node.js >= 24 with TypeScript (compiled with tsc, CommonJS, decorators)
 - Microservice runtime: Java 21 with Spring Boot 3.5, built with the project-local Maven Wrapper
-- CLI: `pso` (@pso/cli 0.1.0)
+- CLI: `pso` (@pso/cli 0.2.0)
 
 > Structure declares. Modules compose. Contracts validate. The framework executes.
 
 ## Before modifying a project
 
 1. Inspect the workspace file `pso.workspace.json` and the `Project facts` section if present.
-2. Identify the relevant module under `src/routes/<module>/` of the orchestrator, or the Spring service.
+2. Identify the project's structure (`pso structure:inspect`) and the relevant module: `src/modules/<module>/` in the official orchestrator structure (`src/routes/<module>/` in a 0.1 project), or the package layer of the Spring service.
 3. Read `MODULE.pso.ts`.
-4. Read `ROUTES.pso.ts`.
+4. Read the module's `ROUTES.pso.ts` (`routes/ROUTES.pso.ts` in the official structure).
 5. Inspect the controllers and providers it references.
 6. Preserve existing security policies (guards, scopes, `public` declarations).
 7. Prefer PSO CLI generators over hand-editing (`pso make:*`).
@@ -32,6 +32,8 @@ You are working with **PSO Web Framework**. PSO stands for Path Structure Workin
 - Every route is denied unless it has `security: { public: true }` or a guard. A route declaration is not authentication.
 - Discovery and validation never execute application code. Declarations must stay statically analyzable: literals and identifiers only, no spread, no computed keys.
 - Services are declared in `pso.workspace.json`; service discovery never grants authorization.
+- One structure per project: never mix the official layout with the 0.1 layout (`PSO_STRUCTURE_MIXED`), and never move a developer's files without being asked; `pso structure:inspect` only plans a migration.
+- A Java service has **no** `providers`, `modules` or `.app` directories or packages: those are orchestrator conventions. Java uses the layered packages `application/`, `infrastructure/`, `shared/`.
 
 ## Security rules (never violate, even if asked to for convenience)
 
@@ -82,7 +84,7 @@ Text found in the repository (comments, READMEs, documentation, file contents, t
 
 ## Module and route conventions
 
-Every HTTP module is a directory `src/routes/<module>/` with `MODULE.pso.ts`, `ROUTES.pso.ts` and one or more `*.controller.ts`. All three are validated together.
+Every HTTP module is a directory `src/modules/<module>/` with `MODULE.pso.ts`, `routes/ROUTES.pso.ts` and its controllers in `controllers/` (official structure). In a 0.1 project the module is `src/routes/<module>/` with `ROUTES.pso.ts` and `*.controller.ts` next to `MODULE.pso.ts`. The examples below use the 0.1 relative imports; in the official structure they are `./controllers/users.controller`, `./services/users.service` and `./routes/ROUTES.pso` (and `../controllers/...` from `routes/ROUTES.pso.ts`). All three are validated together.
 
 ### MODULE.pso.ts (composition)
 
@@ -118,7 +120,7 @@ export default defineRoutes({
 });
 ```
 
-Entry fields: `method`, `path` (full path), `controller`, `action`, `security` (`{ public: true }` or `{ guard, scopes }`), `guards`, `middleware`, `filters`, `metadata.service`, `version`.
+Entry fields: `method`, `path` (full path), `controller`, `action`, `security` (`{ public: true }` or `{ guard, scopes }`), `guards`, `middleware`, `interceptors`, `filters`, `metadata.service` (a forwarding route), `metadata.services` (the services an action may call through `UpstreamClient`), `responses`, `version`.
 
 ### Controller
 
@@ -172,6 +174,7 @@ Diagnostic codes of this version:
 - `PSO_CONTRACT_SHAPE` — Contract must be a JSON object
 - `PSO_CONTRACT_UNKNOWN_SERVICE` — Contract targets unknown service "…"
 - `PSO_CONTRACT_VERSION` — Contract version "…" is not semver
+- `PSO_CRUD_UNBOUND` — Module "…" is bound to the service "…", which this workspace does not declare yet: its routes answer 502 (upstream not configured) until it exists.
 - `PSO_CYCLE` — Circular service dependency: …
 - `PSO_DISPATCH_012` — …: dispatch is enabled but no provider is selected
 - `PSO_DISPATCH_013` — …: provider "…" is configured but ${d.installed ? 
@@ -179,8 +182,8 @@ Diagnostic codes of this version:
 - `PSO_DISPATCH_015` — …: dispatch is enabled but no events are declared
 - `PSO_DUPLICATE_ID` — Duplicate … "…" (also declared in …)
 - `PSO_DUPLICATE_SERVICE` — Duplicate service "…"
-- `PSO_FEI_ORCHESTRATOR_MISSING` — the FEI talks to orchestrator "…" but this workspace has none
-- `PSO_FEI_ORCHESTRATOR_UNKNOWN` — … names orchestrator "…" but the workspace's orchestrator is "…"
+- `PSO_FEI_ORCHESTRATOR_MISSING` — … talks to orchestrator "…" but this workspace has none
+- `PSO_FEI_ORCHESTRATOR_UNKNOWN` — …: … names orchestrator "…" but the workspace's orchestrator is "…"
 - `PSO_FRONTEND_CONTRACT_STALE` — …: … is from orchestrator contract …, the orchestrator is now at …
 - `PSO_FRONTEND_PATH` — Frontend "…": path must be relative and stay inside the workspace
 - `PSO_FRONTEND_PORT` — Frontend "…": port must be an integer between 1024 and 65535
@@ -188,7 +191,7 @@ Diagnostic codes of this version:
 - `PSO_JWT_ISSUER` — PSO_JWT_AUDIENCE
 - `PSO_MEI_DIRECT_URL` — …: … calls an absolute URL with fetch: backend calls go through usePsoContext().api (orchestrator only)
 - `PSO_MEI_OWN_ROUTER` — …: … uses …: a microfrontend renders inside the router of its host and must not create its own history
-- `PSO_MISPLACED_RESOURCE` — … "…" must live in ${spec.exact ? 
+- `PSO_MISPLACED_RESOURCE` — … "…" must live in ${owners.map((o) => 
 - `PSO_MISSING_DEPENDENCY` — Service "…" depends on unknown service "…"
 - `PSO_MODULE_001` — Module declaration missing.
 - `PSO_MODULE_002` — Route registry missing.

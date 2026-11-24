@@ -2,6 +2,13 @@
 
 > Authentication and authorization checks that run before a route's action, including the built-in jwt guard.
 
+<!-- pso:structure-note -->
+> [!NOTE]
+> Examples on this page use the 0.1 orchestrator layout (`src/routes/<module>/`, `src/guards/`, `src/contracts/`), which existing
+> projects keep. In the official structure of new projects the same files are in `src/modules/<module>/` (`routes/ROUTES.pso.ts`,
+> `controllers/`, `services/`, `providers/`, `dto/`) and in `src/.app/` (`guards/`, `middlewares/`, `filters/`, `contracts/`); what the
+> page describes works the same way. See [TypeScript orchestrator structure](architecture/typescript-orchestrator.md).
+
 A guard is a function exported as the default of a `*.guard.ts` file. Its **name** is the file name without `.guard.ts`.
 
 ## The built-in `jwt` guard

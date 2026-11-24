@@ -7,7 +7,7 @@ Generate a guard (orchestrator: inside a module; Spring: hexagonal layout).
 ## Usage
 
 ```text
-pso make:guard <name> | <module> <name> [--service <name>] [--dry-run] [--force] [--json] (module form creates routes/<module>/guards/<name>.guard.ts)
+pso make:guard <name> | <module> <name> [--service <name>] [--dry-run] [--force] [--json] (application-wide in src/.app/guards/ (0.1: src/guards/); the module form creates <module>/guards/<name>.guard.ts)
 ```
 
 ## Flags

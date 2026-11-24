@@ -1,8 +1,8 @@
 # pso make:adapter
 
-> Generate an adapter component (Spring, hexagonal layout: adapters/)
+> Generate an adapter component (Spring, 0.1 hexagonal layout only: adapters/; layered services use clients: pso make:client)
 
-Generate an adapter component (Spring, hexagonal layout: adapters/).
+Generate an adapter component (Spring, 0.1 hexagonal layout only: adapters/; layered services use clients: pso make:client).
 
 ## Usage
 

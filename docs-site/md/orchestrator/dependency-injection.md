@@ -2,6 +2,13 @@
 
 > A complete example - a service injected into a controller, exported and imported across modules - with the exact diagnostics for each mistake and the rules of the container.
 
+<!-- pso:structure-note -->
+> [!NOTE]
+> Examples on this page use the 0.1 orchestrator layout (`src/routes/<module>/`, `src/guards/`, `src/contracts/`), which existing
+> projects keep. In the official structure of new projects the same files are in `src/modules/<module>/` (`routes/ROUTES.pso.ts`,
+> `controllers/`, `services/`, `providers/`, `dto/`) and in `src/.app/` (`guards/`, `middlewares/`, `filters/`, `contracts/`); what the
+> page describes works the same way. See [TypeScript orchestrator structure](architecture/typescript-orchestrator.md).
+
 The `users` module injects `UsersService` into `UsersController` through the constructor:
 
 ```typescript {4}

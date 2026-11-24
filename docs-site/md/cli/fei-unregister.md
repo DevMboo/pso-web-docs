@@ -7,12 +7,12 @@ Remove a MEI from FEI.pso.ts (the MEI project itself is not deleted).
 ## Usage
 
 ```text
-pso fei:unregister <mei> [--dry-run]
+pso fei:unregister <mei> [--fei <name>] [--dry-run]
 ```
 
 ## Flags
 
-`--dry-run`.
+`--fei`, `--dry-run`.
 
 ## Examples
 

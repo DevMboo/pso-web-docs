@@ -4,13 +4,13 @@
 
 | Tool | Version | Needed for |
 |---|---|---|
-| Node.js | developed and tested on **24**; the framework packages declare `engines.node >=24` | the CLI and the orchestrator |
+| Node.js | developed and tested on **24**; the framework packages declare `engines.node >=24` | a source checkout and a separately run orchestrator; the Windows portable distribution bundles its own private runtime |
 | npm | bundled with Node | installing dependencies |
 | JDK | 21 or newer (tested with 25 compiling for release 21) | Spring Boot services |
 | Maven | **not required** | each service carries a project-local Maven Wrapper (Maven 3.9.9, SHA-256 pinned) that downloads Maven from Maven Central on first use |
 | Docker | optional | `pso docker:build`, the generated Compose stack, and running real brokers or PostgreSQL locally |
 
-Windows, macOS and Linux are supported by the CLI. The Windows installer exists only for Windows x64 ([distribution](devops/distribution-and-installation.md)).
+Windows, macOS and Linux are supported by the CLI from an authorized checkout. The current portable distribution is Windows 10/11 x64; its unsigned installer candidate is not a supported installation method ([Downloads](downloads/index.md)).
 
 > [!NOTE]
 > **Which Node version?** Node 24 or newer. The framework packages and the generated orchestrator declare `engines.node >=24`, `pso doctor` requires 24 (it prints `>=24`), and every test of this framework ran on Node 24.

@@ -2,6 +2,13 @@
 
 > Injectable classes that hold logic belonging to the orchestrator - how to create them, inject them into controllers and into each other, share them between modules, and what should not live in them.
 
+<!-- pso:structure-note -->
+> [!NOTE]
+> Examples on this page use the 0.1 orchestrator layout (`src/routes/<module>/`, `src/guards/`, `src/contracts/`), which existing
+> projects keep. In the official structure of new projects the same files are in `src/modules/<module>/` (`routes/ROUTES.pso.ts`,
+> `controllers/`, `services/`, `providers/`, `dto/`) and in `src/.app/` (`guards/`, `middlewares/`, `filters/`, `contracts/`); what the
+> page describes works the same way. See [TypeScript orchestrator structure](architecture/typescript-orchestrator.md).
+
 ## What a provider is
 
 A **provider** is a class the orchestrator creates for you, once, and hands to whoever asks for it in a constructor. "Service" is the usual name for a provider that holds logic. Anything you list in `providers` of `MODULE.pso.ts` is a provider; nothing is discovered by scanning.

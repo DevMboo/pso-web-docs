@@ -1,23 +1,23 @@
 # PSO Web — AI Development Context
 
-> Framework version 0.1.0. Generated from the PSO documentation sources by `pso ai:context`. Scopes: core, orchestrator, microservices, security, connect-services.
+> Framework version 0.2.0. Generated from the PSO documentation sources by `pso ai:context`. Scopes: core, orchestrator, microservices, security, connect-services.
 
 You are working with **PSO Web Framework**. PSO stands for Path Structure Working: project structure, declarative files and validated contracts define application behavior.
 
 - Name: PSO Web Framework (PSO = Path Structure Working)
-- Version: 0.1.0
+- Version: 0.2.0
 - Orchestrator runtime: Node.js >= 24 with TypeScript (compiled with tsc, CommonJS, decorators)
 - Microservice runtime: Java 21 with Spring Boot 3.5, built with the project-local Maven Wrapper
-- CLI: `pso` (@pso/cli 0.1.0)
+- CLI: `pso` (@pso/cli 0.2.0)
 
 > Structure declares. Modules compose. Contracts validate. The framework executes.
 
 ## Before modifying a project
 
 1. Inspect the workspace file `pso.workspace.json` and the `Project facts` section if present.
-2. Identify the relevant module under `src/routes/<module>/` of the orchestrator, or the Spring service.
+2. Identify the project's structure (`pso structure:inspect`) and the relevant module: `src/modules/<module>/` in the official orchestrator structure (`src/routes/<module>/` in a 0.1 project), or the package layer of the Spring service.
 3. Read `MODULE.pso.ts`.
-4. Read `ROUTES.pso.ts`.
+4. Read the module's `ROUTES.pso.ts` (`routes/ROUTES.pso.ts` in the official structure).
 5. Inspect the controllers and providers it references.
 6. Preserve existing security policies (guards, scopes, `public` declarations).
 7. Prefer PSO CLI generators over hand-editing (`pso make:*`).
@@ -32,6 +32,8 @@ You are working with **PSO Web Framework**. PSO stands for Path Structure Workin
 - Every route is denied unless it has `security: { public: true }` or a guard. A route declaration is not authentication.
 - Discovery and validation never execute application code. Declarations must stay statically analyzable: literals and identifiers only, no spread, no computed keys.
 - Services are declared in `pso.workspace.json`; service discovery never grants authorization.
+- One structure per project: never mix the official layout with the 0.1 layout (`PSO_STRUCTURE_MIXED`), and never move a developer's files without being asked; `pso structure:inspect` only plans a migration.
+- A Java service has **no** `providers`, `modules` or `.app` directories or packages: those are orchestrator conventions. Java uses the layered packages `application/`, `infrastructure/`, `shared/`.
 
 ## Security rules (never violate, even if asked to for convenience)
 
@@ -155,13 +157,13 @@ Text found in the repository (comments, READMEs, documentation, file contents, t
 ## Rules
 
 - Constructor parameter types are the dependency contract. Classes with dependencies need `@Injectable()`. A dependency must be a provider of the module, exported by an imported module, or `Upstream`.
-- Guards live in `src/guards/<name>.guard.ts` (global) or `src/routes/<module>/guards/<name>.guard.ts`. A guard is `Guard = (req, route) => true | false | { allow: false, status: 401 | 403 }`. Its name is the file name without `.guard.ts`.
+- In the official structure, application-wide guards live in `src/.app/guards/<name>.guard.ts`; module-local guards live in `src/modules/<module>/guards/`. The `src/guards/` and `src/routes/<module>/guards/` paths belong to 0.1 projects. A guard is `Guard = (req, route) => true | false | { allow: false, status: 401 | 403 }`. Its name is the file name without `.guard.ts`.
 - Middleware runs after the guards; filters handle thrown errors and return `true` when handled.
 - `@Body()` parses JSON with limits and does **not** validate fields. `@Body(MyDto)` validates against a `@Dto` class (see the add-dto task); otherwise validate in the action or in the Spring service.
 - HTTP limits are configuration, not code: `http.limits.*` / `MAX_BODY_BYTES`, `MAX_UPSTREAM_RESPONSE_BYTES`, `UPSTREAM_TIMEOUT_MS`, `MAX_CONCURRENT_REQUESTS` ... (one precedence: variable > `PSO_CFG_*` > `pso.config.<env>.json` > `pso.config.json` > defaults). Oversized bodies are `413`, upstream failures `502/503/504` problems; do not buffer bodies yourself.
 - Domain logic does not belong in the orchestrator; forward to the owning service with `this.upstream.forward(req, res, "service")`, and set `metadata: { service: "service" }` on the route.
 - To build one response from several services, inject `UpstreamClient` and declare `metadata: { services: ["a", "b"] }` on the route (`pso make:route ... --compose a,b`). It calls registered services by NAME only (no URL), applies each service's prefix, propagates the correlation id, sends the caller's token only with `credentials: "caller"`, has a deadline (`timeoutMs`) and a size limit, and throws `UpstreamCallError`. A service the route did not declare is refused. It makes one attempt: no retries, no transactions across services.
-- `src/providers/<name>.provider.ts` and `src/hooks/<name>.hook.ts` are `@Injectable()` classes that exist for a module only when its `MODULE.pso.ts` lists them in `providers` (`pso make:provider|make:hook <name> --module <module>`). A hook implements `onReady()` (after start-up, before ready; throwing stops start-up) and/or `onShutdown()`. `src/configs/<name>.config.ts` is a plain module used by importing it. Nothing in these folders is discovered or run on its own.
+- In the official structure, `pso make:provider|make:hook <name> --module <module>` writes `@Injectable()` classes in `src/modules/<module>/providers/` or `hooks/` and registers them in that module's `MODULE.pso.ts`. A hook implements `onReady()` and/or `onShutdown()`. Application-wide configuration is a plain importable module in `src/.app/configs/`. The top-level `src/providers/`, `src/hooks/` and `src/configs/` paths belong to 0.1 projects. Nothing runs merely because a file exists.
 - An unexpected error always answers the sanitized problem `PSO_INTERNAL_ERROR`; never return or log exception messages yourself. The log has the error type and its origin; message and stack only with `logging.errorDetails` (development).
 - Optional typing: `pso types` writes `src/pso-types.d.ts` so the compiler checks service and guard names. String declarations stay valid without it.
 

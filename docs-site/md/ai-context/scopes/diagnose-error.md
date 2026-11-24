@@ -24,6 +24,7 @@ Diagnostic codes of this version:
 - `PSO_CONTRACT_SHAPE` — Contract must be a JSON object
 - `PSO_CONTRACT_UNKNOWN_SERVICE` — Contract targets unknown service "…"
 - `PSO_CONTRACT_VERSION` — Contract version "…" is not semver
+- `PSO_CRUD_UNBOUND` — Module "…" is bound to the service "…", which this workspace does not declare yet: its routes answer 502 (upstream not configured) until it exists.
 - `PSO_CYCLE` — Circular service dependency: …
 - `PSO_DISPATCH_012` — …: dispatch is enabled but no provider is selected
 - `PSO_DISPATCH_013` — …: provider "…" is configured but ${d.installed ? 
@@ -31,8 +32,8 @@ Diagnostic codes of this version:
 - `PSO_DISPATCH_015` — …: dispatch is enabled but no events are declared
 - `PSO_DUPLICATE_ID` — Duplicate … "…" (also declared in …)
 - `PSO_DUPLICATE_SERVICE` — Duplicate service "…"
-- `PSO_FEI_ORCHESTRATOR_MISSING` — the FEI talks to orchestrator "…" but this workspace has none
-- `PSO_FEI_ORCHESTRATOR_UNKNOWN` — … names orchestrator "…" but the workspace's orchestrator is "…"
+- `PSO_FEI_ORCHESTRATOR_MISSING` — … talks to orchestrator "…" but this workspace has none
+- `PSO_FEI_ORCHESTRATOR_UNKNOWN` — …: … names orchestrator "…" but the workspace's orchestrator is "…"
 - `PSO_FRONTEND_CONTRACT_STALE` — …: … is from orchestrator contract …, the orchestrator is now at …
 - `PSO_FRONTEND_PATH` — Frontend "…": path must be relative and stay inside the workspace
 - `PSO_FRONTEND_PORT` — Frontend "…": port must be an integer between 1024 and 65535
@@ -40,7 +41,7 @@ Diagnostic codes of this version:
 - `PSO_JWT_ISSUER` — PSO_JWT_AUDIENCE
 - `PSO_MEI_DIRECT_URL` — …: … calls an absolute URL with fetch: backend calls go through usePsoContext().api (orchestrator only)
 - `PSO_MEI_OWN_ROUTER` — …: … uses …: a microfrontend renders inside the router of its host and must not create its own history
-- `PSO_MISPLACED_RESOURCE` — … "…" must live in ${spec.exact ? 
+- `PSO_MISPLACED_RESOURCE` — … "…" must live in ${owners.map((o) => 
 - `PSO_MISSING_DEPENDENCY` — Service "…" depends on unknown service "…"
 - `PSO_MODULE_001` — Module declaration missing.
 - `PSO_MODULE_002` — Route registry missing.

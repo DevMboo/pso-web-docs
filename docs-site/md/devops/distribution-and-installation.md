@@ -43,7 +43,7 @@ every file was decompressed and its SHA-256 checked
 
 ## 2. Installation lifecycle
 
-Every command needs an explicit `--root` (or `PSO_HOME`); PSO never guesses a directory and refuses file system roots, home and system directories and links.
+Every command operates on an explicit root: `--root`, else `PSO_HOME`, else the installation the running `pso` was started from (its own launcher says which). PSO never guesses a directory and refuses file system roots, home and system directories and links.
 
 ```bash
 pso setup     --package pso.psopkg --root C:\Tools\pso --trust release.public.pem

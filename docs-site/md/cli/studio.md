@@ -7,7 +7,7 @@ Open the local developer dashboard (live services, graph, routes, config, securi
 ## Usage
 
 ```text
-pso studio [--port N] [--no-open] [--remote] [--frontend-ops]
+pso studio [--port N] [--no-open] [--remote] [--frontend-ops] [--ops]
 ```
 
 ## Flags
@@ -18,6 +18,7 @@ pso studio [--port N] [--no-open] [--remote] [--frontend-ops]
 | `--no-open` | Print the URL without launching a browser. |
 | `--remote` | See the usage line and the task guide for this option. |
 | `--frontend-ops` | See the usage line and the task guide for this option. |
+| `--ops` | See the usage line and the task guide for this option. |
 
 ## Examples
 

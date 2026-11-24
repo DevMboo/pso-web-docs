@@ -1,8 +1,14 @@
-# Java project structure
+# Java project structure: layered and legacy
 
-> The simplified hexagonal layout and the naming rules PSO validates, with the generators that place each kind of class and what they create.
+> The official layered Java service structure and the 0.1 hexagonal layout retained for existing projects.
 
-```tree title="The simplified hexagonal layout"
+New `pso create service` projects use the **layered** structure, with `application/rest`, `application/service`, `application/dto`, `application/mapper`, `infrastructure/entity`, `infrastructure/persistence`, `infrastructure/config` and `shared/`. The default template includes a working Product CRUD, PostgreSQL and Flyway; `--template empty` keeps the structure without the example. See the [official Java structure](architecture/java-microservice.md) and [current generator destinations](architecture/generators.md).
+
+## Existing 0.1 projects
+
+The following structure and verified generator output describe a **0.1 legacy service**. Existing services keep working and their generators continue to write in their own layout. Do not mix its `routes/`, `ports/`, `adapters/` and `contracts/` packages with the new layered packages in one service (`PSO_STRUCTURE_MIXED`). Use [structure inspection](architecture/structure-migration.md) to plan a manual migration.
+
+```tree title="The 0.1 simplified hexagonal layout"
 catalog/
   pom.xml  # generated
   mvnw  # generated: Maven Wrapper, with mvnw.cmd and .mvn/wrapper/maven-wrapper.properties

@@ -1,16 +1,57 @@
 # Installation
 
-> Install the pso CLI from a framework checkout, as a global command or run it in place; what changes on your machine, how to verify it, how to update and remove it, and the Windows installer.
+> Use the portable Windows distribution or an authorized framework checkout, install matching Java dependencies, verify files, update and roll back.
 
 > Status: PARTIALLY implemented — read the limitations.
 
 > [!NOTE]
-> **Private evaluation pre-release — security assessment incomplete.** The Windows x64 installer is available to authorized users of the private release repository. Only the existing validation recipient can install this encrypted candidate. See [Downloads](downloads/index.md) for the release, verification and recipient enrollment. The checkout instructions below apply to developers who already have authorized source access.
+> The installed distribution on the validation machine is `0.2.0-rc.2`; its CLI reports version `0.2.0`. That candidate is not yet published in the private releases repository. [Downloads](downloads/index.md) identifies the older, published alpha.2 portable preview. Do not substitute its files for rc.2.
 
-> [!WARNING]
-> The `@pso/*` packages are **not published**. `npm install -g @pso/cli` is the intended future command, but the package name has not been checked for availability and nothing was published. Today you install from a checkout, or from a signed package you build yourself ([distribution](devops/distribution-and-installation.md)).
+## Option 1: an authorized portable Windows distribution
 
-## Option 1: from a checkout, as a global command
+The portable ZIP is the supported form for the current release candidate while the Windows installer is unsigned and unvalidated end to end. It needs Windows 10/11 x64, but bundles a private Node.js runtime: you do **not** install Node.js system-wide. Obtain the ZIP and its matching `SHA256SUMS`, detached signature and public key from an authorized release channel. Confirm the ZIP's SHA-256 before extraction; see [Downloads](downloads/index.md) for published assets and security limits.
+
+1. Extract to a writable folder such as `%LOCALAPPDATA%\PSO` or `C:\Tools\pso`. Avoid `Program Files`; no administrator rights are needed.
+2. Run `pso.cmd` from the extracted folder and check the installation:
+
+   ```powershell
+   .\pso.cmd --version
+   .\pso.cmd doctor
+   .\pso.cmd integrity check --full
+   ```
+
+3. Optionally add that folder's `bin` directory to your **user** PATH, open a new terminal, and check `Get-Command pso -All`. A development `npm link` can otherwise take precedence over the installed command.
+
+The ZIP writes no registry entries and does not alter a system Node.js installation. The bundled `node.exe` is Authenticode-signed by the OpenJS Foundation; the PSO ZIP and scripts are **not** publisher-authenticated. Do not disable or bypass Windows or organizational application-control protections. See [Release integrity and signing](infrastructure/release-integrity-and-signing.md).
+
+### Matching Java artifacts
+
+For generated Spring services, use JDK 21 or newer and run `pso java:install`. The installed rc.2 distribution contains its matching Maven file repository and generates services that request `com.pso:*:0.2.0-rc.2`; `java:install` copies those artifacts into your local Maven repository. It does not publish them to Maven Central. Then build a generated service with its Maven Wrapper:
+
+```powershell
+pso java:install
+cd .\catalog
+.\mvnw.cmd test
+```
+
+If your authorized distribution provides the Maven file repository separately, use `pso java:install --from <maven-repository-dir>`. The source-checkout workflow below uses its own Java version; do not mix its SNAPSHOT artifacts with a release candidate. See [Maven BOM and versions](spring/maven-bom.md).
+
+### Maintain and update
+
+Run maintenance commands from the installed CLI, with `--root <folder>` when you are managing another installation root:
+
+```powershell
+pso integrity check --full
+pso repair --full
+pso update install --package <authorized-newer.psopkg>
+pso update rollback
+```
+
+`integrity check` is read-only. Repair restores the installed version from its authenticated package. Update verifies a newer signed package and keeps the prior version for rollback; it does not fetch an unreleased candidate or change your workspaces. If an update changes the Java artifacts, run `pso java:install` for the newly active release. A package signed by another key is refused. See [Version migration](reference/migration.md) before adopting new project structure or infrastructure features.
+
+## Option 2: an authorized framework checkout
+
+For framework development, install Node.js 24 or newer and build the checkout. The `@pso/*` npm packages are not published; `npm link` points to the checkout, and moving it breaks the command:
 
 ```powershell
 cd path\to\pso-web-framework
@@ -18,100 +59,19 @@ npm install
 npm run build
 cd packages\cli
 npm link
-```
-
-`npm link` makes `pso` a global command that points at your checkout.
-
-### Verify
-
-```bash
-pso --help
 pso doctor
 ```
 
-`pso --help` starts with `PSO CLI (Path Structure Working)`, then `Usage: pso <command> [options]` and the list of implemented commands, followed by the commands that are not implemented yet (they exit with code 2).
+Alternatively run `node path/to/pso-web-framework/packages/cli/bin/pso.js` without linking. A checkout also has `pso-java/`; there `pso java:install` builds and installs its `0.1.0-SNAPSHOT` artifacts, which are distinct from the installed rc.2 artifacts. Rebuild the checkout after source changes, and remove the global link with `npm unlink -g @pso/cli` when finished. [Installed versus development CLI](devops/installed-and-development-cli.md) explains how to identify which `pso` is running.
 
-### What this means
+## Start a workspace
 
-- The global `pso` runs the code of that checkout. If you move or delete it, the command breaks.
-- After you change the framework, rebuild with `npm run build` so the global command sees the change.
-- Generated orchestrators reference `@pso/core` and `@pso/http` by an absolute `file:` path to the checkout until the packages are published.
-- To remove the command: `npm unlink -g @pso/cli`.
-
-## Option 2: run it without linking
-
-```bash
-node path/to/pso-web-framework/packages/cli/bin/pso.js --help
-```
-
-Useful in CI or when you do not want a global command. Replace `pso` by that invocation in every example.
-
-## Option 3: a signed package and the Windows installer
-
-The repository can produce a signed `.psopkg` and an unsigned Windows installer (Inno Setup 6 or 7). These are for distributing a build to another machine, not for developing the framework. They need Node 24 on the target. A private release is encrypted for individual developers: you create your own key first (`pso-recipient init`), the installer checks that it is signed by a key you pinned, and nothing is installed otherwise. All of this is described, with the real output of the steps, in [Signed packages and installation lifecycle](devops/distribution-and-installation.md).
-
-## Java artifacts for Spring services: `pso java:install`
-
-A generated Spring service depends on the PSO Java artifacts (`com.pso:pso-bom` and the starters). They are not on Maven Central, so they must be in your local Maven repository **before** you build or start a Spring service. Do this once per machine (and again after upgrading the framework):
-
-| You installed the CLI from | Command | What it does |
-|---|---|---|
-| a framework checkout (options 1 and 2) | `pso java:install` | builds the artifacts from `pso-java/` with the bundled Maven Wrapper and installs them into `~/.m2` (a few minutes the first time; needs a JDK 21 or newer) |
-| a release package, without the sources | `pso java:install --from <maven-repository-dir>` | copies prebuilt artifacts from the Maven file repository of the release (no build, no sources); a package that ships that repository next to the CLI needs no `--from` |
-
-```bash
-pso java:install
-```
-
-```text evidence="expected"
-installing PSO Java 0.1.0-SNAPSHOT from D:\pso-web-framework\pso-java
-...
-installed com.pso:*:0.1.0-SNAPSHOT into ~/.m2
-```
-
-Verify: `pso create service catalog` no longer prints the note `the PSO Java artifacts ... are not in your local Maven repository yet`, and `./mvnw -o test` in the service resolves `com.pso` offline. Skip this step only if the workspace has no Spring service. Without it Maven fails with `Non-resolvable import POM: com.pso:pso-bom`. Image builds do not use `~/.m2`: `pso docker:init --vendor` copies the artifacts into each service ([Docker](devops/docker.md)).
-
-## Verify the installation with a smoke test
-
-```bash
-pso create workspace smoke-test
-cd smoke-test
+```powershell
+pso create workspace shop
+cd shop
+pso create service catalog
 pso create orchestrator gateway
 pso validate
 ```
 
-Expected output, abridged:
-
-```text evidence="expected"
-registered "gateway" in pso.workspace.json (port 3000)
-gateway: 1 resource(s), digest a78ac8b26230
-OK
-```
-
-`pso validate` ends with `OK` and exit code 0.
-
-## Update
-
-```bash
-cd path/to/pso-web-framework
-git pull          # or however you obtain a new checkout
-npm install
-npm run build
-```
-
-Already generated projects keep working; they are plain files. Regenerating a file never overwrites yours silently (a conflict is reported and you choose `--force`).
-
-## Troubleshooting
-
-| Symptom | Cause and fix |
-|---|---|
-| `pso: command not found` after `npm link` | the npm global bin directory is not on your PATH; run `npm bin -g` (or `npm prefix -g`) and add it, then open a new terminal |
-| `Cannot find module '.../dist/main.js'` | the checkout was not built; run `npm run build` in the repository root |
-| the command runs old behavior | rebuild; the global command runs the compiled `dist` of the checkout |
-| `EACCES` on `npm link` (macOS/Linux) | configure an npm prefix you own, or use Option 2 |
-| generated project: `Cannot find module '@pso/http'` | the checkout moved or `npm install` was not run in the project; fix the `file:` path in its `package.json` and run `npm install` |
-
-## Next steps
-
-- [Requirements](getting-started/requirements.md)
-- [Quick start](getting-started/quick-start.md)
+New projects use the [layered Java service](architecture/java-microservice.md) and [modular TypeScript orchestrator](architecture/typescript-orchestrator.md), with a functional Product CRUD example. Add `--template empty` to a `create service` or `create orchestrator` command for the same structure without the example. Existing 0.1 projects keep their legacy structure; use [Structure compatibility and migration](architecture/structure-migration.md) to plan any change.

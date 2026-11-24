@@ -7,12 +7,12 @@ Publish a built FEI or MEI release to a site root: immutable versioned files, co
 ## Usage
 
 ```text
-pso frontend:publish <project> --site <dir> [--version 1.2.0] [--base-path /commerce/] [--stage] [--json]
+pso frontend:publish <project> --site <dir> | --env <name> [--version 1.2.0] [--base-path /commerce/] [--stage] [--json] | --all --env <name> [--json]
 ```
 
 ## Flags
 
-`--site`, `--version`, `--base-path`, `--stage`, `--json`.
+`--site`, `--env`, `--version`, `--base-path`, `--stage`, `--json`, `--all`.
 
 ## Examples
 

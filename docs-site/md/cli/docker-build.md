@@ -1,28 +1,36 @@
 # pso docker:build
 
-> Build the images with docker compose (requires a running Docker daemon)
+> Build the service images. With pso.infra.json: for the environment's generated topology (Dockerfiles are created when missing, never overwritten; --vendor copies the framework packages into the services). Without it: the 0.1 behaviour (docker-compose.yml from pso docker:init)
 
-Build the images with docker compose (requires a running Docker daemon).
+Build the service images. With pso.infra.json: for the environment's generated topology (Dockerfiles are created when missing, never overwritten; --vendor copies the framework packages into the services). Without it: the 0.1 behaviour (docker-compose.yml from pso docker:init).
 
 ## Usage
 
 ```text
-pso docker:build [--service name] [--json]
+pso docker:build [--env <name>] [--service <name>] [--vendor] [--json]
 ```
 
 ## Flags
 
-`--service`, `--json`.
+`--env`, `--service`, `--vendor`, `--json`.
 
 ## Examples
 
 ```bash
 pso docker:build
+pso docker:build --env local --vendor
+pso docker:build --service catalog
 ```
+
+## What it changes
+
+- With pso.infra.json: creates a Dockerfile only where none exists, vendors the framework packages with `--vendor`, builds the images of the environment's topology. Without it: the 0.1 behaviour with `docker-compose.yml`.
 
 ## Failure cases
 
-- `the Docker daemon is not running`: nothing is built. Start Docker Desktop and retry.
+- `resolve to a path on this machine`: re-run with `--vendor`.
+- `--env and --vendor need pso.infra.json` in a 0.1 workspace that still uses docker-compose.yml.
+- Docker not running: nothing is built.
 
 ## Exit codes
 
@@ -30,4 +38,4 @@ pso docker:build
 
 ## See also
 
-- [devops/docker](devops/docker.md)
+- [infrastructure/containers](infrastructure/containers.md)

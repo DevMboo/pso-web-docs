@@ -3,7 +3,7 @@
 > A complete, tested example - connection, pool, Flyway migration, entity, repository, DTOs, mapper, service with transactions, controller, validation, errors and tests - with real output.
 
 > [!TIP]
-> This page is the reference for the Spring side. To go from an **empty folder** to a running API, with the orchestrator, tokens and every request, follow [Build a CRUD API](tutorials/crud-api.md).
+> This is a tested **hand-built 0.1-layout** example retained for existing projects and for learning each layer. New services generate the functional CRUD in the [official layered structure](architecture/reference-crud.md) by default; use `--template empty` to omit it. To go from an empty folder to a running manual example, follow [Build a CRUD API](tutorials/crud-api.md).
 
 ## What you will build
 

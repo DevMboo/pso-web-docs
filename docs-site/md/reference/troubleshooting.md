@@ -2,6 +2,13 @@
 
 > Diagnose routing, modules, DTO validation, JWT, connectivity, databases, migrations, brokers, telemetry, installation and updates - each with symptoms, causes, diagnostic commands, log lines, the fix, how to verify and how to prevent it.
 
+<!-- pso:structure-note -->
+> [!NOTE]
+> Examples on this page use the 0.1 orchestrator layout (`src/routes/<module>/`, `src/guards/`, `src/contracts/`), which existing
+> projects keep. In the official structure of new projects the same files are in `src/modules/<module>/` (`routes/ROUTES.pso.ts`,
+> `controllers/`, `services/`, `providers/`, `dto/`) and in `src/.app/` (`guards/`, `middlewares/`, `filters/`, `contracts/`); what the
+> page describes works the same way. See [TypeScript orchestrator structure](architecture/typescript-orchestrator.md).
+
 Start at the workspace root with `pso validate`. Then use `pso routes:inspect <route id or path>` for a route, `pso services:health` for running processes, `pso security:check` for policy, `pso config:validate` for configuration and `pso dispatch:validate` for event declarations. They answer different questions; a clean static check cannot prove that an upstream or a broker is reachable.
 
 This page is organised by symptom. When you already have an error code or a log line, go straight to the page that owns it: [Validation errors, one by one](reference/diagnostics-catalog.md) for what `pso validate` prints, [Why the orchestrator refuses to start](reference/startup-failures.md) for start-up refusals, and [Checking Dispatch](dispatch/diagnostics.md) for broker checks and contract errors.

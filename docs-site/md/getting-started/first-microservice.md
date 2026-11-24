@@ -1,6 +1,6 @@
 # First microservice
 
-> Generate a Spring Boot service that is secure from its first request, run its tests, start it, and read what it answers with and without a token.
+> Generate a Spring Boot service in the layered structure with the reference Product CRUD, secure from its first request, run its tests, start it with PostgreSQL, and read what it answers with and without a token.
 
 ## 1. Command
 
@@ -11,64 +11,69 @@ pso create service catalog
 pso validate
 ```
 
-Use `pso create service orders --db postgres` for a service with PostgreSQL and Flyway ([PostgreSQL CRUD](spring/postgresql-crud.md)).
+The service is generated in the [layered structure](architecture/java-microservice.md) with the reference Product CRUD and a declared
+PostgreSQL database. `pso create service orders --template empty` creates the same foundations without the example (add `--db postgres`
+for a database).
 
 ## 2. What was created
 
-Expected output:
+Expected output (abridged: the command prints every file):
 
 ```text evidence="expected"
 $ pso create service catalog
 created    pom.xml
-created    mvnw
-created    mvnw.cmd
-created    .mvn/wrapper/maven-wrapper.properties
 created    lombok.config
 created    src/main/java/com/pso/catalog/Application.java
-created    src/main/java/com/pso/catalog/application/PingService.java
-created    src/main/java/com/pso/catalog/contracts/PingDto.java
-created    src/main/java/com/pso/catalog/contracts/PingRequest.java
-created    src/main/java/com/pso/catalog/routes/PingController.java
+created    src/main/java/com/pso/catalog/application/dto/request/CreateProductRequest.java
+created    src/main/java/com/pso/catalog/application/dto/request/UpdateProductRequest.java
+created    src/main/java/com/pso/catalog/application/dto/response/PageResponse.java
+created    src/main/java/com/pso/catalog/application/dto/response/ProductResponse.java
+created    src/main/java/com/pso/catalog/application/mapper/ProductMapper.java
+created    src/main/java/com/pso/catalog/application/rest/ProductController.java
+created    src/main/java/com/pso/catalog/application/service/ProductService.java
+created    src/main/java/com/pso/catalog/infrastructure/entity/ProductEntity.java
+created    src/main/java/com/pso/catalog/infrastructure/persistence/ProductRepository.java
+created    src/main/java/com/pso/catalog/infrastructure/persistence/ProductSpecifications.java
+created    src/main/java/com/pso/catalog/shared/exception/ConflictException.java
+created    src/main/java/com/pso/catalog/shared/validation/PageRequests.java
 created    src/main/resources/application.yml
-created    src/main/resources/application-{dev,h2,local,prod,staging,test}.yml
+created    src/main/resources/db/migration/V1__create_products.sql
 created    src/test/java/com/pso/catalog/ApplicationTests.java
-created    src/test/java/com/pso/catalog/application/PingServiceTests.java
-created    src/test/java/com/pso/catalog/routes/PingControllerTests.java
+created    src/test/java/com/pso/catalog/DatabaseMigrationTests.java
+created    src/test/java/com/pso/catalog/TestDatabaseConfig.java
+created    src/test/java/com/pso/catalog/application/rest/ProductControllerTests.java
 registered "catalog" in pso.workspace.json (port 8081)
 ```
 
-(The per-profile files are listed as one line here; the command prints each.)
-
 | Path | Purpose |
 |---|---|
-| `pom.xml` | Spring Boot 3.5 parent, the PSO BOM and starters, `java.version` 21 |
+| `pom.xml` | Spring Boot 3.5 parent, the PSO BOM and starters, JPA, Flyway, the PostgreSQL driver, `java.version` 21 |
 | `mvnw`, `mvnw.cmd`, `.mvn/wrapper/` | Maven Wrapper (Maven 3.9.9, checksum pinned): no `mvn` needed |
 | `Application.java` | the Spring Boot entry point |
-| `routes/PingController.java` | an example controller, served under the service prefix |
-| `application/PingService.java` | constructor injection with Lombok |
-| `contracts/` | request and response records |
+| `application/` | `rest/` controllers, `service/` transactional services, `dto/request` and `dto/response` records, `mapper/` |
+| `infrastructure/` | `entity/` JPA entities, `persistence/` repositories and filters |
+| `shared/` | the RFC 9457 exceptions and the page-request validation |
+| `db/migration/V1__create_products.sql` | the table, its constraints and indexes: Flyway owns the schema, Hibernate only validates it |
 | `application.yml`, `application-<profile>.yml` | configuration; no default profile on purpose: choose one (`local`, `dev`, `test`, `staging`, `prod`, `h2`) |
-| `src/test/...` | unit and integration tests with real JWT validation |
+| `src/test/...` | the API tests: real JWT validation and an embedded PostgreSQL with the real migration |
+
+There is no `providers`, `modules` or `.app` directory: those are orchestrator conventions ([why](architecture/overview.md#why-two-conventions)).
 
 ## 3. The generated controller
 
-```java title="catalog/src/main/java/com/pso/catalog/routes/PingController.java" {8-10}
-@RestController
-@RequestMapping("/ping")
-@RequiredArgsConstructor
-public class PingController {
+An excerpt of the generated controller:
 
-    private final PingService service;
-
-    @PostMapping
-    @PreAuthorize("hasAuthority('SCOPE_ping:write')")
-    public PingDto ping(@Valid @RequestBody PingRequest request) {
-        return service.ping(request);
-    }
+```java title="catalog/src/main/java/com/pso/catalog/application/rest/ProductController.java" {1-3}
+@PostMapping
+@PreAuthorize("hasAuthority('SCOPE_products:write')")
+public ResponseEntity<ProductResponse> create(@Valid @RequestBody CreateProductRequest request) {
+    ProductResponse created = service.create(request);
+    URI location = ServletUriComponentsBuilder.fromCurrentRequestUri().path("/{id}").buildAndExpand(created.id()).toUri();
+    return ResponseEntity.created(location).body(created);
 }
 ```
 
-There is no security code in the project: the [security starter](spring/security-and-cors.md) provides a deny-by-default chain. Only the health endpoints are public; every other route needs a valid JWT, and scopes become `SCOPE_*` authorities for `@PreAuthorize`. The controller maps `/ping` and PSO serves it under the [service prefix](spring/service-prefix.md) (`/catalog/ping`). Without `PSO_JWT_*` settings every token is rejected.
+There is no security code in the project: the [security starter](spring/security-and-cors.md) provides a deny-by-default chain. Only the health endpoints are public; every other route needs a valid JWT, and scopes become `SCOPE_*` authorities for `@PreAuthorize`. The controller maps `/products` and PSO serves it under the [service prefix](spring/service-prefix.md) (`/catalog/products`). Without `PSO_JWT_*` settings every token is rejected.
 
 > [!NOTE]
 > The service resolves the PSO Java artifacts (`com.pso:*`) from your local Maven repository. If you have not done it on this machine yet, run `pso java:install` once before the next step ([installation](getting-started/installation.md)); otherwise Maven stops with `Non-resolvable import POM: com.pso:pso-bom`.
@@ -85,50 +90,37 @@ cd catalog
 ./mvnw test
 ```
 
-Expected output of the second run (expected). Here the service also has a `product` resource added by `pso make:resource`:
-
-```text evidence="expected"
-[INFO] Running com.pso.catalog.application.PingServiceTests
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0 -- in com.pso.catalog.application.PingServiceTests
-[INFO] Running com.pso.catalog.ApplicationTests
-[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0 -- in com.pso.catalog.ApplicationTests
-[INFO] Running com.pso.catalog.routes.PingControllerTests
-[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0 -- in com.pso.catalog.routes.PingControllerTests
-[INFO] Running com.pso.catalog.routes.ProductControllerTests
-[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0 -- in com.pso.catalog.routes.ProductControllerTests
-[INFO] Tests run: 16, Failures: 0, Errors: 0, Skipped: 0
-[INFO] BUILD SUCCESS
-```
-
-Without the extra resource a fresh service runs 13 tests (the 16 above minus `ProductControllerTests`). What they prove: health is public, everything else answers `401` without a token, a token with the scope succeeds, a token without it is `403`, an expired token is `401`, invalid bodies are `400` with field errors, and the unprefixed path does not exist.
+A fresh service runs 16 tests and needs neither Docker nor a running database (the tests start an embedded PostgreSQL). What they
+prove: health is public, everything else answers `401` without a token and `403` without the scope; a product is created (`201` with
+`Location`), read, listed with pagination, sorting and filters, replaced and deleted (`204`); invalid bodies and unknown properties are
+`400` with field errors; a duplicate SKU is `409`, also when two requests race; an unknown id is `404`; and the migration produces the
+schema the entities expect.
 
 ## 5. Start it and call it
 
 ```powershell
-cd catalog
-.\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=local"
+pso docker:up
 ```
 
-End of start-up with the local profile (Expected output from a generated service named `orders` that was started on port 18123; yours shows `catalog` and port 8081):
+starts the service with its PostgreSQL database (and the rest of the workspace) in containers. To run it from the IDE or Maven instead,
+point it at a PostgreSQL database with `DB_URL`, `DB_USER` and `DB_PASSWORD`. The `h2` profile does not apply to a service with
+PostgreSQL: its migrations use PostgreSQL features, and it would still try to reach PostgreSQL.
 
-```text evidence="expected"
-2026-11-08T11:21:55.402-03:00  INFO [orders,,] 40436 --- [orders] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 18123 (http) with context path '/'
-2026-11-08T11:21:55.413-03:00  INFO [orders,,] 40436 --- [orders] [           main] com.pso.orders.Application               : Started Application in 2.578 seconds (process running for 2.889)
-```
-
-Without a token the service answers `401` and sets `WWW-Authenticate: Bearer`; the `X-Correlation-ID` header is the id that appears in its logs ([logging](devops/logging.md)). With `PSO_JWT_*` set to your issuer's values and a token carrying `ping:write`:
+Without a token the service answers `401` and sets `WWW-Authenticate: Bearer`; the `X-Correlation-ID` header is the id that appears in its logs ([logging](devops/logging.md)). With a token carrying `products:write`:
 
 ```bash
-curl -i -X POST http://127.0.0.1:8081/catalog/ping -H "authorization: Bearer $TOKEN" -H "content-type: application/json" -d '{"message":"hello"}'
+curl -i -X POST http://127.0.0.1:8081/catalog/products -H "authorization: Bearer $TOKEN" -H "content-type: application/json" -d '{"sku":"KB-100","name":"Keyboard","price":"12.50"}'
 ```
 
-*(expected output: `200` with `{"service":"catalog","message":"hello"}`; the generated test asserts exactly the `service` and `message` members)*
+*(expected: `201` with a `Location` header and the product with its `id`; clients normally call the orchestrator's `/products` instead,
+see [the reference CRUD](architecture/reference-crud.md))*
 
 ## 6. Variations
 
 | You want | Do |
 |---|---|
-| a database | `pso create service orders --db postgres`, or `pso database:enable postgresql --service catalog` |
+| no example | `pso create service orders --template empty` (add `--db postgres` for a database) |
+| another resource | `pso make:crud order --service catalog --orchestrator` ([Generators](architecture/generators.md)) |
 | to run on another port | `pso create service orders --port 8090` |
 | JSON logs | the `prod` and `staging` profiles write structured JSON; see [Logging](devops/logging.md) |
 | messaging | `pso dispatch:install redis --service catalog` ([Dispatch](dispatch/installation.md)) |
@@ -140,7 +132,8 @@ curl -i -X POST http://127.0.0.1:8081/catalog/ping -H "authorization: Bearer $TO
 - Calling the service with `curl` and no token: `401` is correct, not a bug.
 - Putting business routes in `permitAll()`: `pso security:check` flags anything beyond health as a finding.
 - Running without choosing a profile and wondering why the prod-only rules are absent: pick one explicitly.
-- Forgetting that the service prefix is applied by PSO: map `/ping`, not `/catalog/ping`.
+- Forgetting that the service prefix is applied by PSO: map `/products`, not `/catalog/products`.
+- Editing `V1__create_products.sql` after it ran: Flyway refuses to start; add a new migration instead.
 
 ## Troubleshooting
 

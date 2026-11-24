@@ -19,7 +19,13 @@
 | `NODE_ENV`, `PSO_ENV` | environment name; `production` refuses unsafe settings |
 | `PSO_WORKSPACE` | path of `pso.workspace.json` for a service started outside the workspace |
 | `PSO_SERVICE` | name of the service this process is (set by `pso dev`) |
-| `PSO_HOME` | installation root for `setup`, `integrity`, `repair`, `update`, `uninstall` |
+| `PSO_HTTP_TLS_CERT_FILE`, `PSO_HTTP_TLS_KEY_FILE` | 0.2.0: the orchestrator terminates TLS itself with these PEM files (set together; the generated container topology uses them behind the edge) ([security model](infrastructure/security-and-certificates.md)) |
+| `PSO_HTTP_TLS_CLIENT_CA_FILE` | 0.2.0: with inbound TLS, also require a client certificate issued by this authority (mutual TLS) |
+| `PSO_JWT_JWKS_TRUSTED_HOSTS` | a JWKS host that differs from the issuer's host, bound to it explicitly (the generated topology fetches keys from the identity provider's internal name) |
+| `PSO_INFRA_ENV` | the infrastructure environment the `infra:*`, `docker:*` and `dev` commands use when `--env` is absent ([contract](infrastructure/contract.md)) |
+| `PSO_SECRET_<NAME>` | the value of the declared secret `<name>` for an environment whose secret provider is `env` (never written by PSO) |
+| `PSO_HOME` | installation root for `setup`, `integrity`, `repair`, `update`, `uninstall` (when not given, an installed `pso` uses the installation it runs from) |
+| `PSO_LAUNCHED_FROM` | set by the launcher of an installed distribution (`bin/pso-launch.mjs`) to its own installation root; used by the maintenance commands after `--root` and `PSO_HOME`. Not meant to be set by hand |
 | `PSO_RECIPIENT_HOME` | directory of your recipient identity (the key that opens encrypted releases). Default `%LOCALAPPDATA%\PSO\recipient` on Windows, `~/.pso/recipient` elsewhere. It holds your public key, the pinned signer fingerprints and your private key **protected** (Windows DPAPI for your account, or a passphrase); see [Recipient keys](devops/distribution-and-installation.md) |
 | `PSO_RECIPIENT_PASSPHRASE` | the passphrase of a passphrase-protected recipient identity, for non-interactive use (never put it in a file you keep) |
 | `PSO_ORCHESTRATOR_URL` | frontend development: where the dev servers proxy `/api` (default `http://localhost:<orchestrator port of the workspace>`); read by `pso frontend:dev` and the generated rspack configuration; never used by a production build ([frontend](frontend/getting-started.md)) |

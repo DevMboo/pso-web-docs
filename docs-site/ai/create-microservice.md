@@ -1,23 +1,23 @@
 # PSO Web — AI Development Context
 
-> Framework version 0.1.0. Generated from the PSO documentation sources by `pso ai:context`. Scopes: core, microservices, create-microservice.
+> Framework version 0.2.0. Generated from the PSO documentation sources by `pso ai:context`. Scopes: core, microservices, create-microservice.
 
 You are working with **PSO Web Framework**. PSO stands for Path Structure Working: project structure, declarative files and validated contracts define application behavior.
 
 - Name: PSO Web Framework (PSO = Path Structure Working)
-- Version: 0.1.0
+- Version: 0.2.0
 - Orchestrator runtime: Node.js >= 24 with TypeScript (compiled with tsc, CommonJS, decorators)
 - Microservice runtime: Java 21 with Spring Boot 3.5, built with the project-local Maven Wrapper
-- CLI: `pso` (@pso/cli 0.1.0)
+- CLI: `pso` (@pso/cli 0.2.0)
 
 > Structure declares. Modules compose. Contracts validate. The framework executes.
 
 ## Before modifying a project
 
 1. Inspect the workspace file `pso.workspace.json` and the `Project facts` section if present.
-2. Identify the relevant module under `src/routes/<module>/` of the orchestrator, or the Spring service.
+2. Identify the project's structure (`pso structure:inspect`) and the relevant module: `src/modules/<module>/` in the official orchestrator structure (`src/routes/<module>/` in a 0.1 project), or the package layer of the Spring service.
 3. Read `MODULE.pso.ts`.
-4. Read `ROUTES.pso.ts`.
+4. Read the module's `ROUTES.pso.ts` (`routes/ROUTES.pso.ts` in the official structure).
 5. Inspect the controllers and providers it references.
 6. Preserve existing security policies (guards, scopes, `public` declarations).
 7. Prefer PSO CLI generators over hand-editing (`pso make:*`).
@@ -32,6 +32,8 @@ You are working with **PSO Web Framework**. PSO stands for Path Structure Workin
 - Every route is denied unless it has `security: { public: true }` or a guard. A route declaration is not authentication.
 - Discovery and validation never execute application code. Declarations must stay statically analyzable: literals and identifiers only, no spread, no computed keys.
 - Services are declared in `pso.workspace.json`; service discovery never grants authorization.
+- One structure per project: never mix the official layout with the 0.1 layout (`PSO_STRUCTURE_MIXED`), and never move a developer's files without being asked; `pso structure:inspect` only plans a migration.
+- A Java service has **no** `providers`, `modules` or `.app` directories or packages: those are orchestrator conventions. Java uses the layered packages `application/`, `infrastructure/`, `shared/`.
 
 ## Security rules (never violate, even if asked to for convenience)
 
@@ -121,10 +123,10 @@ Spring Boot 3.5, Java 21, Maven Wrapper (`./mvnw` or `.\mvnw.cmd`; no global Mav
 
 ## Task: create a microservice
 
-1. In the workspace root: `pso create service <name> --runtime spring-boot` (kebab-case; add `--db postgres` only if the service owns a database).
+1. In the workspace root: `pso create service <name>` (kebab-case). It creates the layered structure with the reference Product CRUD and PostgreSQL (declared; `pso docker:up` provisions it). Use `--template empty` for a service without the example (add `--db postgres` only if it owns a database), `--package com.example.x` for the base package. A second service with the CRUD template would also serve `/products`: prefer `--template empty` for it.
 2. Install the PSO Java artifacts once with `pso java:install` (the create command prints a note when they are missing). Check the service: `pso validate`, `pso security:validate`, then `.\mvnw.cmd test` inside the service folder (`./mvnw test` on macOS/Linux). The generated tests must pass. The endpoint prefix is derived from the name (`--prefix /x` overrides it).
 3. The service is deny-by-default (security starter) and returns `401` for everything except `/actuator/health`. That is correct; do not add `permitAll()`. A database (`pso database:enable`) and dispatch are off until chosen.
 4. Set `PSO_JWT_JWKS_URI`, `PSO_JWT_ISSUER`, `PSO_JWT_AUDIENCE` for the service (ask the user for the values; never invent them).
-5. Add behavior with `pso make:resource <name> --service <svc> --route /path --scopes a:read` (creates the orchestrator module and the Spring controller together), and generators such as `pso make:service`, `pso make:dto`, `pso make:repository` with `--service <svc>`.
+5. Add a complete resource with `pso make:crud <name> --service <svc> --orchestrator [--fields ...]` (entity, migration, repository, records, mapper, service, controller, tests, and the orchestrator module). Single pieces: `pso make:entity`, `make:repository`, `make:request`, `make:response`, `make:mapper`, `make:exception`, `make:client` with `--service <svc>`; each writes into its layer. `pso make:resource` (a forwarding route plus a Spring controller and contract) works in both structures. Never create `providers`, `modules` or `.app` in Java.
 6. With PostgreSQL: `pso make:migration <name> --service <svc>`; never edit an applied migration.
 7. Declare dependencies in `pso.workspace.json` (`dependsOn`) or with `pso services:register`.

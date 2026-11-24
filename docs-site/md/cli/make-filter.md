@@ -1,8 +1,8 @@
 # pso make:filter
 
-> Generate an error filter in src/filters/ (orchestrator). It runs only for the routes that name it in ROUTES.pso.ts
+> Generate an error filter. Orchestrator: src/.app/filters/ (0.1: src/filters/), run for the routes that name it; Spring (layered): a servlet filter in infrastructure/filter
 
-Generate an error filter in src/filters/ (orchestrator). It runs only for the routes that name it in ROUTES.pso.ts.
+Generate an error filter. Orchestrator: src/.app/filters/ (0.1: src/filters/), run for the routes that name it; Spring (layered): a servlet filter in infrastructure/filter.
 
 ## Usage
 

@@ -1,8 +1,8 @@
 # pso make:middleware
 
-> Generate a middleware in src/middlewares/ (orchestrator). It runs only for the routes that name it in ROUTES.pso.ts
+> Generate a middleware in src/.app/middlewares/ (orchestrator; 0.1: src/middlewares/). It runs only for the routes that name it in ROUTES.pso.ts
 
-Generate a middleware in src/middlewares/ (orchestrator). It runs only for the routes that name it in ROUTES.pso.ts.
+Generate a middleware in src/.app/middlewares/ (orchestrator; 0.1: src/middlewares/). It runs only for the routes that name it in ROUTES.pso.ts.
 
 ## Usage
 

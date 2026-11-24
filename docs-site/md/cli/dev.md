@@ -1,13 +1,13 @@
 # pso dev
 
-> Validate, start, monitor and gracefully stop all workspace services (Ctrl+C stops)
+> Validate, start, monitor and gracefully stop the workspace (Ctrl+C stops). Local processes by default; --docker runs the environment's containers instead. --service starts one service (and with --with-dependencies what it depends on: other services, its database and the identity provider), --fei also starts that frontend's development servers
 
-Validate, start, monitor and gracefully stop all workspace services (Ctrl+C stops).
+Validate, start, monitor and gracefully stop the workspace (Ctrl+C stops). Local processes by default; --docker runs the environment's containers instead. --service starts one service (and with --with-dependencies what it depends on: other services, its database and the identity provider), --fei also starts that frontend's development servers.
 
 ## Usage
 
 ```text
-pso dev [--only a,b] [--install] [--timeout 120] [--smoke]
+pso dev [--only a,b] [--service <name>] [--with-dependencies] [--fei <name>] [--docker] [--env <name>] [--install] [--timeout 120] [--smoke]
 ```
 
 ## Flags
@@ -15,6 +15,11 @@ pso dev [--only a,b] [--install] [--timeout 120] [--smoke]
 | Flag | What it does |
 |---|---|
 | `--only` | Start only the comma-separated service names. |
+| `--service` | See the usage line and the task guide for this option. |
+| `--with-dependencies` | See the usage line and the task guide for this option. |
+| `--fei` | See the usage line and the task guide for this option. |
+| `--docker` | See the usage line and the task guide for this option. |
+| `--env` | See the usage line and the task guide for this option. |
 | `--install` | Install missing Node dependencies before starting. |
 | `--timeout` | Set the readiness wait in seconds. |
 | `--smoke` | Start, check readiness and stop for a bounded smoke run. |
@@ -25,6 +30,9 @@ pso dev [--only a,b] [--install] [--timeout 120] [--smoke]
 pso dev
 pso dev --only gateway --install
 pso dev --smoke --timeout 60
+pso dev --service catalog --with-dependencies
+pso dev --docker --env local
+pso dev --service gateway --with-dependencies --fei shop
 ```
 
 ## What it changes

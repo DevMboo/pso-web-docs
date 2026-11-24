@@ -7,12 +7,12 @@ Generate a dto (orchestrator: inside a module; Spring: hexagonal layout).
 ## Usage
 
 ```text
-pso make:dto <module> <name> [--fields "name:string:min=3,email:email,age?:integer:min=18,document:file:mime=application/pdf:size=10MB"] [--service <orchestrator>] [--dry-run] [--json] (Spring: pso make:dto <name> --service <svc> [--dry-run] [--force] [--json])
+pso make:dto <module> <name> [--response] [--fields "name:string:min=3,email:email,age?:integer:min=18,document:file:mime=application/pdf:size=10MB"] [--service <orchestrator>] [--dry-run] [--json] (Spring: pso make:dto <name> --service <svc> [--dry-run] [--force] [--json])
 ```
 
 ## Flags
 
-`--fields`, `--service`, `--dry-run`, `--json`, `--force`.
+`--response`, `--fields`, `--service`, `--dry-run`, `--json`, `--force`.
 
 ## Examples
 

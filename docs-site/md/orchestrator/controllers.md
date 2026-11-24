@@ -2,6 +2,13 @@
 
 > Decorated classes that implement endpoints - the decorators, what an action may return or throw, the real answers for each case, and how a controller relates to the registry and to services.
 
+<!-- pso:structure-note -->
+> [!NOTE]
+> Examples on this page use the 0.1 orchestrator layout (`src/routes/<module>/`, `src/guards/`, `src/contracts/`), which existing
+> projects keep. In the official structure of new projects the same files are in `src/modules/<module>/` (`routes/ROUTES.pso.ts`,
+> `controllers/`, `services/`, `providers/`, `dto/`) and in `src/.app/` (`guards/`, `middlewares/`, `filters/`, `contracts/`); what the
+> page describes works the same way. See [TypeScript orchestrator structure](architecture/typescript-orchestrator.md).
+
 ```ts
 // users/users.controller.ts
 import { Controller, RestController, Get, Post, Delete, Param, Body } from "@pso/http";

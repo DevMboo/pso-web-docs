@@ -1,18 +1,18 @@
 # pso frontend:dev
 
-> Start the development servers: the FEI and every registered MEI (ports from their declarations), or one MEI alone with the development host adapter (--standalone)
+> Start the development servers: every FEI and its registered MEIs (ports from their declarations), one FEI with its MEIs (--fei), or one MEI alone with the development host adapter (--standalone)
 
-Start the development servers: the FEI and every registered MEI (ports from their declarations), or one MEI alone with the development host adapter (--standalone).
+Start the development servers: every FEI and its registered MEIs (ports from their declarations), one FEI with its MEIs (--fei), or one MEI alone with the development host adapter (--standalone).
 
 ## Usage
 
 ```text
-pso frontend:dev [--standalone <mei>] [--only <project>] [--no-install-check]
+pso frontend:dev [--fei <name>] [--standalone <mei>] [--only <project>] [--no-install-check]
 ```
 
 ## Flags
 
-`--standalone`, `--only`, `--no-install-check`.
+`--fei`, `--standalone`, `--only`, `--no-install-check`.
 
 ## Examples
 

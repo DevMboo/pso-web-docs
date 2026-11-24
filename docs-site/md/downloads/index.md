@@ -1,6 +1,6 @@
 # Downloads
 
-> PSO Web installer availability, Windows requirements, recipient enrollment and release verification.
+> Current PSO Web distribution status, the available private portable preview, verification and Windows installation limits.
 
 > Status: PARTIALLY implemented — read the limitations.
 
@@ -8,59 +8,41 @@
 
 **One ecosystem. Independent teams. Unified architecture.**
 
-**Build independently. Integrate seamlessly. Operate securely.**
-
 > [!NOTE]
-> **Private evaluation pre-release — security assessment incomplete.** The installer is available only to GitHub users with access to the private release repository. This publication is not final security approval or unrestricted distribution approval.
+> **The current installed distribution is `0.2.0-rc.2`.** This documentation describes its implemented framework. Its portable candidate exists on the development machine but has not been published in the private releases repository. Documentation deployment does not authorize a software release.
 
-## PSO Installer — Windows x64
+## Available private preview
+
+The latest published private download is the earlier **`0.1.0-alpha.2` portable ZIP**. It is for evaluation, not the current `0.2.0-rc.2` framework. The older `0.1.0-alpha.1` installer is encrypted for one validation recipient and should not be used as the general installation path.
 
 | Release detail | Value |
 | --- | --- |
-| Version | `0.1.0-alpha.1` |
+| Published asset | `PSO-Web-0.1.0-alpha.2-win-x64-portable.zip` |
 | Platform | Windows 10/11 x64 |
-| Installer size | 8.8 MB (8,801,368 bytes) |
-| Runtime requirement | Node.js 24 or newer on `PATH` |
-| Distribution | Encrypted private evaluation |
-| Security assessment | Incomplete |
-| Authenticode | Not signed |
+| ZIP size | 50.2 MB (50,196,310 bytes) |
+| Node.js requirement | Bundled private runtime; no system Node.js installation |
+| Access | GitHub sign-in and access to `DevMboo/pso-web-releases` |
+| Security | Unsigned developer alpha; no independent publisher authentication |
 
-:::download-button url="https://github.com/DevMboo/pso-web-releases/releases/download/v0.1.0-alpha.1/PSO-Web-0.1.0-alpha.1-win-x64.exe" label="Download PSO Web — Windows x64"
+:::download-button url="https://github.com/DevMboo/pso-web-releases/releases/download/v0.1.0-alpha.2/PSO-Web-0.1.0-alpha.2-win-x64-portable.zip" label="Download PSO Web — Windows x64 portable (alpha.2)"
 
-The [PSO Web 0.1.0 Alpha 1 private release page](https://github.com/DevMboo/pso-web-releases/releases/tag/v0.1.0-alpha.1) provides checksums, signature verification materials, installation instructions and release notes. You must sign in to GitHub **and** have access to `DevMboo/pso-web-releases` to view or download its assets. The public documentation does not proxy the private file or contain GitHub credentials.
+See the [private alpha.2 release page](https://github.com/DevMboo/pso-web-releases/releases/tag/v0.1.0-alpha.2) for `PORTABLE.md`, checksums, the detached signature, SBOMs and notices. The public website does not proxy private assets or contain GitHub credentials.
 
-**Downloading does not authorize installation.** This candidate is encrypted for the existing validation recipient only. It installs for the same Windows user who enrolled as that recipient; administrator rights are not required. Other developers must complete recipient enrollment and receive a future installer encrypted for their public keys. Spring Boot projects additionally need JDK 21 or newer and Maven prerequisites described in [Installation](getting-started/installation.md).
+## Verify before use
 
-## Recipient enrollment
-
-When invited to the preview, obtain the official `pso-recipient.mjs` utility and release instructions from the private release or maintainer. On your own Windows account, run:
+Download `SHA256SUMS`, `SHA256SUMS.sig` and `release-signing-key.public.pem` from the same release. For alpha.2, the ZIP must have SHA-256 `094b4cd555fd837d46688d45f82b9805b8c8c73667c6f63dc172f4f9c4c45dbe`:
 
 ```powershell
-node pso-recipient.mjs init --label "Your Name"
-```
-
-Send **only** the generated `.enrollment.json` public enrollment file to the maintainer. Keep the private key on your machine. Confirm your public-key fingerprint with the maintainer through a separate channel. The maintainer must create a new installer encrypted for your key; an existing candidate cannot authorize you after it was built. The [installation lifecycle guide](devops/distribution-and-installation.md) explains the authorization model.
-
-## Verify the release before installation
-
-Obtain the installer, `SHA256SUMS`, `SHA256SUMS.sig`, `release-signing-key.public.pem`, and `release-manifest.json` from the private release. Confirm the signing-key fingerprint through a channel separate from the downloaded files. Do not treat a fingerprint inside the same download as independent trust.
-
-In PowerShell, compare the installer's SHA-256 with its entry in `SHA256SUMS`:
-
-```powershell
-Get-FileHash .\PSO-Web-0.1.0-alpha.1-win-x64.exe -Algorithm SHA256
+Get-FileHash .\PSO-Web-0.1.0-alpha.2-win-x64-portable.zip -Algorithm SHA256
 Get-Content .\SHA256SUMS
 ```
 
-The expected installer SHA-256 is `fc273f6e216c0f4b901c8eec4c28a2db20341bc5f095fd0dc4560e2638523ca2`. Verify the detached Ed25519 signature using a trusted verification utility and the independently confirmed public key. Pin that signer with `node pso-recipient.mjs pin-signer --fingerprint <confirmed-fingerprint>` before installation. If a checksum, signature, or fingerprint differs, stop and contact the maintainer. This candidate is not Authenticode-signed, so Windows may show an unknown publisher warning or an application-control policy may block it; do not bypass organizational policy.
+The Ed25519 signature proves integrity relative to the included key. Because that key travels with the release, it does **not** independently establish the publisher's identity. Confirm a trusted fingerprint through another channel before using it as an identity claim. Stop if a checksum or signature differs.
 
-## Install, update and repair
+## Current release candidate and installation limits
 
-Only the existing validation recipient may install this candidate after the maintainer confirms that identity and local policy permits it. Other recipients must wait for a future installer built for their public keys. Run an authorized installer as the enrolled Windows user, then check the CLI and installed files:
+The local `0.2.0-rc.2` candidate is a portable Windows x64 ZIP with a bundled Node.js runtime and matching Java artifacts. Its recorded ZIP SHA-256 is `8210ec436748354c424e760d54dbbe1b9dac80347aa9b6a5b30e2fe40ac0c62c`; this is verification information, **not a download link or publication notice**. Only obtain it through an authorized distribution channel with its matching release materials.
 
-```powershell
-pso doctor
-pso integrity check --full --root C:\Tools\pso
-```
+For a supplied portable ZIP, follow [Installation](getting-started/installation.md): verify its checksum, extract into a writable folder, run `pso.cmd` from that folder, and optionally add its `bin` directory to your user PATH. It does not install an application or change the system Node.js. Use `pso integrity check --full`, `pso update install --package <file.psopkg>` and `pso update rollback` for maintenance. Spring services additionally need JDK 21 or newer and the matching `com.pso` Java artifacts.
 
-Use `pso repair --root C:\Tools\pso` to restore damaged files from the authenticated package. Use `pso update check`, `pso update install`, and `pso update rollback` as documented in [Signed packages and installation lifecycle](devops/distribution-and-installation.md). These commands require an installed, authorized release; they are not a way to obtain the preview before approval.
+The Windows installer remains **unsigned and unvalidated end to end**, so it is not a supported installation method. Do not disable or bypass Smart App Control, SmartScreen, Defender or organizational policy. See [Release integrity and signing](infrastructure/release-integrity-and-signing.md).

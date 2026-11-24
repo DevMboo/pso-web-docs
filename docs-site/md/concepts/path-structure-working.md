@@ -2,6 +2,13 @@
 
 > The central idea - where a file lives and what it is called defines what it does - with a walkthrough from a file name to a running endpoint, and the limits of the approach.
 
+<!-- pso:structure-note -->
+> [!NOTE]
+> Examples on this page use the 0.1 orchestrator layout (`src/routes/<module>/`, `src/guards/`, `src/contracts/`), which existing
+> projects keep. In the official structure of new projects the same files are in `src/modules/<module>/` (`routes/ROUTES.pso.ts`,
+> `controllers/`, `services/`, `providers/`, `dto/`) and in `src/.app/` (`guards/`, `middlewares/`, `filters/`, `contracts/`); what the
+> page describes works the same way. See [TypeScript orchestrator structure](architecture/typescript-orchestrator.md).
+
 In PSO the **path** of a file and its **name** are part of the program. `src/routes/users/MODULE.pso.ts` is a module because of where it is and what it is called, not because some other file registered it.
 
 | Level | What the structure says |

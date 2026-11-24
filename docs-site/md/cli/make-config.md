@@ -1,8 +1,8 @@
 # pso make:config
 
-> Generate a configuration artifact. Orchestrator: a plain module in src/configs/ that is used by importing it; Spring: a @Configuration class found by Spring's component scan
+> Generate a configuration artifact. Orchestrator: a plain module in src/.app/configs/ (0.1: src/configs/) used by importing it; Spring: a @Configuration class (layered: infrastructure/config)
 
-Generate a configuration artifact. Orchestrator: a plain module in src/configs/ that is used by importing it; Spring: a @Configuration class found by Spring's component scan.
+Generate a configuration artifact. Orchestrator: a plain module in src/.app/configs/ (0.1: src/configs/) used by importing it; Spring: a @Configuration class (layered: infrastructure/config).
 
 ## Usage
 

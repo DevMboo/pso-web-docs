@@ -54,6 +54,11 @@ Contract targets unknown service "…"
 Contract version "…" is not semver
 
 
+### PSO_CRUD_UNBOUND
+
+Module "…" is bound to the service "…", which this workspace does not declare yet: its routes answer 502 (upstream not configured) until it exists.
+
+
 ### PSO_CYCLE
 
 Circular service dependency: …
@@ -91,12 +96,12 @@ Duplicate service "…"
 
 ### PSO_FEI_ORCHESTRATOR_MISSING
 
-the FEI talks to orchestrator "…" but this workspace has none
+… talks to orchestrator "…" but this workspace has none
 
 
 ### PSO_FEI_ORCHESTRATOR_UNKNOWN
 
-… names orchestrator "…" but the workspace's orchestrator is "…"
+…: … names orchestrator "…" but the workspace's orchestrator is "…"
 
 
 ### PSO_FRONTEND_CONTRACT_STALE
@@ -136,7 +141,7 @@ PSO_JWT_AUDIENCE
 
 ### PSO_MISPLACED_RESOURCE
 
-… "…" must live in ${spec.exact ? 
+… "…" must live in ${owners.map((o) => 
 
 
 ### PSO_MISSING_DEPENDENCY

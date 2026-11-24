@@ -2,6 +2,13 @@
 
 > Where to add resource kinds, commands, guards, checks and documentation pages - with a worked example of a new command and the tests that will tell you what you forgot.
 
+<!-- pso:structure-note -->
+> [!NOTE]
+> Examples on this page use the 0.1 orchestrator layout (`src/routes/<module>/`, `src/guards/`, `src/contracts/`), which existing
+> projects keep. In the official structure of new projects the same files are in `src/modules/<module>/` (`routes/ROUTES.pso.ts`,
+> `controllers/`, `services/`, `providers/`, `dto/`) and in `src/.app/` (`guards/`, `middlewares/`, `filters/`, `contracts/`); what the
+> page describes works the same way. See [TypeScript orchestrator structure](architecture/typescript-orchestrator.md).
+
 This page is for people changing the framework itself. Application code extends PSO through guards, middleware, filters, providers and DTO validators ([guards](orchestrator/guards.md), [middleware and filters](orchestrator/middleware-and-filters.md), [DTO validation](orchestrator/dto-validation.md)); those need no framework change.
 
 - **New resource kinds:** add a `KindSpec` to `packages/core/src/conventions.ts`; discovery, validation and manifests pick it up.

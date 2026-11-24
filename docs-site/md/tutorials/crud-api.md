@@ -4,6 +4,11 @@
 
 By the end of this page you will have a **products API** running on your machine: a Spring Boot service that stores products in PostgreSQL, behind a PSO orchestrator that checks who is calling. You will create, list, read, update and delete products, look at the rows in the database after each step, and provoke every common error on purpose.
 
+> [!NOTE]
+> This tutorial builds the CRUD **by hand, piece by piece**, in the 0.1 layout (`--structure legacy --template empty`), to show what each
+> file does. New projects get a complete CRUD generated in the official structure: `pso create service` and `pso create orchestrator`
+> ([the reference CRUD](architecture/reference-crud.md)), or `pso make:crud` for another resource.
+
 Everything here was run, in this order, on an empty folder. Output marked **Verified output** is copied from that run. Where a block is not from the run, it says so.
 
 ## What you will build
@@ -76,7 +81,7 @@ The workspace file is the map of your platform: every service, its runtime, port
 ## 2. Create the Spring Boot service with PostgreSQL
 
 ```bash
-pso create service catalog --db postgres --port 8081
+pso create service catalog --structure legacy --template empty --db postgres --port 8081
 ```
 
 ```text evidence="verified"
@@ -141,7 +146,7 @@ An existing service can adopt PostgreSQL later with `pso database:enable postgre
 ## 3. Create the orchestrator
 
 ```bash
-pso create orchestrator gateway
+pso create orchestrator gateway --structure legacy --template empty
 ```
 
 ```text evidence="verified"

@@ -17,30 +17,30 @@ pso routes:list
 ## 2. What was created
 
 ```text evidence="expected"
-gateway/src/routes/customer/MODULE.pso.ts       composition
-gateway/src/routes/customer/ROUTES.pso.ts       the declaration
-gateway/src/routes/customer/customer.controller.ts
-gateway/src/contracts/customer.contract.json    versioned contract
-catalog/src/main/java/com/pso/catalog/routes/CustomerController.java
-catalog/src/main/java/com/pso/catalog/contracts/CustomerDto.java
-catalog/src/main/resources/contracts/customer.contract.json   mirror of the contract
-catalog/src/test/java/com/pso/catalog/routes/CustomerControllerTests.java
-docs/api/customer.md
-```
+$ pso make:resource customer --service catalog --route /customers --scopes customers:read
+created    gateway/src/.app/contracts/customer.contract.json
+created    catalog/src/main/java/com/pso/catalog/application/dto/response/CustomerResponse.java
+created    catalog/src/main/java/com/pso/catalog/application/rest/CustomerController.java
+created    catalog/src/main/resources/contracts/customer.contract.json
+created    catalog/src/test/java/com/pso/catalog/application/rest/CustomerControllerTests.java
+created    docs/api/customer.md
+created    gateway/src/modules/customer/MODULE.pso.ts
+created    gateway/src/modules/customer/controllers/customer.controller.ts
+created    gateway/src/modules/customer/routes/ROUTES.pso.ts
 
-Then:
-
-```text evidence="expected"
 $ pso routes:list
-GET     /customers               customer.findAll       -> catalog        guard:jwt
+GET     /customers               customer.findAll        -> catalog        guard:jwt
 ```
-*(the same command for a `product` resource was captured as `GET /products product.findAll -> catalog guard:jwt`)*
+
+`routes:list` also shows the six routes of the reference `products` module the two projects were created with. `make:resource` is the
+smallest way to expose a service endpoint: a **forwarding** route, a Spring controller and a mirrored contract (both copies are
+checked for drift). For a complete, database-backed resource use `pso make:crud` ([Generators](architecture/generators.md)).
 
 ## 3. The generated code
 
-```typescript title="gateway/src/routes/customer/ROUTES.pso.ts"
+```typescript title="gateway/src/modules/customer/routes/ROUTES.pso.ts"
 import { defineRoutes } from "@pso/http";
-import { CustomerController } from "./customer.controller";
+import { CustomerController } from "../controllers/customer.controller";
 
 export default defineRoutes({
   routes: [
@@ -56,7 +56,7 @@ export default defineRoutes({
 });
 ```
 
-```typescript title="gateway/src/routes/customer/customer.controller.ts"
+```typescript title="gateway/src/modules/customer/controllers/customer.controller.ts"
 import { Controller, RestController, Get, Req, Res, Upstream } from "@pso/http";
 import { IncomingMessage, ServerResponse } from "node:http";
 
@@ -72,14 +72,14 @@ export class CustomerController {
 }
 ```
 
-```java title="catalog/.../routes/CustomerController.java"
+```java title="catalog/.../application/rest/CustomerController.java"
 @RestController
 @RequestMapping("/customers")
 public class CustomerController {
 
     @PreAuthorize("hasAuthority('SCOPE_customers:read')")
     @GetMapping
-    public List<CustomerDto> list() {
+    public List<CustomerResponse> list() {
         return List.of();
     }
 }

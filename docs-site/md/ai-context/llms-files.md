@@ -18,7 +18,9 @@ Every documentation build writes these files from the **same sources** as the HT
 | [ai/manifest.json](../../ai/manifest.json) | version, scopes and SHA-256 of each AI file |
 | `md/<page-id>.md` | every page as plain Markdown, with facts and examples expanded |
 
-All of them carry the framework version (0.1.0). They contain no credentials, keys or environment-specific values: the build never reads `.env` files or key material.
+All of them carry the framework version (0.2.0). They contain no credentials, keys or environment-specific values: the build never reads `.env` files or key material.
+
+The installed `0.2.0-rc.2` distribution reports the CLI/API version `0.2.0`; use the accompanying release label when matching an installed binary to these files. The current contexts describe the [official application structures](architecture/overview.md), [generator destinations](architecture/generators.md), [infrastructure engine](infrastructure/overview.md) and [migration path](reference/migration.md). Regenerate `pso ai:init` files after changing the installed CLI so an older repository instruction file does not override these conventions.
 
 Generate your own copy of the site:
 

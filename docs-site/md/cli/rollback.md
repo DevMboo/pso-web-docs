@@ -1,18 +1,18 @@
 # pso rollback
 
-> Re-activate the previous release of a native deployment
+> Re-activate the previous release of a native deployment, or (--env) of an environment deployed to Docker
 
-Re-activate the previous release of a native deployment.
+Re-activate the previous release of a native deployment, or (--env) of an environment deployed to Docker.
 
 ## Usage
 
 ```text
-pso rollback --dir <path> --yes [--json]
+pso rollback --dir <path> --yes [--json] | --env <name> [--to <release>] --yes [--json]
 ```
 
 ## Flags
 
-`--dir`, `--yes`, `--json`.
+`--dir`, `--yes`, `--json`, `--env`, `--to`.
 
 ## Examples
 

@@ -1,18 +1,18 @@
 # pso make:mapper
 
-> Generate a mapper component (Spring, hexagonal layout: adapters/)
+> Generate a mapper. Orchestrator (modular): a mapping function in modules/<module>/mappers/; Spring: a mapper component (layered: application/mapper)
 
-Generate a mapper component (Spring, hexagonal layout: adapters/).
+Generate a mapper. Orchestrator (modular): a mapping function in modules/<module>/mappers/; Spring: a mapper component (layered: application/mapper).
 
 ## Usage
 
 ```text
-pso make:mapper <name> [--service <name>] [--dry-run] [--force] [--json]
+pso make:mapper <module> <name> [--service <orchestrator>] [--dry-run] [--json] (Spring: pso make:mapper <name> --service <svc> [--dry-run] [--force] [--json])
 ```
 
 ## Flags
 
-`--service`, `--dry-run`, `--force`, `--json`.
+`--service`, `--dry-run`, `--json`, `--force`.
 
 ## Examples
 

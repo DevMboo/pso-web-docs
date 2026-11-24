@@ -7,12 +7,12 @@ Return one MEI to its previous (or a chosen) published release, after the same c
 ## Usage
 
 ```text
-pso frontend:rollback <mei> --site <dir> [--to 1.1.0] [--json]
+pso frontend:rollback <mei> --site <dir> | --env <name> [--to 1.1.0] [--json]
 ```
 
 ## Flags
 
-`--site`, `--to`, `--json`.
+`--site`, `--env`, `--to`, `--json`.
 
 ## Examples
 

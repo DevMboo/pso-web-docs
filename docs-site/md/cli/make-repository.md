@@ -1,8 +1,8 @@
 # pso make:repository
 
-> Generate a repository interface (Spring: persistence/). It does not enable a database: see `pso database:enable`
+> Generate a Spring Data repository (layered: infrastructure/persistence, for an existing entity; 0.1: persistence/). It does not enable a database: see `pso database:enable`
 
-Generate a repository interface (Spring: persistence/). It does not enable a database: see `pso database:enable`.
+Generate a Spring Data repository (layered: infrastructure/persistence, for an existing entity; 0.1: persistence/). It does not enable a database: see `pso database:enable`.
 
 ## Usage
 

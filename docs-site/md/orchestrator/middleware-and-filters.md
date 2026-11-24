@@ -2,6 +2,13 @@
 
 > Named per-route middleware that runs after the guards and exception filters that turn errors into answers - generated, wired, run and verified end to end.
 
+<!-- pso:structure-note -->
+> [!NOTE]
+> Examples on this page use the 0.1 orchestrator layout (`src/routes/<module>/`, `src/guards/`, `src/contracts/`), which existing
+> projects keep. In the official structure of new projects the same files are in `src/modules/<module>/` (`routes/ROUTES.pso.ts`,
+> `controllers/`, `services/`, `providers/`, `dto/`) and in `src/.app/` (`guards/`, `middlewares/`, `filters/`, `contracts/`); what the
+> page describes works the same way. See [TypeScript orchestrator structure](architecture/typescript-orchestrator.md).
+
 Both are **named** files that a route opts into. Nothing runs globally from `main.ts` ([why](decisions/why-minimal-bootstrap.md)). The examples on this page are run by the framework's test suite (`docs-middleware.test.ts`): the behavior described here is verified, not assumed.
 
 ## Middleware

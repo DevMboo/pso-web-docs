@@ -18,6 +18,14 @@
 - `pso.workspace.json` declares each service: `name`, `path`, `runtime` (`node` | `spring-boot`), `role` (`orchestrator` | `service`), `port`, `dependsOn`, `health`, optional `db`, optional `dev.command`.
 - The orchestrator forwards guarded requests to services with a verified bearer token; services validate it again.
 
+## Application structure (official, 0.2)
+
+- Orchestrator: `src/.app/{configs,contracts,filters,guards,middlewares,interceptors,decorators}` for application-wide components; `src/modules/<module>/` with `MODULE.pso.ts`, `routes/ROUTES.pso.ts`, `controllers/`, `services/`, `providers/`, `contracts/`, `dto/request|response/`, `mappers/`; `src/shared/`; `src/main.ts` (bootstrap only). `tsconfig.json` must include `"src/.app/**/*"` (TypeScript skips dot-directories).
+- Spring service (layered): `application/{rest,service,dto/request,dto/response,mapper}`, `infrastructure/{entity,persistence,config,security,filter,client}`, `shared/{exception,validation,constant}`; Flyway migrations in `src/main/resources/db/migration`; Hibernate `ddl-auto: validate`, never `update`. No providers, modules or `.app` in Java.
+- `.infra/` (workspace) is operational infrastructure PSO generates and reconciles: never put application code there, never edit it by hand.
+- New projects include a reference Product CRUD (`--template empty` omits it); the orchestrator's CRUD module is bound to the service that serves its path (`PRODUCT_SERVICE` + `metadata.services`), rebind with `pso crud:bind`.
+- 0.1 projects (`src/routes/<module>/`, `routes/`, `ports/`, `adapters/` in Java) keep working; never mix the two in one project.
+
 ## Discovery, manifest, lifecycle
 
 - Files are classified by suffix and directory in byte-wise sorted order. Kinds are listed in the orchestrator and microservice conventions.

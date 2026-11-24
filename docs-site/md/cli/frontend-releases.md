@@ -7,12 +7,12 @@ Show the published versions of each MEI and of the FEI on a site root: which is 
 ## Usage
 
 ```text
-pso frontend:releases [<mei>] --site <dir> [--json]
+pso frontend:releases [<mei>] --site <dir> | --env <name> [--json]
 ```
 
 ## Flags
 
-`--site`, `--json`.
+`--site`, `--env`, `--json`.
 
 ## Examples
 

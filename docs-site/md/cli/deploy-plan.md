@@ -1,18 +1,18 @@
 # pso deploy:plan
 
-> Show exactly what a deployment would change, without changing anything
+> Show exactly what a deployment would change, without changing anything (--env: the 0.2 environment deployment of pso.infra.json)
 
-Show exactly what a deployment would change, without changing anything.
+Show exactly what a deployment would change, without changing anything (--env: the 0.2 environment deployment of pso.infra.json).
 
 ## Usage
 
 ```text
-pso deploy:plan --target native --dir <path> [--release 1.0.0] [--health-url url] [--allow-snapshot] [--json] | --target compose [--json]
+pso deploy:plan --target native --dir <path> [--release 1.0.0] [--health-url url] [--allow-snapshot] [--json] | --target compose [--json] | --env <name> [--json]
 ```
 
 ## Flags
 
-`--target`, `--dir`, `--release`, `--health-url`, `--allow-snapshot`, `--json`.
+`--target`, `--dir`, `--release`, `--health-url`, `--allow-snapshot`, `--json`, `--env`.
 
 ## Examples
 

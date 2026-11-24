@@ -2,6 +2,13 @@
 
 > How MODULE.pso.ts, ROUTES.pso.ts and controllers compose one HTTP module, how modules share providers, and the one invariant the framework enforces.
 
+<!-- pso:structure-note -->
+> [!NOTE]
+> Examples on this page use the 0.1 orchestrator layout (`src/routes/<module>/`, `src/guards/`, `src/contracts/`), which existing
+> projects keep. In the official structure of new projects the same files are in `src/modules/<module>/` (`routes/ROUTES.pso.ts`,
+> `controllers/`, `services/`, `providers/`, `dto/`) and in `src/.app/` (`guards/`, `middlewares/`, `filters/`, `contracts/`); what the
+> page describes works the same way. See [TypeScript orchestrator structure](architecture/typescript-orchestrator.md).
+
 A module is a directory under `src/routes/` with three kinds of file. None is enough alone. Think of the directory as a boundary: composition says what belongs together, the route registry says what callers may reach, and the controller performs the work.
 
 | File | Role | Question it answers |

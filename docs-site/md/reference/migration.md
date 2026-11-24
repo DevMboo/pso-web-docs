@@ -11,11 +11,13 @@ Only the current documentation version is published; `docs/versions.json` lists 
 ## An upgrade procedure
 
 1. **Commit** your current state so the upgrade is a reviewable diff.
-2. Update the framework checkout, `npm install`, `npm run build` ([installation](getting-started/installation.md)), and `pso java:install` if you use Spring services.
+2. Update an authorized portable installation with a matching, trusted `.psopkg` (`pso update install --package <file.psopkg>`), or update and rebuild an authorized framework checkout. Run `pso java:install` after changing releases if you use Spring services ([installation](getting-started/installation.md)); the installed rc.2 CLI uses `com.pso:*:0.2.0-rc.2`, while this source checkout builds its own `0.1.0-SNAPSHOT` artifacts.
 3. `pso validate` and `pso config:validate`: new rules show up as diagnostics, not as run-time surprises.
 4. Preview changes to generated files with the generators' `--dry-run`, e.g. `pso docker:init --dry-run`. A differing file is reported as a conflict and never overwritten silently.
 5. Apply what you want by hand or with `--force` for files you never edited; review the diff.
 6. Run `pso test` and your own checks, then a short smoke run (`pso dev --smoke`).
+
+An installed distribution keeps its previous verified package for `pso update rollback`. Rolling back the CLI does not automatically undo workspace migrations: back up or commit each workspace before `pso workspace:migrate --apply`, and use [structure:inspect](architecture/structure-migration.md) before manually moving application files. The unsigned rc.2 installer is not an upgrade path.
 
 ## What changed that generated projects may want to adopt
 
@@ -33,6 +35,18 @@ Nothing below changes the behavior of existing code without you opting in, excep
 | Ports | `pso create service --port <n>` | optional |
 | Configuration | `logging.level` is a schema key; `PSO_LOG_FORMAT`/`PSO_LOG_COLOR` are variables | none |
 | Telemetry | OTLP export defaults to protobuf; exporter packages were updated | see [observability](devops/observability.md) |
+
+## Application structure (0.2.0-rc.2)
+
+Existing projects keep their structure and keep working: nothing is moved or rewritten by an upgrade.
+
+| Area | Change | What to do |
+|---|---|---|
+| New projects | `pso create service` / `orchestrator` use the official structure with the reference CRUD | `--template empty` for no example; `--structure legacy` for the 0.1 layout |
+| 0.1 projects | recognised as `legacy`; generators write in their structure | to adopt the official one: `pso structure:inspect`, then move the files yourself ([structure migration](architecture/structure-migration.md)) |
+| Mixed projects | refused with `PSO_STRUCTURE_MIXED` | keep one structure per project |
+| `make:crud`, `make:entity`, `make:interceptor`, ... | generate the official structure only | a 0.1 project uses its own generators (`make:resource`, `make:dto`) |
+| Layered services | Hibernate `validate`, unknown JSON properties refused | add `spring.jackson.deserialization.fail-on-unknown-properties: true` to an older layered service before `make:crud` relies on it |
 
 ## Changes of the developer experience release (2026-11-14)
 

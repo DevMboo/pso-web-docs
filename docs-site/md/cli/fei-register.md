@@ -7,12 +7,12 @@ Register a MEI with the FEI: adds it to FEI.pso.ts (mount path, entry scopes, lo
 ## Usage
 
 ```text
-pso fei:register <mei> [--path /prefix] [--scopes a:read,b:write] [--title <text>] [--icon <name>] [--loading lazy|eager] [--dry-run]
+pso fei:register <mei> [--fei <name>] [--path /prefix] [--scopes a:read,b:write] [--public] [--title <text>] [--icon <name>] [--loading lazy|eager] [--dry-run]
 ```
 
 ## Flags
 
-`--path`, `--scopes`, `--title`, `--icon`, `--loading`, `--dry-run`.
+`--fei`, `--path`, `--scopes`, `--public`, `--title`, `--icon`, `--loading`, `--dry-run`.
 
 ## Examples
 

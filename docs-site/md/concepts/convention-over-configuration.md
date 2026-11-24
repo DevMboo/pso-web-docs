@@ -2,6 +2,13 @@
 
 > The directory and naming rules PSO enforces for each runtime, why they are enforced and not suggested, what the diagnostics look like, and where explicit configuration begins.
 
+<!-- pso:structure-note -->
+> [!NOTE]
+> Examples on this page use the 0.1 orchestrator layout (`src/routes/<module>/`, `src/guards/`, `src/contracts/`), which existing
+> projects keep. In the official structure of new projects the same files are in `src/modules/<module>/` (`routes/ROUTES.pso.ts`,
+> `controllers/`, `services/`, `providers/`, `dto/`) and in `src/.app/` (`guards/`, `middlewares/`, `filters/`, `contracts/`); what the
+> page describes works the same way. See [TypeScript orchestrator structure](architecture/typescript-orchestrator.md).
+
 Conventions are enforced, not suggested: a file with a known suffix in the wrong place is `PSO_MISPLACED_RESOURCE`, a badly named file is `PSO_BAD_NAME`.
 
 ## Why enforce

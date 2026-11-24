@@ -2,6 +2,13 @@
 
 > Reproducible resource manifests with a content digest - what is in them, why they are stable, and how to use them in CI and releases.
 
+<!-- pso:structure-note -->
+> [!NOTE]
+> Examples on this page use the 0.1 orchestrator layout (`src/routes/<module>/`, `src/guards/`, `src/contracts/`), which existing
+> projects keep. In the official structure of new projects the same files are in `src/modules/<module>/` (`routes/ROUTES.pso.ts`,
+> `controllers/`, `services/`, `providers/`, `dto/`) and in `src/.app/` (`guards/`, `middlewares/`, `filters/`, `contracts/`); what the
+> page describes works the same way. See [TypeScript orchestrator structure](architecture/typescript-orchestrator.md).
+
 `pso validate --write-manifest` writes `.pso/manifest.json` for every project. It is the machine-readable answer to "what resources does this project contain?".
 
 ```bash

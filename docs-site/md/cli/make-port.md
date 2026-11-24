@@ -1,8 +1,8 @@
 # pso make:port
 
-> Generate a port interface (Spring, hexagonal layout: ports/)
+> Generate a port interface (Spring, 0.1 hexagonal layout only: ports/; the layered structure has no ports)
 
-Generate a port interface (Spring, hexagonal layout: ports/).
+Generate a port interface (Spring, 0.1 hexagonal layout only: ports/; the layered structure has no ports).
 
 ## Usage
 

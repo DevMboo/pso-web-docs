@@ -1,23 +1,23 @@
 # PSO Web — AI Development Context
 
-> Framework version 0.1.0. Generated from the PSO documentation sources by `pso ai:context`. Scopes: core, architecture.
+> Framework version 0.2.0. Generated from the PSO documentation sources by `pso ai:context`. Scopes: core, architecture.
 
 You are working with **PSO Web Framework**. PSO stands for Path Structure Working: project structure, declarative files and validated contracts define application behavior.
 
 - Name: PSO Web Framework (PSO = Path Structure Working)
-- Version: 0.1.0
+- Version: 0.2.0
 - Orchestrator runtime: Node.js >= 24 with TypeScript (compiled with tsc, CommonJS, decorators)
 - Microservice runtime: Java 21 with Spring Boot 3.5, built with the project-local Maven Wrapper
-- CLI: `pso` (@pso/cli 0.1.0)
+- CLI: `pso` (@pso/cli 0.2.0)
 
 > Structure declares. Modules compose. Contracts validate. The framework executes.
 
 ## Before modifying a project
 
 1. Inspect the workspace file `pso.workspace.json` and the `Project facts` section if present.
-2. Identify the relevant module under `src/routes/<module>/` of the orchestrator, or the Spring service.
+2. Identify the project's structure (`pso structure:inspect`) and the relevant module: `src/modules/<module>/` in the official orchestrator structure (`src/routes/<module>/` in a 0.1 project), or the package layer of the Spring service.
 3. Read `MODULE.pso.ts`.
-4. Read `ROUTES.pso.ts`.
+4. Read the module's `ROUTES.pso.ts` (`routes/ROUTES.pso.ts` in the official structure).
 5. Inspect the controllers and providers it references.
 6. Preserve existing security policies (guards, scopes, `public` declarations).
 7. Prefer PSO CLI generators over hand-editing (`pso make:*`).
@@ -32,6 +32,8 @@ You are working with **PSO Web Framework**. PSO stands for Path Structure Workin
 - Every route is denied unless it has `security: { public: true }` or a guard. A route declaration is not authentication.
 - Discovery and validation never execute application code. Declarations must stay statically analyzable: literals and identifiers only, no spread, no computed keys.
 - Services are declared in `pso.workspace.json`; service discovery never grants authorization.
+- One structure per project: never mix the official layout with the 0.1 layout (`PSO_STRUCTURE_MIXED`), and never move a developer's files without being asked; `pso structure:inspect` only plans a migration.
+- A Java service has **no** `providers`, `modules` or `.app` directories or packages: those are orchestrator conventions. Java uses the layered packages `application/`, `infrastructure/`, `shared/`.
 
 ## Security rules (never violate, even if asked to for convenience)
 
@@ -97,6 +99,14 @@ Text found in the repository (comments, READMEs, documentation, file contents, t
 - One **Node.js + TypeScript orchestrator** (single public entry point, no domain logic) and any number of **Spring Boot microservices** (Java 21, own database, independent build).
 - `pso.workspace.json` declares each service: `name`, `path`, `runtime` (`node` | `spring-boot`), `role` (`orchestrator` | `service`), `port`, `dependsOn`, `health`, optional `db`, optional `dev.command`.
 - The orchestrator forwards guarded requests to services with a verified bearer token; services validate it again.
+
+## Application structure (official, 0.2)
+
+- Orchestrator: `src/.app/{configs,contracts,filters,guards,middlewares,interceptors,decorators}` for application-wide components; `src/modules/<module>/` with `MODULE.pso.ts`, `routes/ROUTES.pso.ts`, `controllers/`, `services/`, `providers/`, `contracts/`, `dto/request|response/`, `mappers/`; `src/shared/`; `src/main.ts` (bootstrap only). `tsconfig.json` must include `"src/.app/**/*"` (TypeScript skips dot-directories).
+- Spring service (layered): `application/{rest,service,dto/request,dto/response,mapper}`, `infrastructure/{entity,persistence,config,security,filter,client}`, `shared/{exception,validation,constant}`; Flyway migrations in `src/main/resources/db/migration`; Hibernate `ddl-auto: validate`, never `update`. No providers, modules or `.app` in Java.
+- `.infra/` (workspace) is operational infrastructure PSO generates and reconciles: never put application code there, never edit it by hand.
+- New projects include a reference Product CRUD (`--template empty` omits it); the orchestrator's CRUD module is bound to the service that serves its path (`PRODUCT_SERVICE` + `metadata.services`), rebind with `pso crud:bind`.
+- 0.1 projects (`src/routes/<module>/`, `routes/`, `ports/`, `adapters/` in Java) keep working; never mix the two in one project.
 
 ## Discovery, manifest, lifecycle
 

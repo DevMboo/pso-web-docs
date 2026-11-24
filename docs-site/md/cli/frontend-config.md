@@ -7,12 +7,12 @@ Write the FEI's runtime configuration on a site root: where each approved MEI's 
 ## Usage
 
 ```text
-pso frontend:config --site <dir> [--auth dev-token|oidc|none] [--oidc-issuer <url>] [--oidc-authorize <url>] [--oidc-token <url>] [--oidc-client <id>] [--oidc-scope "openid"] [--api-base /api] [--channels-path /channels] [--require-signature] [--trust-key <public-or-private-pem>] [--key-id <id>]
+pso frontend:config --site <dir> [--fei <name>] [--auth dev-token|oidc|none] [--oidc-issuer <url>] [--oidc-authorize <url>] [--oidc-token <url>] [--oidc-client <id>] [--oidc-scope "openid"] [--api-base /api] [--channels-path /channels] [--require-signature] [--trust-key <public-or-private-pem>] [--key-id <id>]
 ```
 
 ## Flags
 
-`--site`, `--auth`, `--oidc-issuer`, `--oidc-authorize`, `--oidc-token`, `--oidc-client`, `--oidc-scope`, `--api-base`, `--channels-path`, `--require-signature`, `--trust-key`, `--key-id`.
+`--site`, `--fei`, `--auth`, `--oidc-issuer`, `--oidc-authorize`, `--oidc-token`, `--oidc-client`, `--oidc-scope`, `--api-base`, `--channels-path`, `--require-signature`, `--trust-key`, `--key-id`.
 
 ## Examples
 

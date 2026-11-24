@@ -1,8 +1,8 @@
 # PSO Web
 
-> PSO Web Framework 0.1.0: build distributed applications through structure, conventions and declarative contracts (Node.js + TypeScript orchestrator, Spring Boot microservices).
+> PSO Web Framework 0.2.0: build distributed applications through structure, conventions and declarative contracts (Node.js + TypeScript orchestrator, Spring Boot microservices).
 
-Version: 0.1.0. Features marked "not implemented" in a page are design notes, not available functionality.
+Version: 0.2.0. Features marked "not implemented" in a page are design notes, not available functionality.
 
 ## Getting Started
 
@@ -10,25 +10,25 @@ Version: 0.1.0. Features marked "not implemented" in a page are design notes, no
 - [Why PSO exists](md/getting-started/why-pso.md): The problems PSO targets, the design bets it makes, a concrete before and after, and when another approach is the better choice.
 - [Architectural philosophy](md/getting-started/philosophy.md): Structure declares, modules compose, contracts validate, the framework executes - each principle shown in a concrete behavior you can reproduce, with its cost.
 - [Requirements](md/getting-started/requirements.md): The tools PSO needs on your machine, which are optional, what the check command really verifies, and how to fix what it reports.
-- [Installation](md/getting-started/installation.md): Install the pso CLI from a framework checkout, as a global command or run it in place; what changes on your machine, how to verify it, how to update and remove it, and the Windows installer.
-- [Quick start](md/getting-started/quick-start.md): From an empty folder to a secured two-tier application in a few commands, with the real output of each step and what to do next.
+- [Installation](md/getting-started/installation.md): Use the portable Windows distribution or an authorized framework checkout, install matching Java dependencies, verify files, update and roll back.
+- [Quick start](md/getting-started/quick-start.md): From an empty folder to a secured two-tier application with a working Product CRUD in a few commands, with the real output of each step and what to do next.
 - [First workspace](md/getting-started/first-workspace.md): Create the pso.workspace.json that declares your services - fields, validation rules, how to adopt existing projects, and what to do when it is wrong.
-- [First orchestrator](md/getting-started/first-orchestrator.md): Generate the Node.js + TypeScript gateway, build and start it, and understand what its minimal entry point does at start-up and what it answers with no routes.
-- [First microservice](md/getting-started/first-microservice.md): Generate a Spring Boot service that is secure from its first request, run its tests, start it, and read what it answers with and without a token.
+- [First orchestrator](md/getting-started/first-orchestrator.md): Generate the Node.js + TypeScript orchestrator in the modular structure, build and start it, and understand what its minimal entry point does at start-up and what its reference module answers before and after a service exists.
+- [First microservice](md/getting-started/first-microservice.md): Generate a Spring Boot service in the layered structure with the reference Product CRUD, secure from its first request, run its tests, start it with PostgreSQL, and read what it answers with and without a token.
 - [First HTTP endpoint](md/getting-started/first-endpoint.md): Declare, implement and secure GET /customers across the orchestrator and a Spring service, then call it and read every answer - 200, 401, 403, 404 and 503 - with the logs they produce.
 - [Running the environment](md/getting-started/running.md): Start, monitor and stop the whole workspace with pso dev, including JWT configuration, what each log line means, how to check health, and how to recover from the failures you will meet first.
 - [Troubleshooting](md/getting-started/troubleshooting.md): The problems developers meet first - each with symptoms, likely causes, the command that tells them apart, the fix, how to verify it and how to prevent it.
 
 ## Downloads
 
-- [Downloads](md/downloads/index.md): PSO Web installer availability, Windows requirements, recipient enrollment and release verification.
+- [Downloads](md/downloads/index.md): Current PSO Web distribution status, the available private portable preview, verification and Windows installation limits.
 
 ## Tutorials
 
-- [Build your first application](md/tutorials/first-application.md): Create a workspace, a Java service and a TypeScript gateway, then trace a request through both.
+- [Build your first application](md/tutorials/first-application.md): Create a workspace, a Java microservice and a TypeScript orchestrator with the reference Product CRUD, start them with PostgreSQL and the identity provider, call the API, then generate a second resource the same way.
 - [Build a CRUD API](md/tutorials/crud-api.md): From an empty folder to a working, tested products API - workspace, Spring service, PostgreSQL, Flyway, validation, transactions, the orchestrator routes and every request, with the real responses and the rows they leave in the database.
 - [Protect an API with JWT scopes](md/tutorials/authentication.md): Configure a trusted issuer, declare public and protected routes, and diagnose 401 versus 403.
-- [Connect multiple services](md/tutorials/multiple-services.md): Register two Spring services, route public requests through the gateway and inspect the topology.
+- [Connect multiple services](md/tutorials/multiple-services.md): Two Spring services with their own databases, an orchestrator module for each, calls by service name, and the topology PSO derives from the declarations.
 - [Publish and consume an event](md/tutorials/event-driven.md): Publish an event from an orchestrator action, consume it with a registered consumer over Redis Streams, and watch acknowledgement, retry and dead-lettering happen - with a failing handler on purpose.
 - [Make an event follow a database commit](md/tutorials/transactional-outbox.md): Add the Spring transactional outbox, relay rows and handle duplicate delivery safely.
 - [Diagnose a local workspace](md/tutorials/local-debugging.md): Use static checks, route inspection, health, logs and Studio in a reliable order.
@@ -48,6 +48,15 @@ Version: 0.1.0. Features marked "not implemented" in a page are design notes, no
 - [Contracts](md/concepts/contracts.md): Versioned JSON contracts between services, the route contract that gates exposure, the drift check that keeps both copies honest, and how to evolve a contract safely.
 - [Configuration resolution](md/concepts/configuration.md): Six layers with documented precedence, a typed schema and secrets only as references - how to inspect the effective value of every setting and where each value came from.
 - [Security by default](md/concepts/security-by-default.md): What is protected before you write any security code, shown with real requests and refusals, and what remains your responsibility.
+
+## Application Architecture
+
+- [Application architecture](md/architecture/overview.md): The official structure of a PSO application - .infra, .app, TypeScript modules, the layered Java packages and shared - what each part owns, why the orchestrator and the microservices use different conventions, and how new projects start with a working reference CRUD.
+- [TypeScript orchestrator structure](md/architecture/typescript-orchestrator.md): The official modular structure of a PSO orchestrator - src/.app for application-wide components, src/modules for business modules with MODULE.pso.ts and routes/ROUTES.pso.ts, controllers, services, providers, DTOs, contracts, mappers - and how PSO discovers, validates, compiles and serves it.
+- [Java microservice structure](md/architecture/java-microservice.md): The official layered structure of a PSO Spring Boot microservice - application/rest, service, dto, mapper; infrastructure/persistence, entity, config, security, filter; shared - with transactions, Jakarta Validation, PostgreSQL and Flyway, Spring Security, RFC 9457 errors and tests.
+- [The reference Product CRUD](md/architecture/reference-crud.md): File by file, the Product CRUD that pso create service and pso create orchestrator generate - endpoints, security, validation, persistence, the request lifecycle from the orchestrator to PostgreSQL, how to run and call it locally, in Docker and from Studio, how to remove it and how to generate another resource the same way.
+- [Generators in the official structures](md/architecture/generators.md): Which pso make commands exist for the modular orchestrator and the layered Java service, where each one writes, what it registers for you, and the rules every generator follows (structure detection, no overwrites, no mixing, transactional changes).
+- [Structure compatibility and migration](md/architecture/structure-migration.md): How PSO recognises the 0.1 and the official structures, refuses projects that mix them, keeps 0.1 projects working, and plans (read-only) the migration of a project to the official structure with pso structure:inspect.
 
 ## Orchestrator
 
@@ -70,7 +79,7 @@ Version: 0.1.0. Features marked "not implemented" in a page are design notes, no
 ## Microservices
 
 - [Spring Boot integration](md/microservices/spring-boot-integration.md): How PSO generates and manages Spring Boot services, which starters each generated service includes, and what stays plain Spring.
-- [Java project structure](md/microservices/project-structure.md): The simplified hexagonal layout and the naming rules PSO validates, with the generators that place each kind of class and what they create.
+- [Java project structure: layered and legacy](md/microservices/project-structure.md): The official layered Java service structure and the 0.1 hexagonal layout retained for existing projects.
 - [Hexagonal architecture](md/microservices/hexagonal-architecture.md): The simplified ports-and-adapters layout PSO uses, without extra abstraction - what each layer owns, a worked port-and-adapter example, and when not to add one.
 - [Service contracts](md/microservices/service-contracts.md): Versioned JSON contracts mirrored into each service and checked for drift - what is generated, what is validated, how to change one safely, and what contracts deliberately do not cover.
 - [Service registration](md/microservices/service-registration.md): How services are declared, registered and found, in development and production - the commands, their real output, the validation that runs before anything is saved, and what registration does not grant.
@@ -82,7 +91,7 @@ Version: 0.1.0. Features marked "not implemented" in a page are design notes, no
 ## Spring Boot
 
 - [Spring Boot starters](md/spring/overview.md): The first-party Maven artifacts behind every generated Spring Boot service, what each one provides and what is not implemented yet.
-- [Maven BOM and SNAPSHOTs](md/spring/maven-bom.md): How generated services get compatible PSO versions, how to build the artifacts locally and what releases must look like.
+- [Maven BOM and Java versions](md/spring/maven-bom.md): How the distributed and source-checkout CLIs select matching PSO Java artifacts, and how Maven builds resolve them.
 - [Spring configuration reference](md/spring/configuration.md): Every pso.* key with defaults and environment overrides, the profiles and how misspelled keys are handled.
 - [Service prefix](md/spring/service-prefix.md): The one authoritative prefixing strategy between the orchestrator and Spring services, and how duplicates are prevented.
 - [Spring security and CORS](md/spring/security-and-cors.md): YAML-driven JWT validation, authorization rules, CORS and security headers, all deny-by-default.
@@ -137,6 +146,24 @@ Version: 0.1.0. Features marked "not implemented" in a page are design notes, no
 - [FEI and MEI security model](md/frontend/security.md): The frontend trust model stated plainly: what the shell protects, what the browser cannot protect, how remote code, tokens, redirects, CSRF and content policy are handled, and which claims PSO deliberately does not make.
 - [The Frontend view in PSO Studio](md/frontend/studio.md): What the Frontend section of PSO Studio shows for the FEI and MEIs of a workspace (read-only by default) and the opt-in operations (validate, build, development servers, local publish and rollback) behind pso studio --frontend-ops.
 - [Frontend troubleshooting](md/frontend/troubleshooting.md): Symptoms you will see while developing and operating a FEI and its microfrontends, what causes each, and what to do, including errors that name the exact configuration responsible.
+- [Several shells (FEIs) in one workspace](md/frontend/multiple-feis.md): How 0.2.0 runs several independent application shells side by side, what each one owns, how collisions are detected, and how public and authenticated routes are declared per shell.
+
+## Infrastructure (0.2)
+
+- [The infrastructure engine (0.2.0)](md/infrastructure/overview.md): Why PSO 0.2.0 resolves infrastructure from declarations, what the engine does in each step, and where its responsibilities stop.
+- [The infrastructure contract and the .infra directory](md/infrastructure/contract.md): Every member of pso.infra.json, the defaults PSO derives, the validation rules, and the layout and ownership of the managed .infra directory.
+- [Resource lifecycle: ownership, drift, repair and recovery](md/infrastructure/resource-lifecycle.md): How PSO decides what to create, update or leave alone, how it detects hand edits, how an interrupted run is completed, and how rotation works.
+- [Security model, certificates and secrets](md/infrastructure/security-and-certificates.md): TLS on every hop, mutual TLS, the development certificate authority, operator-supplied certificates, JWT keys and JWKS, the identity provider's clients, secret references and how PSO keeps key material out of files, images, logs and Studio.
+- [Hosts and environments](md/infrastructure/hosts-and-environments.md): How PSO resolves host names, origins, OIDC redirect URIs, web origins and the addresses each component uses, in development, staging and production, and what it never does with DNS.
+- [Identity provider reconciliation (Keycloak)](md/infrastructure/identity-reconciliation.md): How PSO keeps an already running Keycloak realm in line with the declarations through its administration API, what it owns, what it never touches, and which changes need authorization.
+- [The container engine](md/infrastructure/containers.md): The container topology PSO generates (edge, shells, orchestrator, services, databases, identity provider), dependency order, health checks, networks, volumes, secrets, limits, selective operations and safe cleanup.
+- [Local development](md/infrastructure/local-development.md): The ways to run a workspace locally in 0.2.0, local processes with or without containerized dependencies, the full container stack, one service or one shell, and how secrets reach local processes.
+- [Deployment of an environment](md/infrastructure/deployment.md): pso deploy --env, release records, verification through the edge, automatic rollback, the bundle target for remote hosts, and the prerequisites PSO cannot satisfy for you.
+- [Remote hosts and SSH deployment](md/infrastructure/remote-hosts.md): Registering a Linux host, what PSO checks on it, the remote deployment lifecycle over SSH, status, logs, rollback and its limits, and how credentials stay out of the workspace.
+- [Studio infrastructure console and API Client](md/infrastructure/studio-api-client.md): The 0.2.0 areas of PSO Studio (infrastructure, containers, hosts, certificates, deployment, two shells) and the API Client, with its execution boundary and what it never exposes.
+- [Migrating a 0.1 workspace to 0.2.0](md/infrastructure/migration.md): What changes, what does not, the migration command with its inspection and its adoption of existing certificates and keys, and the behaviour changes to review.
+- [Infrastructure troubleshooting](md/infrastructure/troubleshooting.md): The infrastructure problems you will actually meet, what each message means and the fix.
+- [Release integrity, signing and Windows installation](md/infrastructure/release-integrity-and-signing.md): The three different guarantees a PSO distribution can carry (package integrity, cryptographic release signing, Windows code signing), what 0.2.0 has, how to install and upgrade on Windows, and what is required before an official release.
 
 ## CLI Reference
 
@@ -167,12 +194,16 @@ Version: 0.1.0. Features marked "not implemented" in a page are design notes, no
 - [pso connection:test](md/cli/connection-test.md): Check a connection layer by layer: SSH and host identity, the agent, the agent's pinned identity, your authenticated session
 - [pso connection:tunnel](md/cli/connection-tunnel.md): Open a private SSH tunnel from a loopback port here to a loopback port on the server (for example a service's actuator); never binds publicly, runs until Ctrl+C
 - [pso create](md/cli/create.md): Create a workspace, an orchestrator, a Spring Boot service, or a frontend project: the application shell (fei) or a microfrontend (mei)
+- [pso crud:bind](md/cli/crud-bind.md): Bind a CRUD module of the orchestrator to the microservice that serves its resource (the <R>_SERVICE contract constant and the metadata.services of its routes, together)
 - [pso database:enable](md/cli/database-enable.md): Opt a Spring service into a database: adds the persistence starter and sets pso.database.provider (H2 only for the local profile)
-- [pso deploy](md/cli/deploy.md): Apply a deployment (requires --yes); verifies checksums and health, rolls back on failed verification
+- [pso deploy](md/cli/deploy.md): Apply a deployment (requires --yes); verifies checksums and health, rolls back on failed verification. --env deploys an environment of pso.infra.json (Docker target: build, record, start, verify through the edge, automatic rollback; bundle target: a reviewable bundle for the operator); --dry-run only plans
 - [pso deploy:init](md/cli/deploy-init.md): Generate hardened deployment descriptors for Kubernetes, AWS ECS (Fargate), Azure Container Apps or Google Cloud Run (nothing is ever applied to a cloud)
-- [pso deploy:plan](md/cli/deploy-plan.md): Show exactly what a deployment would change, without changing anything
+- [pso deploy:logs](md/cli/deploy-logs.md): Show a container's log from the environment's host (secrets, tokens and keys masked)
+- [pso deploy:plan](md/cli/deploy-plan.md): Show exactly what a deployment would change, without changing anything (--env: the 0.2 environment deployment of pso.infra.json)
+- [pso deploy:status](md/cli/deploy-status.md): Show the active release of an environment, its recorded releases and history, and the state and health of its containers (on the remote host for an SSH target, on this machine for the docker target)
+- [pso deploy:unlock](md/cli/deploy-unlock.md): Remove the deployment lock an interrupted deployment left on the environment's host (only when no deployment is running)
 - [pso deploy:validate](md/cli/deploy-validate.md): Statically check the deployment descriptors (security posture, probes, limits, inline secrets, unfilled placeholders); no cloud is contacted
-- [pso dev](md/cli/dev.md): Validate, start, monitor and gracefully stop all workspace services (Ctrl+C stops)
+- [pso dev](md/cli/dev.md): Validate, start, monitor and gracefully stop the workspace (Ctrl+C stops). Local processes by default; --docker runs the environment's containers instead. --service starts one service (and with --with-dependencies what it depends on: other services, its database and the identity provider), --fei also starts that frontend's development servers
 - [pso dispatch:consumers](md/cli/dispatch-consumers.md): List every declared consumer (event, handler, service, group)
 - [pso dispatch:doctor](md/cli/dispatch-doctor.md): Validate and then really connect to each configured broker; reports up, down or not configured (never claims a connection from configuration alone)
 - [pso dispatch:events](md/cli/dispatch-events.md): List every declared event with its version, channel, owner service, publishers and consumers
@@ -185,8 +216,15 @@ Version: 0.1.0. Features marked "not implemented" in a page are design notes, no
 - [pso dispatch:remove](md/cli/dispatch-remove.md): Remove the installed dispatch provider from a service and disable dispatch (event declarations and handlers are never deleted)
 - [pso dispatch:validate](md/cli/dispatch-validate.md): Statically validate event declarations, schemas, consumers, providers and the contract lock (exit 1 on errors)
 - [pso dist](md/cli/dist.md): Build, sign, encrypt, verify and extract signed .psopkg distribution packages from an explicit allowlist
-- [pso docker:build](md/cli/docker-build.md): Build the images with docker compose (requires a running Docker daemon)
+- [pso docker:build](md/cli/docker-build.md): Build the service images. With pso.infra.json: for the environment's generated topology (Dockerfiles are created when missing, never overwritten; --vendor copies the framework packages into the services). Without it: the 0.1 behaviour (docker-compose.yml from pso docker:init)
+- [pso docker:down](md/cli/docker-down.md): Stop and remove the environment's containers and networks. Persistent data (database volumes) is kept; --volumes deletes it too and needs --yes
 - [pso docker:init](md/cli/docker-init.md): Generate Dockerfiles, docker-compose.yml, .dockerignore, .env.example and a CI workflow (--transport: TLS between the orchestrator and the services, the default, with certificates from ./tls, or plaintext as an explicit choice; --vendor: carry the PSO packages inside each service, @pso/* tarballs for Node and com.pso Maven artifacts for Spring, so the build works on any machine)
+- [pso docker:inspect](md/cli/docker-inspect.md): Show the effective definition of a container (image, environment, mounts, secrets, health check, limits, dependencies) as Docker Compose resolves it, with its runtime state
+- [pso docker:logs](md/cli/docker-logs.md): Show a container's log (credentials, tokens and known secret values are masked)
+- [pso docker:plan](md/cli/docker-plan.md): Show the container topology of an environment before anything runs: startup order, images built or pulled, published ports, networks, volumes, secrets (names only), health checks and resource limits
+- [pso docker:ps](md/cli/docker-ps.md): List the environment's containers with their state and health
+- [pso docker:restart](md/cli/docker-restart.md): Restart only the named containers (their dependencies keep running). --recreate re-creates them from the current topology, which picks up changed environment, mounts or images
+- [pso docker:up](md/cli/docker-up.md): Start the environment's containers in dependency order and wait until every one is healthy (development: missing infrastructure is provisioned and missing images are built first). --service starts those containers and what they depend on
 - [pso docs](md/cli/docs.md): Serve the documentation portal locally, or write the complete static site (search, llms.txt, AI context) with --build
 - [pso doctor](md/cli/doctor.md): Check the local toolchain
 - [pso environment:access](md/cli/environment-access.md): List who may manage the environment; --invite creates a single-use enrollment token for a teammate (shown once), --revoke ends a client's access immediately
@@ -205,7 +243,7 @@ Version: 0.1.0. Features marked "not implemented" in a page are design notes, no
 - [pso frontend:config](md/cli/frontend-config.md): Write the FEI's runtime configuration on a site root: where each approved MEI's release pointer is, who may sign releases, how users sign in and the orchestrator's same-origin path. It holds no secret and is never built into the bundle
 - [pso frontend:contracts](md/cli/frontend-contracts.md): Generate typed frontend contracts from the orchestrator's real route metadata and DTO classes into every frontend project (src/models/contract.generated.ts); --check fails when a project's copy is stale
 - [pso frontend:declare](md/cli/frontend-declare.md): Write deploy/<name>.deployment.pso.ts for a frontend project so the native deployment engine can plan, deploy, verify and roll it back (`pso release:plan`, `release:deploy`, `release:rollback`)
-- [pso frontend:dev](md/cli/frontend-dev.md): Start the development servers: the FEI and every registered MEI (ports from their declarations), or one MEI alone with the development host adapter (--standalone)
+- [pso frontend:dev](md/cli/frontend-dev.md): Start the development servers: every FEI and its registered MEIs (ports from their declarations), one FEI with its MEIs (--fei), or one MEI alone with the development host adapter (--standalone)
 - [pso frontend:graph](md/cli/frontend-graph.md): Show how the FEI, its MEIs and the orchestrator relate
 - [pso frontend:inspect](md/cli/frontend-inspect.md): Show a frontend project: identity, port, orchestrator, registered MEIs, middleware order, scopes and effective routes
 - [pso frontend:install](md/cli/frontend-install.md): Vendor the framework packages into the frontend projects and run `npm install` in each (or only in <project>)
@@ -217,36 +255,57 @@ Version: 0.1.0. Features marked "not implemented" in a page are design notes, no
 - [pso frontend:routes](md/cli/frontend-routes.md): List the effective browser routes of the whole frontend ecosystem with their owners (exit 1 on conflicts)
 - [pso frontend:validate](md/cli/frontend-validate.md): Validate the FEI/MEI declarations, their relationships, route ownership and conflicts, contract compatibility and the architecture rules (exit 1 on errors)
 - [pso graph](md/cli/graph.md): Show service dependencies and orchestrator routes together
+- [pso host:check](md/cli/host-check.md): Check that the host an environment deploys to (deploy.target "ssh") meets its prerequisites: Docker and Compose, a writable root with free space, the edge port, and every operator-supplied certificate (verified: authority, names, expiry; keys present) and secret file (present; never read). Exit 1 when something blocks a deployment
+- [pso host:inspect](md/cli/host-inspect.md): Inspect a registered Linux host over SSH (read-only): operating system and architecture, Docker and Compose available to the deploy user, free disk under the deployment root, listening ports, existing PSO-managed deployments and registry reachability
 - [pso idp:dev](md/cli/idp-dev.md): DEVELOPMENT identity provider for a workspace: init generates a signing key on this machine, its public key set, a JWKS server and a Compose overlay; token signs a development JWT; serve publishes the keys on loopback for `pso dev`. Never for production (refused with PSO_ENV=production)
+- [pso infra:apply](md/cli/infra-apply.md): Provision the environment idempotently: create what is missing and PSO may generate (development only), update configuration whose declarations changed, keep everything valid, never touch operator-supplied resources or hand edits
+- [pso infra:hosts](md/cli/infra-hosts.md): Show the hosts entries a development environment needs; with --apply (or --remove) and --yes write (or remove) PSO's marked block in the hosts file, nothing else (the system file needs administrator rights). Browsers resolve *.localhost without it
+- [pso infra:identity](md/cli/infra-identity.md): Reconcile the environment's running Keycloak realm with the declarations through its administration API: FEI clients, redirect URIs, web origins, the service client, scope roles, mappers and development users. Without --apply it reports drift; changing an existing managed client or removing one (--prune) needs --yes. Users, credentials, sessions, client secrets and resources PSO did not create are never changed
+- [pso infra:init](md/cli/infra-init.md): Write pso.infra.json, the declarative infrastructure contract (environments, hosts, TLS, secrets, identity provider), derived from the workspace: one local development environment to start with
+- [pso infra:inspect](md/cli/infra-inspect.md): Show the resolved topology of an environment (hosts, origins, OIDC redirect URIs, addresses as containers and as processes see them) and its resources with owner, files and facts (fingerprints, expiry; never key material or secret values)
+- [pso infra:plan](md/cli/infra-plan.md): Show what the infrastructure of an environment needs and what applying would do (create, replace, update, supply), without changing anything
+- [pso infra:repair](md/cli/infra-repair.md): Resolve drift and damage: regenerate managed files that were edited by hand (the edited copy is kept in .infra/backups/), complete interrupted provisioning, restrict exposed key files. Needs --yes when something would be overwritten
+- [pso infra:rotate](md/cli/infra-rotate.md): Replace a valid certificate, authority, signing key or secret on purpose (rotation). Replacing the authority re-issues every certificate it signed. Development environments only: production material is rotated by its owner
+- [pso infra:status](md/cli/infra-status.md): One-screen health of an environment's infrastructure: resources by status, drift, certificates close to expiry, the last provisioning and whether one was interrupted
+- [pso infra:token](md/cli/infra-token.md): Get an access token for a development user: signed offline (pso-dev identity) or issued by the environment's Keycloak (password grant through the development-only API client). Development environments only
+- [pso infra:validate](md/cli/infra-validate.md): Validate an environment's infrastructure: integrity of authorities, certificates and keys, expiry, permissions, drift, ignore rules, secrets leaked into files, and with --probe the running environment (TLS, security headers, API readiness, identity provider) for real (exit 1 on errors)
 - [pso init](md/cli/init.md): Create pso.workspace.json in the current directory from the Node/Spring projects found in it
 - [pso inspect](md/cli/inspect.md): List the resources PSO discovered in a project
 - [pso install:react](md/cli/install-react.md): Install an official PSO integration into an existing react application: detects the project and its package manager, installs the packages, writes small application-owned files, never overwrites yours, then type-checks the result
 - [pso integrity](md/cli/integrity.md): Verify the installed files against the signed inventory (read-only: nothing is ever modified)
 - [pso java:install](md/cli/java-install.md): Install the PSO Java artifacts (BOM, starters) into the local Maven repository so generated Spring services resolve them: built from the framework checkout, or copied from a Maven file repository of a release (--from, or the one shipped with an installed CLI) without any source
 - [pso lint](md/cli/lint.md): Static checks: workspace validation, configuration, security check (for one environment, with the sources the application runs with in it) and TypeScript type-check
-- [pso make:adapter](md/cli/make-adapter.md): Generate an adapter component (Spring, hexagonal layout: adapters/)
+- [pso make:adapter](md/cli/make-adapter.md): Generate an adapter component (Spring, 0.1 hexagonal layout only: adapters/; layered services use clients: pso make:client)
 - [pso make:channel](md/cli/make-channel.md): Generate a channel class (and, for a resource channel, a deny-by-default access provider and the event contract), register it in MODULE.pso.ts and add @pso/channels
-- [pso make:config](md/cli/make-config.md): Generate a configuration artifact. Orchestrator: a plain module in src/configs/ that is used by importing it; Spring: a @Configuration class found by Spring's component scan
-- [pso make:contract](md/cli/make-contract.md): Generate a service contract (JSON) in src/contracts/ (orchestrator): the operations the orchestrator expects from a service
+- [pso make:client](md/cli/make-client.md): Generate an outbound client in infrastructure/client (layered Spring service) that calls a declared service through PsoHttpClient
+- [pso make:config](md/cli/make-config.md): Generate a configuration artifact. Orchestrator: a plain module in src/.app/configs/ (0.1: src/configs/) used by importing it; Spring: a @Configuration class (layered: infrastructure/config)
+- [pso make:contract](md/cli/make-contract.md): Generate a contract. With a module (modular orchestrator): TypeScript types of a microservice API in modules/<module>/contracts/; without: a JSON service contract (src/.app/contracts/, 0.1: src/contracts/)
 - [pso make:controller](md/cli/make-controller.md): Generate a controller (orchestrator: inside a module; Spring: hexagonal layout)
+- [pso make:crud](md/cli/make-crud.md): Generate a complete CRUD resource in the official structures: in a Spring service (entity, Flyway migration, repository with database-level filters, request/response records, mapper, transactional service, controller with scopes, tests) and/or, with --orchestrator, the matching orchestrator module (DTOs, contract, provider, service, mapper, controller, routes) bound to that service
+- [pso make:decorator](md/cli/make-decorator.md): Generate a reusable method decorator in src/.app/decorators/ (modular orchestrator): application metadata, never routing or security
 - [pso make:dispatch-event](md/cli/make-dispatch-event.md): Declare a DISTRIBUTED PSO Dispatch event and its payload contract. Spring: dispatch/*.events.json and a payload record; orchestrator: src/dispatch/<module>/EVENTS.pso.ts and a schema. --consume-only declares an event another service publishes
 - [pso make:dispatch-handler](md/cli/make-dispatch-handler.md): Generate a declared consumer of a PSO Dispatch event that this project already declares. Spring: a @PsoEventHandler component; orchestrator: a @DispatchConsumer class listed in EVENTS.pso.ts
 - [pso make:dto](md/cli/make-dto.md): Generate a dto (orchestrator: inside a module; Spring: hexagonal layout)
+- [pso make:entity](md/cli/make-entity.md): Generate a JPA entity in infrastructure/entity (layered Spring service); add its table with pso make:migration
 - [pso make:event](md/cli/make-event.md): Generate a LOCAL Spring application event (a record published with ApplicationEventPublisher and delivered in the same process). For an event between services use make:dispatch-event
+- [pso make:exception](md/cli/make-exception.md): Generate an application exception in shared/exception (layered Spring service), answered as an RFC 9457 problem
 - [pso make:files](md/cli/make-files.md): Generate a Spring files controller (upload, download, metadata, list, move, delete on PsoStorageService with scope checks) and its test
-- [pso make:filter](md/cli/make-filter.md): Generate an error filter in src/filters/ (orchestrator). It runs only for the routes that name it in ROUTES.pso.ts
+- [pso make:filter](md/cli/make-filter.md): Generate an error filter. Orchestrator: src/.app/filters/ (0.1: src/filters/), run for the routes that name it; Spring (layered): a servlet filter in infrastructure/filter
 - [pso make:guard](md/cli/make-guard.md): Generate a guard (orchestrator: inside a module; Spring: hexagonal layout)
 - [pso make:hook](md/cli/make-hook.md): Generate a lifecycle hook (onReady / onShutdown) in src/hooks/ and, with --module, list it in that module's providers (a hook nobody lists never runs)
+- [pso make:interceptor](md/cli/make-interceptor.md): Generate an interceptor in src/.app/interceptors/ (modular orchestrator). It runs around the action of the routes that name it (interceptors: [...] in ROUTES.pso.ts)
 - [pso make:listener](md/cli/make-listener.md): Generate a LOCAL Spring @EventListener for the application event of the same name (same process). For an event from another service use make:dispatch-handler
-- [pso make:mapper](md/cli/make-mapper.md): Generate a mapper component (Spring, hexagonal layout: adapters/)
-- [pso make:middleware](md/cli/make-middleware.md): Generate a middleware in src/middlewares/ (orchestrator). It runs only for the routes that name it in ROUTES.pso.ts
+- [pso make:mapper](md/cli/make-mapper.md): Generate a mapper. Orchestrator (modular): a mapping function in modules/<module>/mappers/; Spring: a mapper component (layered: application/mapper)
+- [pso make:middleware](md/cli/make-middleware.md): Generate a middleware in src/.app/middlewares/ (orchestrator; 0.1: src/middlewares/). It runs only for the routes that name it in ROUTES.pso.ts
 - [pso make:migration](md/cli/make-migration.md): Create the next Flyway migration (V<n>__<name>.sql) in a PostgreSQL-backed service
 - [pso make:module](md/cli/make-module.md): Create an HTTP module: MODULE.pso.ts + an empty ROUTES.pso.ts (no endpoint is exposed yet)
 - [pso make:notifier](md/cli/make-notifier.md): Generate a typed Spring publisher for a channel event (a record and a service on PsoChannelPublisher; --durable stores the event in the transactional outbox)
-- [pso make:port](md/cli/make-port.md): Generate a port interface (Spring, hexagonal layout: ports/)
+- [pso make:port](md/cli/make-port.md): Generate a port interface (Spring, 0.1 hexagonal layout only: ports/; the layered structure has no ports)
 - [pso make:provider](md/cli/make-provider.md): Generate an injectable provider class in src/providers/ and, with --module, list it in that module's providers (explicit registration: a provider nobody lists is never constructed)
-- [pso make:repository](md/cli/make-repository.md): Generate a repository interface (Spring: persistence/). It does not enable a database: see `pso database:enable`
+- [pso make:repository](md/cli/make-repository.md): Generate a Spring Data repository (layered: infrastructure/persistence, for an existing entity; 0.1: persistence/). It does not enable a database: see `pso database:enable`
+- [pso make:request](md/cli/make-request.md): Generate a request record with Jakarta Validation in application/dto/request (layered Spring service)
 - [pso make:resource](md/cli/make-resource.md): Generate a connected route + contract in the orchestrator and controller + DTO + test in a Spring service
+- [pso make:response](md/cli/make-response.md): Generate a response record in application/dto/response (layered Spring service)
 - [pso make:route](md/cli/make-route.md): Add a decorated controller action AND its ROUTES.pso.ts declaration, kept consistent (rolled back if validation fails). With --upstream the action forwards the request to one service; with --compose it gets the UpstreamClient and the route declares the services it may call to build its response. With --upstream and --dto the body is validated at the gateway and then forwarded unchanged; a DTO with file fields generates an upload (forwardUpload); --download a streamed file download (forwardDownload)
 - [pso make:service](md/cli/make-service.md): Generate a service (orchestrator: inside a module; Spring: hexagonal layout)
 - [pso migrate](md/cli/migrate.md): Bring files generated by an earlier PSO version up to date without touching your own code: shows what would change (the fixed 10 s shutdown timer of older orchestrators becomes shutdownOnSignals); --apply writes it and keeps the previous file as <file>.bak
@@ -269,7 +328,7 @@ Version: 0.1.0. Features marked "not implemented" in a page are design notes, no
 - [pso release:url](md/cli/release-url.md): Where the deployed application can be reached, from the deployment metadata and the REAL nginx file; --verify measures each layer independently (process, local health, proxy, this machine, TLS, optional SSH tunnel). COMPLETED is not proof of public access
 - [pso release:verify](md/cli/release-verify.md): Ask the environment's SERVER whether a signed manifest is authentic (a trusted, unrevoked signer) and integral (it names exactly the release), reporting the two separately
 - [pso repair](md/cli/repair.md): Restore damaged or missing files of the installed version from an authenticated package (never upgrades; user data is never touched)
-- [pso rollback](md/cli/rollback.md): Re-activate the previous release of a native deployment
+- [pso rollback](md/cli/rollback.md): Re-activate the previous release of a native deployment, or (--env) of an environment deployed to Docker
 - [pso routes:inspect](md/cli/routes-inspect.md): Show one orchestrator route in full: target, access policy, contract and the service-side handler
 - [pso routes:list](md/cli/routes-list.md): List the routes declared in ROUTES.pso.ts files with their effective policy; fails when the registry is invalid
 - [pso security:audit](md/cli/security-audit.md): Audit dependencies: npm audit for Node projects, SNAPSHOT/unpinned scan for Maven projects
@@ -290,6 +349,7 @@ Version: 0.1.0. Features marked "not implemented" in a page are design notes, no
 - [pso signer:remove](md/cli/signer-remove.md): Delete a signing key from THIS machine. It does not revoke trust on servers: if the key may be compromised, run pso trust:revoke on every environment first
 - [pso storage:enable](md/cli/storage-enable.md): Opt a Spring service into PSO Storage: adds the storage starter (and the S3 or Azure SDK), the pso.storage settings and multipart uploads; S3/Azure services use the local provider in the local and test profiles
 - [pso storage:validate](md/cli/storage-validate.md): Validate the pso.storage.* configuration of the Spring services (provider values, secrets in files, limits that disagree, missing dependencies) before anything runs
+- [pso structure:inspect](md/cli/structure-inspect.md): Show the structural convention of each project (modular / layered / 0.1), mixed or contradictory structures, and for a 0.1 project the migration plan: every file to move, the imports, route declarations, module registrations and Java package declarations it affects. Read-only: nothing is moved
 - [pso studio](md/cli/studio.md): Open the local developer dashboard (live services, graph, routes, config, security, logs)
 - [pso test](md/cli/test.md): Run each service's own tests (npm test / mvnw test); fails if any fail
 - [pso tls:check](md/cli/tls-check.md): Verify the workspace's TLS material: files, issuing authority, validity dates, private keys and the host names the orchestrator will verify (exit 1 on any problem; no key material is printed)
@@ -301,6 +361,7 @@ Version: 0.1.0. Features marked "not implemented" in a page are design notes, no
 - [pso uninstall](md/cli/uninstall.md): Remove an installation using its inventory: standard keeps config/cache/logs, --complete removes everything PSO owns, --purge also deletes projects you name and confirm
 - [pso update](md/cli/update.md): Check for, install (side by side, verified, atomically activated) and roll back signed updates; offline packages are supported
 - [pso validate](md/cli/validate.md): Validate workspace structure, conventions and contracts (exit 1 on errors)
+- [pso workspace:migrate](md/cli/workspace-migrate.md): Migrate a workspace to 0.2.0: add pso.infra.json, adopt the existing development TLS authority, certificates and identity key (reused, not regenerated), provision the local environment, and add the PUBLIC rules that Spring services generated before 0.2.0 lack for routes the orchestrator declares public (with backups). Without --apply it only reports; application logic, declarations and data are never changed
 
 ## DevOps
 
@@ -313,6 +374,7 @@ Version: 0.1.0. Features marked "not implemented" in a page are design notes, no
 - [PSO Studio](md/devops/studio.md): The local developer control center: what each screen shows, where the data comes from and how it is protected.
 - [Runtime telemetry and OpenTelemetry](md/devops/observability.md): What the orchestrator measures, the authenticated diagnostics endpoint, W3C trace propagation, the opt-in OTLP export and how Studio shows it without inventing numbers.
 - [Signed packages and installation lifecycle](md/devops/distribution-and-installation.md): Build a signed (optionally encrypted) .psopkg, compile the Windows installer, install, check integrity, repair, update, roll back and uninstall, and produce npm and Maven release evidence - with the real output of each step and the limits that remain.
+- [Installed CLI and framework development CLI](md/devops/installed-and-development-cli.md): Which installation answers to the pso command in a terminal, how an npm-linked development checkout shadows an installed distribution, how to find and resolve PATH conflicts on Windows (PowerShell, CMD, Git Bash), and how to keep pso (installed) and pso-dev (framework checkout) apart.
 - [Kubernetes, ECS, Container Apps and Cloud Run descriptors](md/devops/cloud-descriptors.md): Generate hardened deployment descriptors for four platforms, validate them statically, and understand exactly what was and was not verified.
 - [Logging in the orchestrator and in Spring services](md/devops/logging.md): Readable coloured output in the terminal, structured JSON in production, secrets removed, one correlation id across services, and how to diagnose HTTP and broker problems from the logs.
 
@@ -408,6 +470,7 @@ Version: 0.1.0. Features marked "not implemented" in a page are design notes, no
 - [Task: create a REST module](ai/create-rest-module.md)
 - [Task: diagnose a PSO error](ai/diagnose-error.md)
 - [Task: build the distributed frontend (FEI and MEI)](ai/frontend.md)
+- [Task: infrastructure, containers and environments (0.2.0)](ai/infrastructure.md)
 - [Task: install event dispatch](ai/install-dispatch.md)
 - [Task: configure a Spring service](ai/spring-starters.md)
 - [Manifest with versions and checksums](ai/manifest.json)

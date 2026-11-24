@@ -2,7 +2,7 @@
 
 > MODULE.pso.ts, ROUTES.pso.ts and controller contracts with exact shapes and diagnostics.
 
-Every HTTP module is a directory `src/routes/<module>/` with `MODULE.pso.ts`, `ROUTES.pso.ts` and one or more `*.controller.ts`. All three are validated together.
+Every HTTP module is a directory `src/modules/<module>/` with `MODULE.pso.ts`, `routes/ROUTES.pso.ts` and its controllers in `controllers/` (official structure). In a 0.1 project the module is `src/routes/<module>/` with `ROUTES.pso.ts` and `*.controller.ts` next to `MODULE.pso.ts`. The examples below use the 0.1 relative imports; in the official structure they are `./controllers/users.controller`, `./services/users.service` and `./routes/ROUTES.pso` (and `../controllers/...` from `routes/ROUTES.pso.ts`). All three are validated together.
 
 ### MODULE.pso.ts (composition)
 
@@ -38,7 +38,7 @@ export default defineRoutes({
 });
 ```
 
-Entry fields: `method`, `path` (full path), `controller`, `action`, `security` (`{ public: true }` or `{ guard, scopes }`), `guards`, `middleware`, `filters`, `metadata.service`, `version`.
+Entry fields: `method`, `path` (full path), `controller`, `action`, `security` (`{ public: true }` or `{ guard, scopes }`), `guards`, `middleware`, `interceptors`, `filters`, `metadata.service` (a forwarding route), `metadata.services` (the services an action may call through `UpstreamClient`), `responses`, `version`.
 
 ### Controller
 

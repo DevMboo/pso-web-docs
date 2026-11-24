@@ -2,6 +2,13 @@
 
 > Declare WebSocket channels with decorators, register them in MODULE.pso.ts, authorize every subscription against the resource, publish typed events from Spring Boot through Dispatch, and connect browsers with the client SDK.
 
+<!-- pso:structure-note -->
+> [!NOTE]
+> Examples on this page use the 0.1 orchestrator layout (`src/routes/<module>/`, `src/guards/`, `src/contracts/`), which existing
+> projects keep. In the official structure of new projects the same files are in `src/modules/<module>/` (`routes/ROUTES.pso.ts`,
+> `controllers/`, `services/`, `providers/`, `dto/`) and in `src/.app/` (`guards/`, `middlewares/`, `filters/`, `contracts/`); what the
+> page describes works the same way. See [TypeScript orchestrator structure](architecture/typescript-orchestrator.md).
+
 ## What it is
 
 PSO Channels delivers real-time events to browsers over WebSocket, on the **same HTTP server** as your routes. Three responsibilities stay separate:
