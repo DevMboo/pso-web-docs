@@ -37,7 +37,7 @@ The service sees the same `Authorization` header the orchestrator forwarded (gua
 
 ## How it is tested
 
-The generated tests sign real tokens with a throwaway key and verify them against a real loopback JWKS endpoint (class `PsoTestJwt`). For `PingController` they assert (verified from the generated test class): a valid token with the scope succeeds; a token without the scope is `403`; no token is `401`; an expired token is `401`; invalid bodies are `400` with field errors; the unprefixed path is `404`. Add the same shape of test to every controller you write.
+The generated tests sign real tokens with a throwaway key and verify them against a real loopback JWKS endpoint (class `PsoTestJwt`). In a new service (verified from the generated test classes) `ApplicationTests` asserts that health is public, that everything else is denied without a token, that a forged bearer token is rejected and that the service prefix matches the workspace declaration; `ProductControllerTests` asserts, for the generated Product API, that a token with the scope succeeds, a token without it is `403`, no token is `401`, and invalid bodies are `400` with the fields at fault. Add the same shape of test to every controller you write.
 
 ## Variations
 

@@ -4,21 +4,25 @@
 
 ## Layout and naming
 
-Spring Boot 3.5, Java 21, Maven Wrapper (`./mvnw` or `.\mvnw.cmd`; no global Maven). Classes are PascalCase; the owning directory is the last package segment.
+Spring Boot 3.5, Java 21, Maven Wrapper (`./mvnw` or `.\mvnw.cmd`; no global Maven). Classes are PascalCase; the owning directory is the last package segment. The layered structure below is MANDATORY for new services.
 
-| Kind | Directory | File pattern |
+| Kind | Directory | File |
 |---|---|---|
-| controller | routes/ | `*Controller.java` |
-| service | application/ | `*Service.java` |
-| port | ports/ | `*Port.java` |
-| adapter | adapters/ | `*Adapter.java` |
-| mapper | adapters/ | `*Mapper.java` |
-| repository | persistence/ | `*Repository.java` |
-| event | events/ | `*Event.java` |
-| listener | events/ | `*Listener.java` |
-| dto | contracts/ | `*Dto.java` |
-| config | configs/ | `*Config.java` |
-| guard | security/ | `*Guard.java` |
+| controller | `<package>/application/rest/` | `*Controller.java` |
+| service | `<package>/application/service/` | `*Service.java` |
+| request | `<package>/application/dto/request/` | `*Request.java` |
+| response | `<package>/application/dto/response/` | `*Response.java` |
+| mapper | `<package>/application/mapper/` | `*Mapper.java` |
+| repository | `<package>/infrastructure/persistence/` | `*Repository.java` |
+| entity | `<package>/infrastructure/entity/` | `*Entity.java` |
+| config | `<package>/infrastructure/config/`, `<package>/infrastructure/security/` | `*Config.java` |
+| filter | `<package>/infrastructure/filter/` | `*Filter.java` |
+| client | `<package>/infrastructure/client/` | `*Client.java` |
+| exception | `<package>/shared/exception/` | `*Exception.java` |
+| event | `<package>/application/event/` | `*Event.java` |
+| listener | `<package>/application/event/` | `*Listener.java` |
+
+Mandatory for new services (`pso create service`), relative to the base package under `src/main/java`. Flyway migrations: `src/main/resources/db/migration/V<n>__<name>.sql`. A Java service has NO `providers`, `modules`, `.app` or `app` package. A 0.1 service (`routes/`, `contracts/`, `ports/`, `adapters/`, `persistence/`) keeps its layout: see the structure migration guide.
 
 ## Rules
 
@@ -33,8 +37,8 @@ Spring Boot 3.5, Java 21, Maven Wrapper (`./mvnw` or `.\mvnw.cmd`; no global Mav
 - Lombok is available: `@RequiredArgsConstructor` for constructor injection, `@Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor` for bound request beans, records for immutable DTOs. Never `@Data` on a JPA entity; avoid `@ToString`/`@EqualsAndHashCode` on entities and on types holding secrets.
 - Outbound HTTP: inject `PsoHttpClient` and call named services declared under `pso.http.client.services` (relative paths only; bearer forwarding is opt-in per service). Do not build raw `RestTemplate`/`WebClient` calls to arbitrary URLs.
 - CORS: `pso.security.cors` with exact origins (never `*`); request limits under `pso.limits.*`.
-- Database is off by default (`pso.database.provider: none`). Choose on purpose: `pso database:enable h2|postgresql --service <svc>`. H2 is local-only and is refused with the prod or staging profile.
+- `pso create service <name>` creates the reference Product CRUD with PostgreSQL (Flyway, Hibernate `ddl-auto: validate`, UTC). With `--template empty` the database is off (`pso.database.provider: none`) until `pso database:enable postgresql --service <svc>` (which also sets the schema validation). H2 is local-only, refused with the prod or staging profile, and does not apply to a service with PostgreSQL migrations.
 - Dispatch is off by default (`pso.dispatch.enabled: false`). Install a provider with `pso dispatch:install <redis|rabbitmq|kafka> --service <name>`; the user enables it. Delivery is at-least-once (see the dispatch scope). Never add broker clients by hand. The service's tests use the in-process adapter (`pso.dispatch.provider: memory` in `application-test.yml`, from the test-scoped `pso-dispatch-test`): never set `memory` outside the test profile (`SPR015`, refused in production).
 - Profiles: local, dev, test, staging, prod, h2 (no default profile). Install the PSO artifacts first with `pso java:install`.
-- Generate with `pso make:controller|service|port|adapter|mapper|repository|dto|config|guard <name> --service <svc>`, `pso make:event|listener` (local application events), `pso make:dispatch-event|dispatch-handler` (distributed events), or `pso make:resource` for an endpoint across orchestrator and service. Unknown options are refused: use only the options `pso <command> --help` lists.
+- Generate with `pso make:crud <resource> --service <svc> [--orchestrator] [--fields ...]` for a complete resource, or per layer: `pso make:controller|service|mapper|request|response` (application/), `make:entity|repository|config|filter|client` (infrastructure/; entity and repository need a database), `make:exception` (shared/exception), `make:migration`; `pso make:event|listener` (local application events), `pso make:dispatch-event|dispatch-handler` (distributed events), `pso make:resource` for a forwarding endpoint across orchestrator and service. `make:port` and `make:adapter` exist only for 0.1 hexagonal services. Unknown options are refused: use only the options `pso <command> --help` lists.
 - Build and test: `.\mvnw.cmd test`, `pso test --service <svc>`.

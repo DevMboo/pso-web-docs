@@ -22,7 +22,7 @@ pso make:module users
 
 ## What it changes
 
-- Creates an empty module declaration and route registry under `src/routes/users/`.
+- Creates an empty module declaration (`src/modules/users/MODULE.pso.ts`) and route registry (`routes/ROUTES.pso.ts`); controllers, services, providers, DTOs, contracts and mappers are added to the module's own folders by their generators.
 - No HTTP endpoint exists until a compatible controller action is declared in the registry.
 
 ## Illustrative output
@@ -30,8 +30,8 @@ pso make:module users
 This sample shows the shape of the result. Names, ports, digests and timings may differ in your workspace.
 
 ```text evidence="illustrative"
-created  src/routes/users/MODULE.pso.ts
-created  src/routes/users/ROUTES.pso.ts
+created  src/modules/users/MODULE.pso.ts
+created  src/modules/users/routes/ROUTES.pso.ts
 ```
 
 ## Verify the result

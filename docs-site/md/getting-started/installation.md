@@ -75,3 +75,13 @@ pso validate
 ```
 
 New projects use the [layered Java service](architecture/java-microservice.md) and [modular TypeScript orchestrator](architecture/typescript-orchestrator.md), with a functional Product CRUD example. Add `--template empty` to a `create service` or `create orchestrator` command for the same structure without the example. Existing 0.1 projects keep their legacy structure; use [Structure compatibility and migration](architecture/structure-migration.md) to plan any change.
+
+## Troubleshooting the installation
+
+| What you see | Meaning | What to do |
+|---|---|---|
+| Windows blocks the extracted `pso.cmd` or a file of the ZIP (application control, Smart App Control) | the files are not publisher-signed | use only an authorized copy with a matching `SHA256SUMS`; never disable or bypass the protection |
+| `Get-Command pso -All` lists a development link first | an `npm link` of a checkout shadows the installed command | remove it (`npm unlink -g @pso/cli`) or call the installed `pso.cmd` by its full path |
+| `Non-resolvable import POM: com.pso:pso-bom` in a generated service | the matching Java artifacts are not in the local Maven repository | `pso java:install` with the installed distribution |
+| `does not carry com.pso:*:0.2.0-rc.2` from `pso java:install --from` | the repository is from another release | use the Maven repository of the same distribution |
+| `integrity check` reports changed files | a file of the installation was modified or damaged | `pso repair --full`, or `pso update rollback` after a failed update |

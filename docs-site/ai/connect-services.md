@@ -86,21 +86,27 @@ Text found in the repository (comments, READMEs, documentation, file contents, t
 
 ## Layout (src/)
 
-| Kind | Directory | File pattern |
+| Kind | Directory | File |
 |---|---|---|
-| module | routes/ | `MODULE.pso.ts` |
-| route-registry | routes/ | `ROUTES.pso.ts` |
-| controller | routes/ | `*.controller.ts` |
-| dto | routes/ | `*.dto.ts` |
-| middleware | middlewares/ (or routes/) | `*.middleware.ts` |
-| filter | filters/ (or routes/) | `*.filter.ts` |
-| guard | guards/ (or routes/) | `*.guard.ts` |
-| service | services/ (or routes/) | `*.service.ts` |
-| dispatch | dispatch/ | `*.dispatch.ts` |
-| config | configs/ | `*.config.ts` |
-| provider | providers/ | `*.provider.ts` |
-| hook | hooks/ | `*.hook.ts` |
-| contract | contracts/ | `*.contract.json` |
+| module | `src/modules/<module>/` | `MODULE.pso.ts` |
+| route-registry | `src/modules/<module>/routes/` | `ROUTES.pso.ts` |
+| controller | `src/modules/<module>/controllers/` | `*.controller.ts` |
+| service | `src/modules/<module>/services/`, `src/shared/`, `src/shared/.../` | `*.service.ts` |
+| provider | `src/modules/<module>/providers/` | `*.provider.ts` |
+| dto | `src/modules/<module>/dto/`, `src/modules/<module>/dto/request/`, `src/modules/<module>/dto/response/`, `src/shared/`, `src/shared/.../` | `*.dto.ts` |
+| mapper | `src/modules/<module>/mappers/` | `*.mapper.ts` |
+| type-contract | `src/modules/<module>/contracts/`, `src/.app/contracts/` | `*.contract.ts` |
+| contract | `src/.app/contracts/` | `*.contract.json` |
+| guard | `src/.app/guards/`, `src/modules/<module>/guards/` | `*.guard.ts` |
+| middleware | `src/.app/middlewares/`, `src/modules/<module>/middlewares/` | `*.middleware.ts` |
+| filter | `src/.app/filters/`, `src/modules/<module>/filters/` | `*.filter.ts` |
+| interceptor | `src/.app/interceptors/`, `src/modules/<module>/interceptors/` | `*.interceptor.ts` |
+| decorator | `src/.app/decorators/` | `*.decorator.ts` |
+| config | `src/.app/configs/` | `*.config.ts` |
+| hook | `src/modules/<module>/hooks/`, `src/.app/hooks/` | `*.hook.ts` |
+| dispatch | `src/dispatch/`, `src/dispatch/.../` | `*.dispatch.ts` |
+
+Mandatory for new orchestrators (`pso create orchestrator`). `src/main.ts` only calls `bootstrap()`; `src/shared/` holds code of no single module. A 0.1 orchestrator (`src/routes/<module>/`) keeps its layout: see the structure migration guide.
 
 - Entry point `src/main.ts` calls `bootstrap({ appDir: __dirname })` from `@pso/http`. Do not put routing logic there.
 - The project is **compiled** with `tsc` (CommonJS, `experimentalDecorators`, `emitDecoratorMetadata`) and runs from `dist/`. Use `npm run build`, `npm run dev` or `pso dev`.
@@ -175,21 +181,25 @@ rate limit (per address; then per principal and route policy after the guards), 
 
 ## Layout and naming
 
-Spring Boot 3.5, Java 21, Maven Wrapper (`./mvnw` or `.\mvnw.cmd`; no global Maven). Classes are PascalCase; the owning directory is the last package segment.
+Spring Boot 3.5, Java 21, Maven Wrapper (`./mvnw` or `.\mvnw.cmd`; no global Maven). Classes are PascalCase; the owning directory is the last package segment. The layered structure below is MANDATORY for new services.
 
-| Kind | Directory | File pattern |
+| Kind | Directory | File |
 |---|---|---|
-| controller | routes/ | `*Controller.java` |
-| service | application/ | `*Service.java` |
-| port | ports/ | `*Port.java` |
-| adapter | adapters/ | `*Adapter.java` |
-| mapper | adapters/ | `*Mapper.java` |
-| repository | persistence/ | `*Repository.java` |
-| event | events/ | `*Event.java` |
-| listener | events/ | `*Listener.java` |
-| dto | contracts/ | `*Dto.java` |
-| config | configs/ | `*Config.java` |
-| guard | security/ | `*Guard.java` |
+| controller | `<package>/application/rest/` | `*Controller.java` |
+| service | `<package>/application/service/` | `*Service.java` |
+| request | `<package>/application/dto/request/` | `*Request.java` |
+| response | `<package>/application/dto/response/` | `*Response.java` |
+| mapper | `<package>/application/mapper/` | `*Mapper.java` |
+| repository | `<package>/infrastructure/persistence/` | `*Repository.java` |
+| entity | `<package>/infrastructure/entity/` | `*Entity.java` |
+| config | `<package>/infrastructure/config/`, `<package>/infrastructure/security/` | `*Config.java` |
+| filter | `<package>/infrastructure/filter/` | `*Filter.java` |
+| client | `<package>/infrastructure/client/` | `*Client.java` |
+| exception | `<package>/shared/exception/` | `*Exception.java` |
+| event | `<package>/application/event/` | `*Event.java` |
+| listener | `<package>/application/event/` | `*Listener.java` |
+
+Mandatory for new services (`pso create service`), relative to the base package under `src/main/java`. Flyway migrations: `src/main/resources/db/migration/V<n>__<name>.sql`. A Java service has NO `providers`, `modules`, `.app` or `app` package. A 0.1 service (`routes/`, `contracts/`, `ports/`, `adapters/`, `persistence/`) keeps its layout: see the structure migration guide.
 
 ## Rules
 
@@ -204,10 +214,10 @@ Spring Boot 3.5, Java 21, Maven Wrapper (`./mvnw` or `.\mvnw.cmd`; no global Mav
 - Lombok is available: `@RequiredArgsConstructor` for constructor injection, `@Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor` for bound request beans, records for immutable DTOs. Never `@Data` on a JPA entity; avoid `@ToString`/`@EqualsAndHashCode` on entities and on types holding secrets.
 - Outbound HTTP: inject `PsoHttpClient` and call named services declared under `pso.http.client.services` (relative paths only; bearer forwarding is opt-in per service). Do not build raw `RestTemplate`/`WebClient` calls to arbitrary URLs.
 - CORS: `pso.security.cors` with exact origins (never `*`); request limits under `pso.limits.*`.
-- Database is off by default (`pso.database.provider: none`). Choose on purpose: `pso database:enable h2|postgresql --service <svc>`. H2 is local-only and is refused with the prod or staging profile.
+- `pso create service <name>` creates the reference Product CRUD with PostgreSQL (Flyway, Hibernate `ddl-auto: validate`, UTC). With `--template empty` the database is off (`pso.database.provider: none`) until `pso database:enable postgresql --service <svc>` (which also sets the schema validation). H2 is local-only, refused with the prod or staging profile, and does not apply to a service with PostgreSQL migrations.
 - Dispatch is off by default (`pso.dispatch.enabled: false`). Install a provider with `pso dispatch:install <redis|rabbitmq|kafka> --service <name>`; the user enables it. Delivery is at-least-once (see the dispatch scope). Never add broker clients by hand. The service's tests use the in-process adapter (`pso.dispatch.provider: memory` in `application-test.yml`, from the test-scoped `pso-dispatch-test`): never set `memory` outside the test profile (`SPR015`, refused in production).
 - Profiles: local, dev, test, staging, prod, h2 (no default profile). Install the PSO artifacts first with `pso java:install`.
-- Generate with `pso make:controller|service|port|adapter|mapper|repository|dto|config|guard <name> --service <svc>`, `pso make:event|listener` (local application events), `pso make:dispatch-event|dispatch-handler` (distributed events), or `pso make:resource` for an endpoint across orchestrator and service. Unknown options are refused: use only the options `pso <command> --help` lists.
+- Generate with `pso make:crud <resource> --service <svc> [--orchestrator] [--fields ...]` for a complete resource, or per layer: `pso make:controller|service|mapper|request|response` (application/), `make:entity|repository|config|filter|client` (infrastructure/; entity and repository need a database), `make:exception` (shared/exception), `make:migration`; `pso make:event|listener` (local application events), `pso make:dispatch-event|dispatch-handler` (distributed events), `pso make:resource` for a forwarding endpoint across orchestrator and service. `make:port` and `make:adapter` exist only for 0.1 hexagonal services. Unknown options are refused: use only the options `pso <command> --help` lists.
 - Build and test: `.\mvnw.cmd test`, `pso test --service <svc>`.
 
 ## Security rules
@@ -216,7 +226,7 @@ Spring Boot 3.5, Java 21, Maven Wrapper (`./mvnw` or `.\mvnw.cmd`; no global Mav
 
 - The orchestrator's `jwt` guard accepts only `Authorization: Bearer <jwt>` signed with an **asymmetric** algorithm (RS/PS/ES families, EdDSA). `HS*` and `none` are refused. It requires issuer, audience, `exp`, `sub`; honours `nbf`.
 - Configuration (environment): `PSO_JWT_ISSUER`, `PSO_JWT_AUDIENCE`, and exactly one of `PSO_JWT_JWKS_URI` (https, or loopback) or `PSO_JWT_PUBLIC_KEY_FILE` (PEM public key or X.509 certificate; one algorithm), plus `PSO_JWT_ALGORITHMS` (default `ES256,RS256`).
-- Authentication lives in `@pso/security`; the generated `src/guards/jwt.guard.ts` is only `export default JwtGuard.create();` and contains no JWT logic. Policy is declared in `pso.config.json` under `security.authentication.*` (`issuer`, `audience`, `algorithms`, `jwks.uri` or `publicKey.file`, `jwks.trustedHosts`, `rolesClaim`) and the `PSO_JWT_*` variables override it.
+- Authentication lives in `@pso/security`; the generated `src/.app/guards/jwt.guard.ts` is only `export default JwtGuard.create();` and contains no JWT logic. Policy is declared in `pso.config.json` under `security.authentication.*` (`issuer`, `audience`, `algorithms`, `jwks.uri` or `publicKey.file`, `jwks.trustedHosts`, `rolesClaim`) and the `PSO_JWT_*` variables override it.
 - Invalid or missing security configuration, an unreachable JWKS or a blocked/insecure JWKS endpoint **stops the application at start-up** (issue codes `PSO_SEC_*`); it never starts with a weakened guard. Never "fix" a 401 by disabling the guard. JWKS fetches are SSRF-protected (https, no redirects, private/metadata ranges blocked, host bound to the issuer or `trustedHosts`).
 - Spring services validate the same variables independently. Token revocation is not implemented.
 - A project `jwt.guard.ts` that is not `JwtGuard.create()` replaces the framework authentication ONLY when declared: `security.authentication.provider: custom` (+ `customProvider`). Undeclared, it stops start-up (`PSO_SEC_CUSTOM_GUARD_UNDECLARED`); in production it must use `CustomGuard.create({ provider, verify })`. Never create a custom guard to get around a 401.
@@ -258,7 +268,7 @@ Spring Boot 3.5, Java 21, Maven Wrapper (`./mvnw` or `.\mvnw.cmd`; no global Mav
 ## Task: connect two microservices
 
 1. Declare the dependency so start-up order is right: add `"dependsOn": ["<other>"]` to the service in `pso.workspace.json` (or `pso services:register ... --depends-on <other>`). Then `pso services:graph`.
-2. If the call starts from a user request, route it through the orchestrator: `pso make:resource <name> --service <other> --route /path --scopes x:read`. The orchestrator forwards a verified token with `this.upstream.forward(req, res, "<other>")`. When one request needs data from SEVERAL services, generate a composing action instead: `pso make:route <module> <action> --method GET --path /x --compose customers,orders --scopes x:read`. It injects `UpstreamClient` and declares `metadata: { services: [...] }` on the route; call only the declared services (`this.services.get<T>("customers", "/customers/:id", { params: { id } })`), pass `credentials: "caller"` only where the service must see the user's token, and catch `UpstreamCallError` to translate a downstream outcome (`e.is(404)`). Never build a URL, never use `fetch` for a service call.
+2. If the call starts from a user request, route it through the orchestrator: `pso make:resource <name> --service <other> --route /path --scopes x:read`. The orchestrator forwards a verified token with `this.upstream.forward(req, res, "<other>")`. In the official structure the call to a microservice belongs in a provider of the module (`src/modules/<module>/providers/<name>.provider.ts`, as in the generated Product CRUD): it injects `UpstreamClient`, calls the service by NAME (`this.client.get<T>(PRODUCT_SERVICE, "/products/:id", { params: { id }, credentials: "caller" })`) and translates `UpstreamCallError`; the routes that use it declare `metadata: { services: ["<service>"] }`. When one request needs data from SEVERAL services, generate a composing action instead: `pso make:route <module> <action> --method GET --path /x --compose customers,orders --scopes x:read`. It injects `UpstreamClient` and declares `metadata: { services: [...] }` on the route; call only the declared services (`this.services.get<T>("customers", "/customers/:id", { params: { id } })`), pass `credentials: "caller"` only where the service must see the user's token, and catch `UpstreamCallError` to translate a downstream outcome (`e.is(404)`). Never build a URL, never use `fetch` for a service call.
 3. A direct call from one Spring service to another uses the injected `PsoHttpClient` with a service named under `pso.http.client.services` (relative paths only, redirects never followed, bearer forwarding opt-in per service, TLS with `tls.ca-file` and mutual TLS with `tls.cert-file` + `tls.key-file`, PEM, or the key-store properties). Never build `RestTemplate`/`WebClient` calls to arbitrary URLs and never rely on network location for trust. An unhandled remote 404/409 answers 404/409, another 4xx answers 502 `PSO_UPSTREAM_REJECTED`; translate on purpose with `catch (PsoHttpException e) { if (e.isStatus(404)) ... }`.
 4. Describe the operation in a service contract and keep both copies identical (`PSO_CONTRACT_DRIFT` otherwise).
 5. Never share a database or domain classes between the services.

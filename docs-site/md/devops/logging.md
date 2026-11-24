@@ -107,8 +107,8 @@ Error details are off by default, **on in a `pso dev` session**, and never honou
 | Spring Boot | `pso.observability.error-details` | `PSO_LOG_ERROR_DETAILS=true` (the generated `application.yml` reads it) |
 
 ```text evidence="expected"
-ERROR [SummaryController.boom] unhandled error in a request (corr-boom-000001)  route="GET /summary/boom" error=Error origin="SummaryController.boom (dist/routes/summary/summary.controller.js:41:11)" message="lookup failed: password=[REDACTED]"
-    at SummaryController.boom (dist/routes/summary/summary.controller.js:41:11)
+ERROR [SummaryController.boom] unhandled error in a request (corr-boom-000001)  route="GET /summary/boom" error=Error origin="SummaryController.boom (dist/modules/summary/summary.controller.js:41:11)" message="lookup failed: password=[REDACTED]"
+    at SummaryController.boom (dist/modules/summary/summary.controller.js:41:11)
 ```
 
 Without error details the same line stops after `origin`: enough to find the failing line from a production log. In production the setting is ignored and the log says so once at start-up (`logging.errorDetails is ignored in production`). An upstream call that an action did not handle is logged as `an upstream call failed and the action did not handle it` with `service`, `reason` and `upstreamStatus`, never with the service's response body.

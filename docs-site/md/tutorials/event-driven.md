@@ -2,14 +2,6 @@
 
 > Publish an event from an orchestrator action, consume it with a registered consumer over Redis Streams, and watch acknowledgement, retry and dead-lettering happen - with a failing handler on purpose.
 
-<!-- pso:structure-note -->
-> [!NOTE]
-> Examples on this page use the 0.1 orchestrator layout (`src/routes/<module>/`, `src/guards/`, `src/contracts/`), which existing
-> projects keep. In the official structure of new projects the same files are in `src/modules/<module>/` (`routes/ROUTES.pso.ts`,
-> `controllers/`, `services/`, `providers/`, `dto/`) and in `src/.app/` (`guards/`, `middlewares/`, `filters/`, `contracts/`); what the
-> page describes works the same way. See [TypeScript orchestrator structure](architecture/typescript-orchestrator.md).
-
-
 Use Dispatch when the publisher can finish its request before another service completes its work. A broker acknowledgement means the event was accepted by the transport; it does not mean a consumer completed its handler. Use synchronous HTTP when the caller needs the answer ([HTTP or Dispatch?](decisions/http-or-dispatch.md)).
 
 This tutorial builds one small flow in an orchestrator: `POST /orders` **publishes** `orders.placed`, a **consumer** handles it and publishes `orders.confirmed`. Then it makes the handler fail to show retries and the dead-letter channel. It was run end to end against a real Redis 7 (`docs-event-driven.test.ts`); the output marked *Verified* comes from that run. The orchestrator is both producer and consumer here because it is the quickest real consumer; a Spring service uses the same envelope and rules (see the end).
@@ -48,7 +40,7 @@ pso make:route orders place --method POST --path / --guard jwt --scopes orders:w
 
 Replace the generated action body so it publishes. `Dispatch` is built in like `Upstream`: inject it by constructor type, without listing it in `providers`.
 
-```typescript title="gw/src/routes/orders/orders.controller.ts"
+```typescript title="gw/src/modules/orders/controllers/orders.controller.ts"
 import { Controller, RestController, Post, Body, HttpError } from "@pso/http";
 import { Dispatch } from "@pso/dispatch";
 

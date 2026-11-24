@@ -173,12 +173,16 @@ shop/
 ## Run it
 
 ```powershell
-pso docker:up
+pso infra:init --identity keycloak --runtime docker --users "ana,bob:products:read"
+pso docker:up --vendor
 pso studio
 ```
 
-`docker:up` provisions PostgreSQL (its password generated into `.infra/`, never into source), the identity provider with a development
-user, `catalog` and `gateway`, and waits until each is healthy. In Studio's API client the **reference requests** of the `products`
+`infra:init` declares the local environment in `pso.infra.json`: Docker, Keycloak and two development users (`ana` holds every
+scope the routes declare, `bob` only `products:read`); without it the local environment runs processes and has no identity provider.
+`--vendor` copies the PSO packages and Java artifacts the images need into the projects (an installed CLI references them on this
+machine, which an image build cannot reach); later starts without a rebuild do not need it. `docker:up` provisions PostgreSQL (its password generated into `.infra/`, never into source),
+Keycloak, `catalog`, `gateway` and the edge (`https://api.pso.localhost:8443`), and waits until each is healthy. In Studio's API client the **reference requests** of the `products`
 module create, list, update and delete products through the orchestrator with the development user. Without a token every products
 request except `/options` is `401`. The [reference CRUD page](architecture/reference-crud.md) shows the real requests and answers, and
 [Running the environment](getting-started/running.md) the other ways to start (including `pso dev` without Docker).

@@ -2,14 +2,7 @@
 
 > How MODULE.pso.ts, ROUTES.pso.ts and controllers compose one HTTP module, how modules share providers, and the one invariant the framework enforces.
 
-<!-- pso:structure-note -->
-> [!NOTE]
-> Examples on this page use the 0.1 orchestrator layout (`src/routes/<module>/`, `src/guards/`, `src/contracts/`), which existing
-> projects keep. In the official structure of new projects the same files are in `src/modules/<module>/` (`routes/ROUTES.pso.ts`,
-> `controllers/`, `services/`, `providers/`, `dto/`) and in `src/.app/` (`guards/`, `middlewares/`, `filters/`, `contracts/`); what the
-> page describes works the same way. See [TypeScript orchestrator structure](architecture/typescript-orchestrator.md).
-
-A module is a directory under `src/routes/` with three kinds of file. None is enough alone. Think of the directory as a boundary: composition says what belongs together, the route registry says what callers may reach, and the controller performs the work.
+A module is a directory under `src/modules/` with three kinds of file. None is enough alone. Think of the directory as a boundary: composition says what belongs together, the route registry says what callers may reach, and the controller performs the work.
 
 | File | Role | Question it answers |
 |---|---|---|
@@ -22,9 +15,9 @@ The following files are the complete `users` example in this repository. They ar
 ```ts
 // users/MODULE.pso.ts
 import { defineModule } from "@pso/core";
-import { UsersController } from "./users.controller";
-import { UsersService } from "./users.service";
-import usersRoutes from "./ROUTES.pso";
+import { UsersController } from "./controllers/users.controller";
+import { UsersService } from "./services/users.service";
+import usersRoutes from "./routes/ROUTES.pso";
 
 export default defineModule({
   name: "users",
@@ -37,9 +30,9 @@ export default defineModule({
 ```
 
 ```ts
-// users/ROUTES.pso.ts
+// users/routes/ROUTES.pso.ts
 import { defineRoutes } from "@pso/http";
-import { UsersController } from "./users.controller";
+import { UsersController } from "../controllers/users.controller";
 
 export default defineRoutes({
   routes: [
@@ -51,10 +44,10 @@ export default defineRoutes({
 ```
 
 ```ts
-// users/users.controller.ts
+// users/controllers/users.controller.ts
 import { Controller, RestController, Get, Post, Delete, Param, Body } from "@pso/http";
-import { UsersService } from "./users.service";
-import { CreateUserDto } from "./dto/create-user.dto";
+import { UsersService } from "../services/users.service";
+import { CreateUserDto } from "../dto/request/create-user.dto";
 
 @Controller()
 @RestController("/users")

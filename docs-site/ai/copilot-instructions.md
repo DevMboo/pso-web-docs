@@ -236,21 +236,27 @@ Layers (low to high): defaults, workspace, service, environment-file, environmen
 
 ## Layout (src/)
 
-| Kind | Directory | File pattern |
+| Kind | Directory | File |
 |---|---|---|
-| module | routes/ | `MODULE.pso.ts` |
-| route-registry | routes/ | `ROUTES.pso.ts` |
-| controller | routes/ | `*.controller.ts` |
-| dto | routes/ | `*.dto.ts` |
-| middleware | middlewares/ (or routes/) | `*.middleware.ts` |
-| filter | filters/ (or routes/) | `*.filter.ts` |
-| guard | guards/ (or routes/) | `*.guard.ts` |
-| service | services/ (or routes/) | `*.service.ts` |
-| dispatch | dispatch/ | `*.dispatch.ts` |
-| config | configs/ | `*.config.ts` |
-| provider | providers/ | `*.provider.ts` |
-| hook | hooks/ | `*.hook.ts` |
-| contract | contracts/ | `*.contract.json` |
+| module | `src/modules/<module>/` | `MODULE.pso.ts` |
+| route-registry | `src/modules/<module>/routes/` | `ROUTES.pso.ts` |
+| controller | `src/modules/<module>/controllers/` | `*.controller.ts` |
+| service | `src/modules/<module>/services/`, `src/shared/`, `src/shared/.../` | `*.service.ts` |
+| provider | `src/modules/<module>/providers/` | `*.provider.ts` |
+| dto | `src/modules/<module>/dto/`, `src/modules/<module>/dto/request/`, `src/modules/<module>/dto/response/`, `src/shared/`, `src/shared/.../` | `*.dto.ts` |
+| mapper | `src/modules/<module>/mappers/` | `*.mapper.ts` |
+| type-contract | `src/modules/<module>/contracts/`, `src/.app/contracts/` | `*.contract.ts` |
+| contract | `src/.app/contracts/` | `*.contract.json` |
+| guard | `src/.app/guards/`, `src/modules/<module>/guards/` | `*.guard.ts` |
+| middleware | `src/.app/middlewares/`, `src/modules/<module>/middlewares/` | `*.middleware.ts` |
+| filter | `src/.app/filters/`, `src/modules/<module>/filters/` | `*.filter.ts` |
+| interceptor | `src/.app/interceptors/`, `src/modules/<module>/interceptors/` | `*.interceptor.ts` |
+| decorator | `src/.app/decorators/` | `*.decorator.ts` |
+| config | `src/.app/configs/` | `*.config.ts` |
+| hook | `src/modules/<module>/hooks/`, `src/.app/hooks/` | `*.hook.ts` |
+| dispatch | `src/dispatch/`, `src/dispatch/.../` | `*.dispatch.ts` |
+
+Mandatory for new orchestrators (`pso create orchestrator`). `src/main.ts` only calls `bootstrap()`; `src/shared/` holds code of no single module. A 0.1 orchestrator (`src/routes/<module>/`) keeps its layout: see the structure migration guide.
 
 - Entry point `src/main.ts` calls `bootstrap({ appDir: __dirname })` from `@pso/http`. Do not put routing logic there.
 - The project is **compiled** with `tsc` (CommonJS, `experimentalDecorators`, `emitDecoratorMetadata`) and runs from `dist/`. Use `npm run build`, `npm run dev` or `pso dev`.
@@ -323,15 +329,15 @@ rate limit (per address; then per principal and route policy after the guards), 
 
 ## Module and route conventions
 
-Every HTTP module is a directory `src/modules/<module>/` with `MODULE.pso.ts`, `routes/ROUTES.pso.ts` and its controllers in `controllers/` (official structure). In a 0.1 project the module is `src/routes/<module>/` with `ROUTES.pso.ts` and `*.controller.ts` next to `MODULE.pso.ts`. The examples below use the 0.1 relative imports; in the official structure they are `./controllers/users.controller`, `./services/users.service` and `./routes/ROUTES.pso` (and `../controllers/...` from `routes/ROUTES.pso.ts`). All three are validated together.
+Every HTTP module is a directory `src/modules/<module>/` (MANDATORY for new code) with `MODULE.pso.ts`, `routes/ROUTES.pso.ts`, `controllers/`, `services/`, `providers/`, `contracts/`, `dto/request/`, `dto/response/` and `mappers/`. All of them are validated together. A 0.1 project (`src/routes/<module>/`, every file next to `MODULE.pso.ts`) keeps its layout; never add official-structure files to it (`PSO_STRUCTURE_MIXED`).
 
-### MODULE.pso.ts (composition)
+### src/modules/users/MODULE.pso.ts (composition)
 
 ```typescript
 import { defineModule } from "@pso/core";
-import { UsersController } from "./users.controller";
-import { UsersService } from "./users.service";
-import usersRoutes from "./ROUTES.pso";
+import { UsersController } from "./controllers/users.controller";
+import { UsersService } from "./services/users.service";
+import usersRoutes from "./routes/ROUTES.pso";
 
 export default defineModule({
   name: "users",                 // must equal the directory name
@@ -343,11 +349,11 @@ export default defineModule({
 });
 ```
 
-### ROUTES.pso.ts (authoritative registry; literals and identifiers only)
+### src/modules/users/routes/ROUTES.pso.ts (authoritative registry; literals and identifiers only)
 
 ```typescript
 import { defineRoutes } from "@pso/http";
-import { UsersController } from "./users.controller";
+import { UsersController } from "../controllers/users.controller";
 
 export default defineRoutes({
   routes: [
@@ -361,7 +367,7 @@ export default defineRoutes({
 
 Entry fields: `method`, `path` (full path), `controller`, `action`, `security` (`{ public: true }` or `{ guard, scopes }`), `guards`, `middleware`, `interceptors`, `filters`, `metadata.service` (a forwarding route), `metadata.services` (the services an action may call through `UpstreamClient`), `responses`, `version`.
 
-### Controller
+### src/modules/users/controllers/users.controller.ts
 
 ```typescript
 @Controller()
@@ -393,21 +399,25 @@ pso make:route users findAll --method GET --path / --public --service gateway
 
 ## Layout and naming
 
-Spring Boot 3.5, Java 21, Maven Wrapper (`./mvnw` or `.\mvnw.cmd`; no global Maven). Classes are PascalCase; the owning directory is the last package segment.
+Spring Boot 3.5, Java 21, Maven Wrapper (`./mvnw` or `.\mvnw.cmd`; no global Maven). Classes are PascalCase; the owning directory is the last package segment. The layered structure below is MANDATORY for new services.
 
-| Kind | Directory | File pattern |
+| Kind | Directory | File |
 |---|---|---|
-| controller | routes/ | `*Controller.java` |
-| service | application/ | `*Service.java` |
-| port | ports/ | `*Port.java` |
-| adapter | adapters/ | `*Adapter.java` |
-| mapper | adapters/ | `*Mapper.java` |
-| repository | persistence/ | `*Repository.java` |
-| event | events/ | `*Event.java` |
-| listener | events/ | `*Listener.java` |
-| dto | contracts/ | `*Dto.java` |
-| config | configs/ | `*Config.java` |
-| guard | security/ | `*Guard.java` |
+| controller | `<package>/application/rest/` | `*Controller.java` |
+| service | `<package>/application/service/` | `*Service.java` |
+| request | `<package>/application/dto/request/` | `*Request.java` |
+| response | `<package>/application/dto/response/` | `*Response.java` |
+| mapper | `<package>/application/mapper/` | `*Mapper.java` |
+| repository | `<package>/infrastructure/persistence/` | `*Repository.java` |
+| entity | `<package>/infrastructure/entity/` | `*Entity.java` |
+| config | `<package>/infrastructure/config/`, `<package>/infrastructure/security/` | `*Config.java` |
+| filter | `<package>/infrastructure/filter/` | `*Filter.java` |
+| client | `<package>/infrastructure/client/` | `*Client.java` |
+| exception | `<package>/shared/exception/` | `*Exception.java` |
+| event | `<package>/application/event/` | `*Event.java` |
+| listener | `<package>/application/event/` | `*Listener.java` |
+
+Mandatory for new services (`pso create service`), relative to the base package under `src/main/java`. Flyway migrations: `src/main/resources/db/migration/V<n>__<name>.sql`. A Java service has NO `providers`, `modules`, `.app` or `app` package. A 0.1 service (`routes/`, `contracts/`, `ports/`, `adapters/`, `persistence/`) keeps its layout: see the structure migration guide.
 
 ## Rules
 
@@ -422,10 +432,10 @@ Spring Boot 3.5, Java 21, Maven Wrapper (`./mvnw` or `.\mvnw.cmd`; no global Mav
 - Lombok is available: `@RequiredArgsConstructor` for constructor injection, `@Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor` for bound request beans, records for immutable DTOs. Never `@Data` on a JPA entity; avoid `@ToString`/`@EqualsAndHashCode` on entities and on types holding secrets.
 - Outbound HTTP: inject `PsoHttpClient` and call named services declared under `pso.http.client.services` (relative paths only; bearer forwarding is opt-in per service). Do not build raw `RestTemplate`/`WebClient` calls to arbitrary URLs.
 - CORS: `pso.security.cors` with exact origins (never `*`); request limits under `pso.limits.*`.
-- Database is off by default (`pso.database.provider: none`). Choose on purpose: `pso database:enable h2|postgresql --service <svc>`. H2 is local-only and is refused with the prod or staging profile.
+- `pso create service <name>` creates the reference Product CRUD with PostgreSQL (Flyway, Hibernate `ddl-auto: validate`, UTC). With `--template empty` the database is off (`pso.database.provider: none`) until `pso database:enable postgresql --service <svc>` (which also sets the schema validation). H2 is local-only, refused with the prod or staging profile, and does not apply to a service with PostgreSQL migrations.
 - Dispatch is off by default (`pso.dispatch.enabled: false`). Install a provider with `pso dispatch:install <redis|rabbitmq|kafka> --service <name>`; the user enables it. Delivery is at-least-once (see the dispatch scope). Never add broker clients by hand. The service's tests use the in-process adapter (`pso.dispatch.provider: memory` in `application-test.yml`, from the test-scoped `pso-dispatch-test`): never set `memory` outside the test profile (`SPR015`, refused in production).
 - Profiles: local, dev, test, staging, prod, h2 (no default profile). Install the PSO artifacts first with `pso java:install`.
-- Generate with `pso make:controller|service|port|adapter|mapper|repository|dto|config|guard <name> --service <svc>`, `pso make:event|listener` (local application events), `pso make:dispatch-event|dispatch-handler` (distributed events), or `pso make:resource` for an endpoint across orchestrator and service. Unknown options are refused: use only the options `pso <command> --help` lists.
+- Generate with `pso make:crud <resource> --service <svc> [--orchestrator] [--fields ...]` for a complete resource, or per layer: `pso make:controller|service|mapper|request|response` (application/), `make:entity|repository|config|filter|client` (infrastructure/; entity and repository need a database), `make:exception` (shared/exception), `make:migration`; `pso make:event|listener` (local application events), `pso make:dispatch-event|dispatch-handler` (distributed events), `pso make:resource` for a forwarding endpoint across orchestrator and service. `make:port` and `make:adapter` exist only for 0.1 hexagonal services. Unknown options are refused: use only the options `pso <command> --help` lists.
 - Build and test: `.\mvnw.cmd test`, `pso test --service <svc>`.
 
 ## Security rules
@@ -434,7 +444,7 @@ Spring Boot 3.5, Java 21, Maven Wrapper (`./mvnw` or `.\mvnw.cmd`; no global Mav
 
 - The orchestrator's `jwt` guard accepts only `Authorization: Bearer <jwt>` signed with an **asymmetric** algorithm (RS/PS/ES families, EdDSA). `HS*` and `none` are refused. It requires issuer, audience, `exp`, `sub`; honours `nbf`.
 - Configuration (environment): `PSO_JWT_ISSUER`, `PSO_JWT_AUDIENCE`, and exactly one of `PSO_JWT_JWKS_URI` (https, or loopback) or `PSO_JWT_PUBLIC_KEY_FILE` (PEM public key or X.509 certificate; one algorithm), plus `PSO_JWT_ALGORITHMS` (default `ES256,RS256`).
-- Authentication lives in `@pso/security`; the generated `src/guards/jwt.guard.ts` is only `export default JwtGuard.create();` and contains no JWT logic. Policy is declared in `pso.config.json` under `security.authentication.*` (`issuer`, `audience`, `algorithms`, `jwks.uri` or `publicKey.file`, `jwks.trustedHosts`, `rolesClaim`) and the `PSO_JWT_*` variables override it.
+- Authentication lives in `@pso/security`; the generated `src/.app/guards/jwt.guard.ts` is only `export default JwtGuard.create();` and contains no JWT logic. Policy is declared in `pso.config.json` under `security.authentication.*` (`issuer`, `audience`, `algorithms`, `jwks.uri` or `publicKey.file`, `jwks.trustedHosts`, `rolesClaim`) and the `PSO_JWT_*` variables override it.
 - Invalid or missing security configuration, an unreachable JWKS or a blocked/insecure JWKS endpoint **stops the application at start-up** (issue codes `PSO_SEC_*`); it never starts with a weakened guard. Never "fix" a 401 by disabling the guard. JWKS fetches are SSRF-protected (https, no redirects, private/metadata ranges blocked, host bound to the issuer or `trustedHosts`).
 - Spring services validate the same variables independently. Token revocation is not implemented.
 - A project `jwt.guard.ts` that is not `JwtGuard.create()` replaces the framework authentication ONLY when declared: `security.authentication.provider: custom` (+ `customProvider`). Undeclared, it stops start-up (`PSO_SEC_CUSTOM_GUARD_UNDECLARED`); in production it must use `CustomGuard.create({ provider, verify })`. Never create a custom guard to get around a 401.
@@ -701,6 +711,7 @@ Rules:
 
 - Use the CLI to install: `pso dispatch:install <redis|rabbitmq|kafka> --service <name>`, then `pso dispatch:validate`. Never hand-write broker clients, never add `ioredis`, `amqplib`, `kafkajs`, Spring AMQP, Spring Kafka or Spring Data Redis for messaging.
 - Declare every event first, with the generator: `pso make:dispatch-event <domain.event> --service <name> --fields "id:string,total:number" [--key id] [--consume-only]` writes the declaration (`EVENTS.pso.ts` + schema in TypeScript, `src/main/resources/dispatch/*.events.json` + a payload record in Java), and `pso make:dispatch-handler <domain.event> --service <name>` writes a declared consumer. A published version is never edited: declare the next `--version`.
+- Layered services (0.2.0-rc.2): the Dispatch and event generators write to `events/`, which `pso validate` refuses. After generating, move the classes to `application/event/` and change their `package` line; then `pso validate` must pass. Never leave an `events/` package in a layered service.
 - `pso make:event` / `pso make:listener` are NOT Dispatch: they generate a LOCAL Spring application event and `@EventListener` (same process, not durable). Never use them for an event another service must receive.
 - Publish only through `Dispatch.publish(type, payload)` (TypeScript, injected) or `PsoDispatch.publish(type, payload)` (Java). Consume with `@DispatchConsumer("event")` listed in `EVENTS.pso.ts`, or `@PsoEventHandler("event")`.
 - Delivery is **at-least-once**. Write idempotent handlers. Never promise or describe exactly-once, ordering across partitions, or delayed retries. Retries are in-process with backoff; exhausted and poison messages go to `<channel>.dlq`.
@@ -740,7 +751,7 @@ Machine-readable copies of every page are available as `md/<page-id>.md` in the 
 - Troubleshooting — `getting-started/troubleshooting.html`: The problems developers meet first - each with symptoms, likely causes, the command that tells them apart, the fix, how to verify it and how to prevent it.
 - Downloads — `downloads/index.html`: Current PSO Web distribution status, the available private portable preview, verification and Windows installation limits.
 - Build your first application — `tutorials/first-application.html`: Create a workspace, a Java microservice and a TypeScript orchestrator with the reference Product CRUD, start them with PostgreSQL and the identity provider, call the API, then generate a second resource the same way.
-- Build a CRUD API — `tutorials/crud-api.html`: From an empty folder to a working, tested products API - workspace, Spring service, PostgreSQL, Flyway, validation, transactions, the orchestrator routes and every request, with the real responses and the rows they leave in the database.
+- Build a CRUD API — `tutorials/crud-api.html`: The generated Product CRUD from the first command to real requests - what each layer does, one request followed from the client through the orchestrator's route, controller, service and provider to the Spring controller, service, repository and PostgreSQL, then a second resource generated the same way.
 - Protect an API with JWT scopes — `tutorials/authentication.html`: Configure a trusted issuer, declare public and protected routes, and diagnose 401 versus 403.
 - Connect multiple services — `tutorials/multiple-services.html`: Two Spring services with their own databases, an orchestrator module for each, calls by service name, and the topology PSO derives from the declarations.
 - Publish and consume an event — `tutorials/event-driven.html`: Publish an event from an orchestrator action, consume it with a registered consumer over Redis Streams, and watch acknowledgement, retry and dead-lettering happen - with a failing handler on purpose.
@@ -765,6 +776,7 @@ Machine-readable copies of every page are available as `md/<page-id>.md` in the 
 - The reference Product CRUD — `architecture/reference-crud.html`: File by file, the Product CRUD that pso create service and pso create orchestrator generate - endpoints, security, validation, persistence, the request lifecycle from the orchestrator to PostgreSQL, how to run and call it locally, in Docker and from Studio, how to remove it and how to generate another resource the same way.
 - Generators in the official structures — `architecture/generators.html`: Which pso make commands exist for the modular orchestrator and the layered Java service, where each one writes, what it registers for you, and the rules every generator follows (structure detection, no overwrites, no mixing, transactional changes).
 - Structure compatibility and migration — `architecture/structure-migration.html`: How PSO recognises the 0.1 and the official structures, refuses projects that mix them, keeps 0.1 projects working, and plans (read-only) the migration of a project to the official structure with pso structure:inspect.
+- A CRUD by hand in the 0.1 layout (compatibility) — `architecture/manual-crud-0-1.html`: For projects that keep the 0.1 layout - a products API built piece by piece (Spring service, PostgreSQL, Flyway, validation, transactions, forwarding routes, tokens), with the real responses. New projects get the CRUD generated in the official structure.
 - Orchestrator architecture — `orchestrator/architecture.html`: Node.js + TypeScript, compiled, declarative modules, one public entry point - what the orchestrator does, what it deliberately does not, how a request travels through it, and how to deploy and scale it.
 - Minimal main.ts — `orchestrator/bootstrap.html`: The whole entry point, what bootstrap() does step by step, its options, what it logs on success and on failure, and which environment variables it reads.
 - MODULE.pso.ts — `orchestrator/module.html`: Compose a module - its controllers, providers, route registry, imports and exports - with the generators, the rules, the diagnostics you will see and the shapes modules take in practice.
@@ -781,14 +793,14 @@ Machine-readable copies of every page are available as `md/<page-id>.md` in the 
 - Dependency injection in the orchestrator — `orchestrator/dependency-injection.html`: A complete example - a service injected into a controller, exported and imported across modules - with the exact diagnostics for each mistake and the rules of the container.
 - Remote service clients — `orchestrator/upstream-clients.html`: Forward requests to Spring Boot services with the built-in Upstream provider.
 - Spring Boot integration — `microservices/spring-boot-integration.html`: How PSO generates and manages Spring Boot services, which starters each generated service includes, and what stays plain Spring.
-- Java project structure: layered and legacy — `microservices/project-structure.html`: The official layered Java service structure and the 0.1 hexagonal layout retained for existing projects.
-- Hexagonal architecture — `microservices/hexagonal-architecture.html`: The simplified ports-and-adapters layout PSO uses, without extra abstraction - what each layer owns, a worked port-and-adapter example, and when not to add one.
+- Java project structure — `microservices/project-structure.html`: The mandatory layered structure of a PSO Spring Boot service - application, infrastructure and shared packages - where each kind of class goes, what the generators write, and how 0.1 services are kept.
 - Service contracts — `microservices/service-contracts.html`: Versioned JSON contracts mirrored into each service and checked for drift - what is generated, what is validated, how to change one safely, and what contracts deliberately do not cover.
 - Service registration — `microservices/service-registration.html`: How services are declared, registered and found, in development and production - the commands, their real output, the validation that runs before anything is saved, and what registration does not grant.
 - Security integration in services — `microservices/security-integration.html`: How each Spring Boot service validates tokens and scopes on its own, through the PSO security starter - the settings, what a missing setting does, the generated checks, and how to test and troubleshoot it.
 - Persistence: PostgreSQL and Flyway — `microservices/persistence.html`: A service that owns its database, migrations tested against a real PostgreSQL, and the template's outbox table - what --db postgres adds, what you run, what you see, and where to go for a full CRUD example.
 - Maven dependencies and SNAPSHOTs — `microservices/maven-dependencies.html`: The Maven Wrapper, the PSO BOM, reproducible builds, the release script that produces a file repository and an SBOM, and what PSO does about SNAPSHOT dependencies.
 - Service-to-service communication — `microservices/service-to-service.html`: What PSO provides for calls between services - the gateway path, the Spring HTTP client with TLS and mTLS, events - and what you decide yourself, with the safety rules each path enforces.
+- 0.1 hexagonal layout (compatibility) — `microservices/hexagonal-architecture.html`: The simplified ports-and-adapters layout of 0.1 Java services, kept for existing projects - what each layer owns, a worked port-and-adapter example, and how it maps to the mandatory layered structure of new services.
 - Spring Boot starters — `spring/overview.html`: The first-party Maven artifacts behind every generated Spring Boot service, what each one provides and what is not implemented yet.
 - Maven BOM and Java versions — `spring/maven-bom.html`: How the distributed and source-checkout CLIs select matching PSO Java artifacts, and how Maven builds resolve them.
 - Spring configuration reference — `spring/configuration.html`: Every pso.* key with defaults and environment overrides, the profiles and how misspelled keys are handled.
@@ -799,7 +811,7 @@ Machine-readable copies of every page are available as `md/<page-id>.md` in the 
 - Database selection and H2 — `spring/database-and-h2.html`: pso.database.provider, database-free start-up, the opt-in H2 profile and PostgreSQL with Flyway.
 - Storage — `spring/storage.html`: PSO Storage for Spring Boot services - one API over the local filesystem, Amazon S3 and Azure Blob Storage, with opaque identifiers, ownership, upload validation, safe downloads and audit events.
 - Dispatch configuration — `spring/dispatch.html`: The pso.dispatch.* settings, the provider starters and the Spring Boot API for events.
-- PostgreSQL CRUD in a Spring service — `spring/postgresql-crud.html`: A complete, tested example - connection, pool, Flyway migration, entity, repository, DTOs, mapper, service with transactions, controller, validation, errors and tests - with real output.
+- PostgreSQL CRUD in a Spring service — `spring/postgresql-crud.html`: How the generated layered service persists its data - datasource and pool, the Flyway migration, the JPA entity, the repository and database-level filters, transactions and the 409 for duplicates, pagination limits, the tests against a real PostgreSQL - and how to add a table or a resource.
 - Lombok conventions — `spring/lombok.html`: How Lombok is configured in generated services and which annotations belong where.
 - Authentication: JWT and JWKS — `security/authentication.html`: How the framework-owned jwt guard verifies bearer tokens and how its policy is declared in configuration.
 - Authorization: scopes, roles and principal — `security/authorization.html`: Declarative scope and role requirements, how levels combine, and how to read the current principal.

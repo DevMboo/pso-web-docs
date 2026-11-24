@@ -94,6 +94,13 @@ pso make:dispatch-handler orders.placed --service billing
 pso dispatch:validate
 ```
 
+> [!WARNING]
+> **Known limitation in 0.2.0-rc.2.** In a service with the official layered structure, `pso make:dispatch-event`, `make:dispatch-handler`,
+> `make:event` and `make:listener` still write their classes to the 0.1 package `events/`, and `pso validate` then refuses the service
+> (`PSO_MISPLACED_RESOURCE`, and `PSO_STRUCTURE_MIXED` from `pso structure:inspect`). Until the generators are fixed, move the generated
+> classes to `application/event/` and change their `package` declaration (`pso structure:inspect --service <svc>` lists each move), then
+> run `pso validate`. The paths below are what the generators write; 0.1 services are not affected.
+
 The publisher gets the declaration and the payload record; a consumer declares the same event with `--consume-only` (`"publish": false`) and gets a handler:
 
 ```java title="orders: src/main/java/com/pso/orders/events/OrdersPlacedEvent.java (generated)"

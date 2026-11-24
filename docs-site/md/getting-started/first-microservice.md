@@ -99,10 +99,11 @@ schema the entities expect.
 ## 5. Start it and call it
 
 ```powershell
-pso docker:up
+pso infra:init --identity keycloak --runtime docker --users "ana,bob:products:read"
+pso docker:up --vendor
 ```
 
-starts the service with its PostgreSQL database (and the rest of the workspace) in containers. To run it from the IDE or Maven instead,
+starts the service with its PostgreSQL database (and the rest of the workspace) in containers. `infra:init` declares the local environment in `pso.infra.json`: Docker, Keycloak and two development users (`ana` holds every scope the routes declare, `bob` only `products:read`); without it the local environment runs processes and has no identity provider. `--vendor` copies the PSO packages and Java artifacts the images need into the projects (an installed CLI references them on this machine, which an image build cannot reach); later starts without a rebuild do not need it. To run it from the IDE or Maven instead,
 point it at a PostgreSQL database with `DB_URL`, `DB_USER` and `DB_PASSWORD`. The `h2` profile does not apply to a service with
 PostgreSQL: its migrations use PostgreSQL features, and it would still try to reach PostgreSQL.
 

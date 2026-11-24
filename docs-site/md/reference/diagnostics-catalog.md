@@ -2,13 +2,6 @@
 
 > Eleven real mistakes in modules, routes, services and security, the exact message `pso validate` prints for each, why it happens, how to fix it and how to prevent it.
 
-<!-- pso:structure-note -->
-> [!NOTE]
-> Examples on this page use the 0.1 orchestrator layout (`src/routes/<module>/`, `src/guards/`, `src/contracts/`), which existing
-> projects keep. In the official structure of new projects the same files are in `src/modules/<module>/` (`routes/ROUTES.pso.ts`,
-> `controllers/`, `services/`, `providers/`, `dto/`) and in `src/.app/` (`guards/`, `middlewares/`, `filters/`, `contracts/`); what the
-> page describes works the same way. See [TypeScript orchestrator structure](architecture/typescript-orchestrator.md).
-
 `pso validate` reads your sources without running them and refuses anything that would expose an endpoint by accident. This page shows what it says when you get something wrong. Each mistake below was **made on purpose** in a generated workspace (`gateway` with an `orders` module, plus a `catalog` service) and the output was copied from the run. A test repeats these mistakes and checks that the same codes come back, so the page cannot drift from the CLI.
 
 The baseline, before any mistake:
@@ -18,8 +11,8 @@ pso validate
 ```
 
 ```text evidence="verified"
-gateway: 4 resource(s), digest cc35d7a3b5c6
-catalog: 3 resource(s), digest 4731e3e29002
+gateway: 4 resource(s), digest f7c1e0ee9cd0
+catalog: 3 resource(s), digest 6c847b46dc80
 OK
 ```
 
@@ -42,14 +35,14 @@ Every failure ends with the same two summary lines and `FAILED`, and the exit co
 
 **The mistake.** `MODULE.pso.ts` lost its controller:
 
-```typescript title="gateway/src/routes/orders/MODULE.pso.ts"
+```typescript title="gateway/src/modules/orders/MODULE.pso.ts"
 export default defineModule({
   name: "orders",
   controllers: [],
 ```
 
 ```text evidence="verified"
-ERROR   PSO_MODULE_003 gateway/src/routes/orders/MODULE.pso.ts: Controller is not declared in MODULE.pso.ts.
+ERROR   PSO_MODULE_003 gateway/src/modules/orders/MODULE.pso.ts: Controller is not declared in MODULE.pso.ts.
 
 Module: orders
 Controller: OrdersController
@@ -57,7 +50,7 @@ Controller: OrdersController
 A controller absent from the module declaration is never registered.
 
 Controller rejected.
-ERROR   PSO_ROUTE_001 gateway/src/routes/orders/ROUTES.pso.ts: Route references a controller that is not part of the module.
+ERROR   PSO_ROUTE_001 gateway/src/modules/orders/routes/ROUTES.pso.ts: Route references a controller that is not part of the module.
 
 Module: orders
 Route: GET /orders
@@ -81,7 +74,7 @@ Route activation denied.
 **The mistake.** `ROUTES.pso.ts` says `action: "listAll"`, the controller has `list`.
 
 ```text evidence="verified"
-ERROR   PSO_ROUTE_002 gateway/src/routes/orders/ROUTES.pso.ts: Controller action does not exist.
+ERROR   PSO_ROUTE_002 gateway/src/modules/orders/routes/ROUTES.pso.ts: Controller action does not exist.
 
 Module: orders
 Route: GET /orders
@@ -101,7 +94,7 @@ Route activation denied.
 **The mistake.** The registry says `POST`, the action is `@Get("/")`.
 
 ```text evidence="verified"
-ERROR   PSO_ROUTE_004 gateway/src/routes/orders/ROUTES.pso.ts: Route declaration mismatch.
+ERROR   PSO_ROUTE_004 gateway/src/modules/orders/routes/ROUTES.pso.ts: Route declaration mismatch.
 
 Module: orders
 Route: POST /orders
@@ -121,7 +114,7 @@ Route activation denied.
 **The mistake.** `path: "/order"` where the controller says `/orders`.
 
 ```text evidence="verified"
-ERROR   PSO_ROUTE_005 gateway/src/routes/orders/ROUTES.pso.ts: Route path does not match the controller.
+ERROR   PSO_ROUTE_005 gateway/src/modules/orders/routes/ROUTES.pso.ts: Route path does not match the controller.
 
 Module: orders
 Route: GET /order
@@ -141,7 +134,7 @@ Route activation denied.
 **The mistake.** `guard: "jwtt"`.
 
 ```text evidence="verified"
-ERROR   PSO_ROUTE_008 gateway/src/routes/orders/ROUTES.pso.ts: Unknown guard.
+ERROR   PSO_ROUTE_008 gateway/src/modules/orders/routes/ROUTES.pso.ts: Unknown guard.
 
 Module: orders
 Route: GET /orders
@@ -161,7 +154,7 @@ Route activation denied.
 **The mistake.** `metadata: { service: "billing" }` while the workspace has only `catalog`.
 
 ```text evidence="verified"
-ERROR   PSO_ROUTE_010 gateway/src/routes/orders/ROUTES.pso.ts: Route targets an unknown service.
+ERROR   PSO_ROUTE_010 gateway/src/modules/orders/routes/ROUTES.pso.ts: Route targets an unknown service.
 
 Module: orders
 Route: GET /orders
@@ -179,8 +172,8 @@ Route activation denied.
 **The mistake.** `ROUTES.pso.ts` has `routes: []` while the controller still has `@Get`.
 
 ```text evidence="verified"
-gateway: 4 resource(s), digest cc35d7a3b5c6
-catalog: 3 resource(s), digest 4731e3e29002
+gateway: 4 resource(s), digest f7c1e0ee9cd0
+catalog: 3 resource(s), digest 6c847b46dc80
 OK
 ```
 
@@ -191,7 +184,7 @@ This is **correct behaviour, not a gap**: decorators describe, `ROUTES.pso.ts` d
 **The mistake.** `ROUTES.pso.ts` was removed.
 
 ```text evidence="verified"
-ERROR   PSO_MODULE_002 gateway/src/routes/orders/MODULE.pso.ts: Route registry missing.
+ERROR   PSO_MODULE_002 gateway/src/modules/orders/MODULE.pso.ts: Route registry missing.
 
 Module: orders
 
@@ -218,8 +211,8 @@ ERROR   PSO_PORT_CONFLICT pso.workspace.json: Services "gateway" and "catalog" b
 **The mistake.** A mapper in a `misc/` package:
 
 ```text evidence="verified"
-ERROR   PSO_MISPLACED_RESOURCE catalog/src/main/java/com/pso/catalog/misc/OrderMapper.java: mapper "OrderMapper" must live in a "adapters/" directory
-        hint: Move it to adapters/
+ERROR   PSO_MISPLACED_RESOURCE catalog/src/main/java/com/pso/catalog/misc/OrderMapper.java: mapper "OrderMapper" must live in "application/mapper/" (under the application package) in the layered structure
+        hint: Move it, or generate it with `pso make:mapper` which places it correctly
 ```
 
 **Why.** The owning directory decides the kind of a class ([project structure](microservices/project-structure.md)). That is what lets tools and people find things without reading every file. **Fix.** Move the file and its `package` declaration.

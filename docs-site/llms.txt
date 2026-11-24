@@ -26,7 +26,7 @@ Version: 0.2.0. Features marked "not implemented" in a page are design notes, no
 ## Tutorials
 
 - [Build your first application](md/tutorials/first-application.md): Create a workspace, a Java microservice and a TypeScript orchestrator with the reference Product CRUD, start them with PostgreSQL and the identity provider, call the API, then generate a second resource the same way.
-- [Build a CRUD API](md/tutorials/crud-api.md): From an empty folder to a working, tested products API - workspace, Spring service, PostgreSQL, Flyway, validation, transactions, the orchestrator routes and every request, with the real responses and the rows they leave in the database.
+- [Build a CRUD API](md/tutorials/crud-api.md): The generated Product CRUD from the first command to real requests - what each layer does, one request followed from the client through the orchestrator's route, controller, service and provider to the Spring controller, service, repository and PostgreSQL, then a second resource generated the same way.
 - [Protect an API with JWT scopes](md/tutorials/authentication.md): Configure a trusted issuer, declare public and protected routes, and diagnose 401 versus 403.
 - [Connect multiple services](md/tutorials/multiple-services.md): Two Spring services with their own databases, an orchestrator module for each, calls by service name, and the topology PSO derives from the declarations.
 - [Publish and consume an event](md/tutorials/event-driven.md): Publish an event from an orchestrator action, consume it with a registered consumer over Redis Streams, and watch acknowledgement, retry and dead-lettering happen - with a failing handler on purpose.
@@ -57,6 +57,7 @@ Version: 0.2.0. Features marked "not implemented" in a page are design notes, no
 - [The reference Product CRUD](md/architecture/reference-crud.md): File by file, the Product CRUD that pso create service and pso create orchestrator generate - endpoints, security, validation, persistence, the request lifecycle from the orchestrator to PostgreSQL, how to run and call it locally, in Docker and from Studio, how to remove it and how to generate another resource the same way.
 - [Generators in the official structures](md/architecture/generators.md): Which pso make commands exist for the modular orchestrator and the layered Java service, where each one writes, what it registers for you, and the rules every generator follows (structure detection, no overwrites, no mixing, transactional changes).
 - [Structure compatibility and migration](md/architecture/structure-migration.md): How PSO recognises the 0.1 and the official structures, refuses projects that mix them, keeps 0.1 projects working, and plans (read-only) the migration of a project to the official structure with pso structure:inspect.
+- [A CRUD by hand in the 0.1 layout (compatibility)](md/architecture/manual-crud-0-1.md): For projects that keep the 0.1 layout - a products API built piece by piece (Spring service, PostgreSQL, Flyway, validation, transactions, forwarding routes, tokens), with the real responses. New projects get the CRUD generated in the official structure.
 
 ## Orchestrator
 
@@ -79,14 +80,14 @@ Version: 0.2.0. Features marked "not implemented" in a page are design notes, no
 ## Microservices
 
 - [Spring Boot integration](md/microservices/spring-boot-integration.md): How PSO generates and manages Spring Boot services, which starters each generated service includes, and what stays plain Spring.
-- [Java project structure: layered and legacy](md/microservices/project-structure.md): The official layered Java service structure and the 0.1 hexagonal layout retained for existing projects.
-- [Hexagonal architecture](md/microservices/hexagonal-architecture.md): The simplified ports-and-adapters layout PSO uses, without extra abstraction - what each layer owns, a worked port-and-adapter example, and when not to add one.
+- [Java project structure](md/microservices/project-structure.md): The mandatory layered structure of a PSO Spring Boot service - application, infrastructure and shared packages - where each kind of class goes, what the generators write, and how 0.1 services are kept.
 - [Service contracts](md/microservices/service-contracts.md): Versioned JSON contracts mirrored into each service and checked for drift - what is generated, what is validated, how to change one safely, and what contracts deliberately do not cover.
 - [Service registration](md/microservices/service-registration.md): How services are declared, registered and found, in development and production - the commands, their real output, the validation that runs before anything is saved, and what registration does not grant.
 - [Security integration in services](md/microservices/security-integration.md): How each Spring Boot service validates tokens and scopes on its own, through the PSO security starter - the settings, what a missing setting does, the generated checks, and how to test and troubleshoot it.
 - [Persistence: PostgreSQL and Flyway](md/microservices/persistence.md): A service that owns its database, migrations tested against a real PostgreSQL, and the template's outbox table - what --db postgres adds, what you run, what you see, and where to go for a full CRUD example.
 - [Maven dependencies and SNAPSHOTs](md/microservices/maven-dependencies.md): The Maven Wrapper, the PSO BOM, reproducible builds, the release script that produces a file repository and an SBOM, and what PSO does about SNAPSHOT dependencies.
 - [Service-to-service communication](md/microservices/service-to-service.md): What PSO provides for calls between services - the gateway path, the Spring HTTP client with TLS and mTLS, events - and what you decide yourself, with the safety rules each path enforces.
+- [0.1 hexagonal layout (compatibility)](md/microservices/hexagonal-architecture.md): The simplified ports-and-adapters layout of 0.1 Java services, kept for existing projects - what each layer owns, a worked port-and-adapter example, and how it maps to the mandatory layered structure of new services.
 
 ## Spring Boot
 
@@ -100,7 +101,7 @@ Version: 0.2.0. Features marked "not implemented" in a page are design notes, no
 - [Database selection and H2](md/spring/database-and-h2.md): pso.database.provider, database-free start-up, the opt-in H2 profile and PostgreSQL with Flyway.
 - [Storage](md/spring/storage.md): PSO Storage for Spring Boot services - one API over the local filesystem, Amazon S3 and Azure Blob Storage, with opaque identifiers, ownership, upload validation, safe downloads and audit events.
 - [Dispatch configuration](md/spring/dispatch.md): The pso.dispatch.* settings, the provider starters and the Spring Boot API for events.
-- [PostgreSQL CRUD in a Spring service](md/spring/postgresql-crud.md): A complete, tested example - connection, pool, Flyway migration, entity, repository, DTOs, mapper, service with transactions, controller, validation, errors and tests - with real output.
+- [PostgreSQL CRUD in a Spring service](md/spring/postgresql-crud.md): How the generated layered service persists its data - datasource and pool, the Flyway migration, the JPA entity, the repository and database-level filters, transactions and the 409 for duplicates, pagination limits, the tests against a real PostgreSQL - and how to add a table or a resource.
 - [Lombok conventions](md/spring/lombok.md): How Lombok is configured in generated services and which annotations belong where.
 
 ## Security

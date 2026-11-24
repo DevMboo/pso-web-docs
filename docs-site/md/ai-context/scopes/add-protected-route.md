@@ -6,7 +6,7 @@
 2. Route to an existing module:
    `pso make:route <module> <action> --method GET --path /<path> --guard jwt --scopes orders:read --service <orchestrator>`
    Add `--upstream <service>` to forward to a Spring service.
-3. New resource backed by a Spring service:
+3. New resource backed by a Spring service, with persistence: `pso make:crud <name> --service <spring-service> --orchestrator` (scopes `<plural>:read` / `<plural>:write`, a public `/<plural>/options`). A forwarding endpoint only:
    `pso make:resource <name> --service <spring-service> --route /<path> --scopes orders:read`
    (GET collection or `--method POST`). It generates the orchestrator module, the Spring controller with `@PreAuthorize`, tests, a contract and documentation, all-or-nothing.
 4. `pso validate`, `pso security:policy` (the route must show `guarded` with the scopes) and `pso security:check`.

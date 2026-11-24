@@ -41,11 +41,12 @@ pso make:resource order --service catalog --method POST --route /orders --scopes
 This sample shows the shape of the result. Names, ports, digests and timings may differ in your workspace.
 
 ```text evidence="illustrative"
-created    gw/src/routes/customer/MODULE.pso.ts
-created    gw/src/routes/customer/ROUTES.pso.ts
-created    gw/src/routes/customer/customer.controller.ts
-created    catalog/src/main/java/.../CustomerController.java
+created    gw/src/.app/contracts/customer.contract.json
+created    catalog/src/main/java/.../application/rest/CustomerController.java
 ...
+created    gw/src/modules/customer/MODULE.pso.ts
+created    gw/src/modules/customer/controllers/customer.controller.ts
+created    gw/src/modules/customer/routes/ROUTES.pso.ts
 ```
 
 ## Verify the result

@@ -23,16 +23,16 @@ pso make:hook audit --module users --service gateway
 
 ## What it changes
 
-- Writes `src/hooks/audit.hook.ts`: an injectable class implementing `onReady` (after start-up succeeded, before the application reports ready; throwing stops start-up) and `onShutdown` (after running requests finished, before the framework releases its resources).
-- `--module users` adds the class to `providers` of that module's `MODULE.pso.ts`. A hook runs only when a module lists it: a file in `src/hooks/` is never run on its own.
+- Writes `src/modules/users/hooks/audit.hook.ts`: an injectable class implementing `onReady` (after start-up succeeded, before the application reports ready; throwing stops start-up) and `onShutdown` (after running requests finished, before the framework releases its resources).
+- `--module users` adds the class to `providers` of that module's `MODULE.pso.ts`. A hook runs only when a module lists it: a file in a `hooks/` folder is never run on its own.
 
 ## Illustrative output
 
 This sample shows the shape of the result. Names, ports, digests and timings may differ in your workspace.
 
 ```text evidence="illustrative"
-created  src/hooks/audit.hook.ts
-updated  src/routes/users/MODULE.pso.ts
+updated  src/modules/users/MODULE.pso.ts
+created  src/modules/users/hooks/audit.hook.ts
 ```
 
 ## Verify the result
@@ -43,7 +43,7 @@ updated  src/routes/users/MODULE.pso.ts
 ## Failure cases
 
 - `Module "users" does not exist`: create it with `pso make:module users`.
-- Without `--module` the file is written and the command says that nothing uses it yet.
+- `In the modular structure a hook belongs to a module`: pass `--module <module>`.
 - `A hook is generated in the orchestrator`: Spring services use Spring's own lifecycle callbacks.
 
 ## Exit codes

@@ -2,13 +2,6 @@
 
 > Forward requests to Spring Boot services with the built-in Upstream provider.
 
-<!-- pso:structure-note -->
-> [!NOTE]
-> Examples on this page use the 0.1 orchestrator layout (`src/routes/<module>/`, `src/guards/`, `src/contracts/`), which existing
-> projects keep. In the official structure of new projects the same files are in `src/modules/<module>/` (`routes/ROUTES.pso.ts`,
-> `controllers/`, `services/`, `providers/`, `dto/`) and in `src/.app/` (`guards/`, `middlewares/`, `filters/`, `contracts/`); what the
-> page describes works the same way. See [TypeScript orchestrator structure](architecture/typescript-orchestrator.md).
-
 ```typescript
 @Get("/")
 async findAll(@Req() req: IncomingMessage, @Res() res: ServerResponse) {
@@ -130,7 +123,7 @@ pso make:route summary show --method GET --path /of/:id --compose customers,orde
 
 The generator injects the client and, in `ROUTES.pso.ts`, declares the services the action may call:
 
-```ts title="src/routes/summary/ROUTES.pso.ts (the generated entry)"
+```ts title="src/modules/summary/routes/ROUTES.pso.ts (the generated entry)"
 {
   method: "GET",
   path: "/summary/of/:id",
@@ -141,7 +134,7 @@ The generator injects the client and, in `ROUTES.pso.ts`, declares the services 
 }
 ```
 
-```ts title="src/routes/summary/summary.controller.ts"
+```ts title="src/modules/summary/controllers/summary.controller.ts"
 import { Controller, RestController, Get, Param, UpstreamClient } from "@pso/http";
 
 interface Customer { id: string; name: string }

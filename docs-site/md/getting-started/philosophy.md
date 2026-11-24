@@ -6,7 +6,7 @@
 
 | Verb | Meaning in PSO |
 |---|---|
-| **Structure declares** | Directories and file names say what a file is. `src/routes/users/` is a module; `*.guard.ts` is a guard. |
+| **Structure declares** | Directories and file names say what a file is. `src/modules/users/` is a module; `*.guard.ts` is a guard. |
 | **Modules compose** | `MODULE.pso.ts` lists the controllers and providers that belong together. |
 | **Contracts validate** | `ROUTES.pso.ts`, JSON service contracts and the workspace schema are checked against the code before anything runs. |
 | **The framework executes** | `bootstrap()` validates once more, wires dependencies and activates only what was declared. |
@@ -15,7 +15,7 @@
 
 ### 1. Convention over configuration, with explicit configuration when convention is not enough
 
-A new orchestrator has a fixed layout (`src/routes`, `src/guards`, `src/middlewares`, ...). You do not configure where controllers live; you put them there. When a convention is not enough (a port, an upstream address, a limit) there is one documented place to set it ([configuration](concepts/configuration.md)).
+A new orchestrator has a fixed layout (`src/modules`, `src/.app/guards`, `src/.app/middlewares`, ...). You do not configure where controllers live; you put them there. When a convention is not enough (a port, an upstream address, a limit) there is one documented place to set it ([configuration](concepts/configuration.md)).
 
 *Cost:* the layout is not negotiable. A team that wants a different tree is fighting the tools.
 
@@ -25,11 +25,11 @@ A new orchestrator has a fixed layout (`src/routes`, `src/guards`, `src/middlewa
 
 ```text evidence="expected"
 $ pso validate
-gateway: 5 resource(s), digest 1ce8bc49aa9c
-catalog: 5 resource(s), digest 94045c91b9f4
+catalog: 12 resource(s), digest f4307ea2aac8
+gateway: 12 resource(s), digest e010c0bcf740
 OK
 ```
-*(expected output)*
+*(expected output for a new workspace with the reference CRUD; digests vary with the structure)*
 
 *Cost:* what cannot be seen statically cannot be validated. A route built at run time from a loop is invisible to the tooling, so it is not allowed.
 

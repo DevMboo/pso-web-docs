@@ -2,20 +2,13 @@
 
 > The central idea - where a file lives and what it is called defines what it does - with a walkthrough from a file name to a running endpoint, and the limits of the approach.
 
-<!-- pso:structure-note -->
-> [!NOTE]
-> Examples on this page use the 0.1 orchestrator layout (`src/routes/<module>/`, `src/guards/`, `src/contracts/`), which existing
-> projects keep. In the official structure of new projects the same files are in `src/modules/<module>/` (`routes/ROUTES.pso.ts`,
-> `controllers/`, `services/`, `providers/`, `dto/`) and in `src/.app/` (`guards/`, `middlewares/`, `filters/`, `contracts/`); what the
-> page describes works the same way. See [TypeScript orchestrator structure](architecture/typescript-orchestrator.md).
-
-In PSO the **path** of a file and its **name** are part of the program. `src/routes/users/MODULE.pso.ts` is a module because of where it is and what it is called, not because some other file registered it.
+In PSO the **path** of a file and its **name** are part of the program. `src/modules/users/MODULE.pso.ts` is a module because of where it is and what it is called, not because some other file registered it.
 
 | Level | What the structure says |
 |---|---|
 | Workspace | `pso.workspace.json` lists services, ports, dependencies |
 | Project | A Node orchestrator has `src/`; a Spring service has `src/main/java/<pkg>/` |
-| Module | `src/routes/<module>/` holds `MODULE.pso.ts`, `ROUTES.pso.ts`, controllers, providers, DTOs |
+| Module | `src/modules/<module>/` holds `MODULE.pso.ts`, `ROUTES.pso.ts`, controllers, providers, DTOs |
 | File | A suffix names the kind: `.controller.ts`, `.guard.ts`, `.contract.json`, `Controller.java` |
 
 The framework reads the structure, validates it and composes the application from it. Because reading the structure does not run code, tools such as `pso validate`, `pso routes:list`, Studio and the AI context can all use it safely.
@@ -36,7 +29,7 @@ src/
 
 ## A walkthrough: from a file name to an endpoint
 
-Take `src/routes/product/product.controller.ts` (a real generated file).
+Take `src/modules/product/controllers/product.controller.ts` (a real generated file).
 
 1. **Its path says it is part of the module `product`.** The directory under `routes/` is the module.
 2. **Its suffix says it is a controller.** `.controller.ts` is classified as a controller; the same name with `.guard.ts` would be a guard.
@@ -50,9 +43,9 @@ You can watch the model: `pso routes:inspect product.findAll` prints the whole c
 ```text evidence="verified"
 GET /products  ->  catalog:8081
 access:   guard jwt, scopes products:read
-defined:  gateway/src/routes/product/ROUTES.pso.ts
+defined:  gateway/src/modules/product/routes/ROUTES.pso.ts
 contract: present
-handlers: catalog/src/main/java/com/pso/catalog/routes/ProductController.java
+handlers: catalog/src/main/java/com/pso/catalog/application/rest/ProductController.java
 ```
 
 One command shows the route, its policy, where it is declared, whether a contract exists and which class handles it on the service side. That is the payoff of making structure meaningful.

@@ -7,8 +7,9 @@ Every generated Spring service includes Lombok. The version is the one Spring Bo
 | Use | Annotation |
 |---|---|
 | services and controllers (constructor injection) | `@RequiredArgsConstructor` on a class whose dependencies are `final` fields |
-| mutable request beans bound by Jackson | `@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder` (see `PingRequest`) |
-| immutable DTOs and responses | a Java **record**; no Lombok needed (see `PingDto`) |
+| JPA entities | `@Getter`, `@Setter` on the fields that may change, `@NoArgsConstructor(access = AccessLevel.PROTECTED)` (see the generated `ProductEntity`) |
+| request and response DTOs | a Java **record**; no Lombok needed (see `CreateProductRequest`, `ProductResponse`) |
+| mutable beans a framework binds | `@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder` |
 
 ## Rules
 
@@ -25,11 +26,11 @@ The generated tests check that the template follows these rules (no `@Data` or `
 `pso make:service pricing --service catalog` prints and creates:
 
 ```text evidence="verified"
-created    src/main/java/com/pso/catalog/application/PricingService.java
+created    src/main/java/com/pso/catalog/application/service/PricingService.java
 ```
 
-```java title="catalog/src/main/java/com/pso/catalog/application/PricingService.java (generated)"
-package com.pso.catalog.application;
+```java title="catalog/src/main/java/com/pso/catalog/application/service/PricingService.java (generated)"
+package com.pso.catalog.application.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -41,7 +42,7 @@ public class PricingService {
 }
 ```
 
-Add your dependencies as `private final` fields and the generated constructor injects them. The generated DTOs (`PingDto`) are records.
+Add your dependencies as `private final` fields and the generated constructor injects them. The generated request and response DTOs are records.
 
 ## Common mistakes
 

@@ -10,7 +10,7 @@ secured, database-backed API, not an empty skeleton.
 |---|---|
 | After generation | `pso.workspace.json` names both projects; the orchestrator's `products` module is bound to `catalog` |
 | After `pso validate` | PSO accepts the structure, the routes and their security, without running any code |
-| After `pso docker:up` | PostgreSQL, the identity provider, `catalog` and `gateway` are running and healthy |
+| After `pso docker:up --vendor` | PostgreSQL, the identity provider, `catalog` and `gateway` are running and healthy |
 | After the requests | a token with `products:write` creates a product; without one the orchestrator answers 401 before calling anything |
 
 ## Prerequisites
@@ -56,11 +56,15 @@ the unique SKU.
 ## Start it
 
 ```bash
-pso docker:up
+pso infra:init --identity keycloak --runtime docker --users "ana,bob:products:read"
+pso docker:up --vendor
 ```
 
-PSO provisions PostgreSQL (with a generated password in `.infra/`, never in the source), the identity provider with a development
-user, the service and the orchestrator, and waits until each is healthy. Then:
+`infra:init` declares the local environment in `pso.infra.json`: Docker, Keycloak and two development users (`ana` holds every
+scope the routes declare, `bob` only `products:read`); without it the local environment runs processes and has no identity provider.
+`--vendor` copies the PSO packages and Java artifacts the images need into the projects (an installed CLI references them on this
+machine, which an image build cannot reach); later starts without a rebuild do not need it. PSO then provisions PostgreSQL (with a generated password in `.infra/`, never in the source),
+Keycloak, the service, the orchestrator and the edge, and waits until each is healthy. Then:
 
 ```bash
 pso studio

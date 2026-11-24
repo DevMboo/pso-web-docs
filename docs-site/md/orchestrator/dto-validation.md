@@ -2,13 +2,6 @@
 
 > Declare the shape of a request once with @Dto fields, bind it with @Body(Dto), and let the orchestrator reject invalid input before your action runs. Basic to production, with real output.
 
-<!-- pso:structure-note -->
-> [!NOTE]
-> Examples on this page use the 0.1 orchestrator layout (`src/routes/<module>/`, `src/guards/`, `src/contracts/`), which existing
-> projects keep. In the official structure of new projects the same files are in `src/modules/<module>/` (`routes/ROUTES.pso.ts`,
-> `controllers/`, `services/`, `providers/`, `dto/`) and in `src/.app/` (`guards/`, `middlewares/`, `filters/`, `contracts/`); what the
-> page describes works the same way. See [TypeScript orchestrator structure](architecture/typescript-orchestrator.md).
-
 ## What it is
 
 `@Body(CreateOrderDto)` makes the orchestrator check the request body against a class you declared, field by field, **before your action is called**. If anything is wrong, the client gets a `400` `application/problem+json` response that lists every wrong field, and your code never runs.
@@ -51,14 +44,14 @@ What each command created:
 
 | File | Purpose |
 |---|---|
-| `src/routes/orders/MODULE.pso.ts` | the module: which controller and providers exist |
-| `src/routes/orders/ROUTES.pso.ts` | the authoritative route list: `POST /orders`, guarded, scope `orders:write` |
-| `src/routes/orders/orders.controller.ts` | the action `create`, already using `@Body(CreateOrderDto)` |
-| `src/routes/orders/dto/create-order.dto.ts` | the validated shape |
+| `src/modules/orders/MODULE.pso.ts` | the module: which controller and providers exist |
+| `src/modules/orders/routes/ROUTES.pso.ts` | the authoritative route list: `POST /orders`, guarded, scope `orders:write` |
+| `src/modules/orders/controllers/orders.controller.ts` | the action `create`, already using `@Body(CreateOrderDto)` |
+| `src/modules/orders/dto/request/create-order.dto.ts` | the validated shape |
 
 The generated DTO:
 
-```typescript title="src/routes/orders/dto/create-order.dto.ts"
+```typescript title="src/modules/orders/dto/request/create-order.dto.ts"
 import { Dto, Required, StringField, IntegerField, Email, MinLength, MaxLength, Min, Max } from "@pso/http";
 
 @Dto()
@@ -76,9 +69,9 @@ export class CreateOrderDto {
 
 The generated controller (the action body is yours to write; here it returns what it received):
 
-```typescript title="src/routes/orders/orders.controller.ts"
+```typescript title="src/modules/orders/controllers/orders.controller.ts"
 import { Controller, RestController, Post, Body } from "@pso/http";
-import { CreateOrderDto } from "./dto/create-order.dto";
+import { CreateOrderDto } from "../dto/request/create-order.dto";
 
 @Controller()
 @RestController("/orders")
@@ -214,7 +207,7 @@ Errors carry the path: `address.city`, `tags[2]`. For DTOs that refer to each ot
 
 A field rule is **structural** and pure: it needs nothing but the value. A rule such as "this SKU exists" needs a service. Keep it separate:
 
-```typescript title="src/routes/orders/sku-rules.service.ts"
+```typescript title="src/modules/orders/services/sku-rules.service.ts"
 import { Injectable, type FieldValidator } from "@pso/http";
 import { SkuCatalog } from "./sku-catalog.service";
 

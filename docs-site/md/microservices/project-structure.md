@@ -1,108 +1,141 @@
-# Java project structure: layered and legacy
+# Java project structure
 
-> The official layered Java service structure and the 0.1 hexagonal layout retained for existing projects.
+> The mandatory layered structure of a PSO Spring Boot service - application, infrastructure and shared packages - where each kind of class goes, what the generators write, and how 0.1 services are kept.
 
-New `pso create service` projects use the **layered** structure, with `application/rest`, `application/service`, `application/dto`, `application/mapper`, `infrastructure/entity`, `infrastructure/persistence`, `infrastructure/config` and `shared/`. The default template includes a working Product CRUD, PostgreSQL and Flyway; `--template empty` keeps the structure without the example. See the [official Java structure](architecture/java-microservice.md) and [current generator destinations](architecture/generators.md).
+Every new PSO Spring Boot service uses the **layered** structure. It is the standard, not a suggestion: the generators write into it,
+`pso validate` checks it, and the documentation, examples and AI context assume it. `pso create service <name>` creates it with the
+reference Product CRUD, PostgreSQL and Flyway; `--template empty` creates the same packages without the example.
 
-## Existing 0.1 projects
-
-The following structure and verified generator output describe a **0.1 legacy service**. Existing services keep working and their generators continue to write in their own layout. Do not mix its `routes/`, `ports/`, `adapters/` and `contracts/` packages with the new layered packages in one service (`PSO_STRUCTURE_MIXED`). Use [structure inspection](architecture/structure-migration.md) to plan a manual migration.
-
-```tree title="The 0.1 simplified hexagonal layout"
+```tree title="A new service (pso create service catalog)"
 catalog/
-  pom.xml  # generated
+  pom.xml  # generated: Spring Boot 3.5, the PSO BOM 0.2.0-rc.2 and starters
   mvnw  # generated: Maven Wrapper, with mvnw.cmd and .mvn/wrapper/maven-wrapper.properties
-  lombok.config  # generated
   src/
     main/
       java/com/pso/catalog/
         Application.java  # generated
-        configs/  # application-specific configuration (security comes from the starter): ...Config.java
-        routes/  # controllers: ...Controller.java
-        application/  # services: ...Service.java
-        ports/  # interfaces the application needs: ...Port.java
-        adapters/  # implementations of ports and mappers: ...Adapter.java, ...Mapper.java
-        persistence/  # repositories: ...Repository.java
-        events/  # ...Event.java, ...Listener.java
-        contracts/  # request and response records: ...Dto.java
-        security/  # ...Guard.java
+        application/
+          rest/  # generated: @RestController classes
+          service/  # generated: @Service classes, the transaction boundaries
+          dto/
+            request/  # generated: request records with Jakarta Validation
+            response/  # generated: response records
+          mapper/  # generated: request to entity to response
+        infrastructure/
+          entity/  # generated: JPA entities
+          persistence/  # generated: Spring Data repositories and specifications
+          config/  # generated: @Configuration classes
+          security/  # generated: security integration beyond the starter
+          filter/  # generated: servlet filters
+        shared/
+          exception/  # generated: RFC 9457 problems (PsoProblemException subclasses)
+          constant/  # generated: constants
+          validation/  # generated: reusable validation helpers
       resources/
         application.yml  # generated, plus application-<profile>.yml
-        contracts/  # optional: *.contract.json
-    test/java/com/pso/catalog/  # generated: unit and integration tests
+        db/migration/  # generated: Flyway migrations V<n>__<name>.sql
+    test/java/com/pso/catalog/  # generated: tests with real JWTs and an embedded PostgreSQL
 ```
 
-The owning directory is the **last package segment**, and the package prefix (`com.pso.catalog`) is free. Component scanning and auto-configuration behave exactly as in any Spring Boot application.
+Empty packages hold a `.gitkeep`. `infrastructure/client/` appears when `pso make:client` writes the first outbound client. The
+package prefix (`com.pso.catalog`, or `--package com.example.catalog` at creation) is free; the layer is the package path below it.
 
-| Kind | Directory | File pattern |
+A Java service has **no `providers`, `modules`, `.app` or `app` package**: those are orchestrator conventions. A Java service calls
+other services through `PsoHttpClient` (`infrastructure/client/`); its layers are packages, not modules.
+
+## Where each class goes
+
+| Kind | Directory | File |
 |---|---|---|
-| controller | routes/ | `*Controller.java` |
-| service | application/ | `*Service.java` |
-| port | ports/ | `*Port.java` |
-| adapter | adapters/ | `*Adapter.java` |
-| mapper | adapters/ | `*Mapper.java` |
-| repository | persistence/ | `*Repository.java` |
-| event | events/ | `*Event.java` |
-| listener | events/ | `*Listener.java` |
-| dto | contracts/ | `*Dto.java` |
-| config | configs/ | `*Config.java` |
-| guard | security/ | `*Guard.java` |
+| controller | `<package>/application/rest/` | `*Controller.java` |
+| service | `<package>/application/service/` | `*Service.java` |
+| request | `<package>/application/dto/request/` | `*Request.java` |
+| response | `<package>/application/dto/response/` | `*Response.java` |
+| mapper | `<package>/application/mapper/` | `*Mapper.java` |
+| repository | `<package>/infrastructure/persistence/` | `*Repository.java` |
+| entity | `<package>/infrastructure/entity/` | `*Entity.java` |
+| config | `<package>/infrastructure/config/`, `<package>/infrastructure/security/` | `*Config.java` |
+| filter | `<package>/infrastructure/filter/` | `*Filter.java` |
+| client | `<package>/infrastructure/client/` | `*Client.java` |
+| exception | `<package>/shared/exception/` | `*Exception.java` |
+| event | `<package>/application/event/` | `*Event.java` |
+| listener | `<package>/application/event/` | `*Listener.java` |
 
-Plain helper files without a recognised suffix are allowed anywhere and are ignored by discovery.
+Known limitation of 0.2.0-rc.2: `make:event`, `make:listener`, `make:dispatch-event` and `make:dispatch-handler` still write to the 0.1
+package `events/`; move those classes to `application/event/` (and fix their `package` line) before `pso validate`.
+
+Plain helper classes without one of these suffixes are allowed in any package of the service and are ignored by discovery. A class with
+a known suffix in the wrong package is `PSO_MISPLACED_RESOURCE`; a badly named one is `PSO_BAD_NAME`.
 
 ## The generators
 
-`pso make:controller|service|port|adapter|mapper|repository|event|listener|dto|config|guard <name> --service catalog`. Names are given in kebab-case and become PascalCase classes with the right suffix. Real output (verified):
+Names are given in kebab-case and become PascalCase classes with the right suffix, in the right layer. Real output (verified):
 
 ```text evidence="verified"
-$ pso make:dto customer-request --service catalog
-created    src/main/java/com/pso/catalog/contracts/CustomerRequestDto.java
+$ pso make:request create-customer --service catalog
+created    src/main/java/com/pso/catalog/application/dto/request/CreateCustomerRequest.java
+$ pso make:response customer --service catalog
+created    src/main/java/com/pso/catalog/application/dto/response/CustomerResponse.java
 $ pso make:service pricing --service catalog
-created    src/main/java/com/pso/catalog/application/PricingService.java
-$ pso make:port payment-gateway --service catalog
-created    src/main/java/com/pso/catalog/ports/PaymentGatewayPort.java
-$ pso make:adapter payment-gateway --service catalog
-created    src/main/java/com/pso/catalog/adapters/PaymentGatewayAdapter.java
+created    src/main/java/com/pso/catalog/application/service/PricingService.java
 $ pso make:mapper customer --service catalog
-created    src/main/java/com/pso/catalog/adapters/CustomerMapper.java
+created    src/main/java/com/pso/catalog/application/mapper/CustomerMapper.java
+$ pso make:entity customer --service catalog
+created    src/main/java/com/pso/catalog/infrastructure/entity/CustomerEntity.java
 $ pso make:repository customer --service catalog
-created    src/main/java/com/pso/catalog/persistence/CustomerRepository.java
+created    src/main/java/com/pso/catalog/infrastructure/persistence/CustomerRepository.java
 ```
 
-The generated DTO is a record with a validation starting point; make it yours:
+The generated request is a record with a validation starting point; make it yours:
 
-```java
-package com.pso.catalog.contracts;
+```java title="src/main/java/com/pso/catalog/application/dto/request/CreateCustomerRequest.java"
+package com.pso.catalog.application.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
-public record CustomerRequestDto(@NotBlank String id) {
+public record CreateCustomerRequest(@NotBlank @Size(max = 120) String name) {
 }
 ```
 
-A class with a known suffix in the wrong directory is `PSO_MISPLACED_RESOURCE`; a badly named one is `PSO_BAD_NAME`.
+For a complete resource (entity, the next Flyway migration, repository, records, mapper, transactional service, controller, tests, and
+optionally the orchestrator module) use one command: `pso make:crud <resource> --service <svc> [--orchestrator]`
+([Generators](architecture/generators.md)). An entity or a repository needs a database: in a service without one the generators refuse
+and name `pso database:enable postgresql --service <svc>`.
 
 ## Where does this code go?
 
 | You are writing | Put it in | Why |
 |---|---|---|
-| an HTTP endpoint | `routes/` (`@RestController`) | translates HTTP to a call |
-| the rule behind it | `application/` (`@Service`) | transaction boundary, reusable |
-| a request or response shape | `contracts/` (records) | the public contract; never an entity |
-| something the service needs from outside (payments, a remote API) | `ports/` interface and `adapters/` implementation | the service stays testable without the outside |
-| persistence | `persistence/` (Spring Data repository) and entities where you keep your domain | see [PostgreSQL CRUD](spring/postgresql-crud.md) |
-| converting between shapes | a mapper in `adapters/` | one visible place for field mapping |
-| an event | `events/` | [Dispatch](dispatch/events-and-consumers.md) |
-
-The tested [PostgreSQL CRUD example](spring/postgresql-crud.md) uses `domain/` for entities and repositories; that directory has no framework meaning (it is a helper location the discovery ignores), which is allowed.
+| an HTTP endpoint | `application/rest/` (`@RestController`) | translates HTTP to a call; validates and authorizes |
+| the rule behind it | `application/service/` (`@Service`, `@Transactional`) | the transaction boundary, reusable |
+| a request or response shape | `application/dto/request/`, `application/dto/response/` (records) | the public contract; never an entity |
+| converting between shapes | `application/mapper/` | one visible place for field mapping |
+| a table | `infrastructure/entity/` and a Flyway migration | Flyway owns the schema; Hibernate only validates it |
+| queries | `infrastructure/persistence/` (Spring Data, `Specification`) | filters, sorting and pagination run in the database |
+| a call to another service | `infrastructure/client/` (`PsoHttpClient`) | named services, never URLs |
+| technical configuration, security integration, servlet filters | `infrastructure/config/`, `security/`, `filter/` | how it is done, not what |
+| an application error, a constant, a validation helper | `shared/exception/`, `shared/constant/`, `shared/validation/` | genuinely reusable, no business logic |
+| an event | `application/event/` (local) or [Dispatch](dispatch/events-and-consumers.md) (distributed) | |
 
 ## Common mistakes
 
-- Putting a `Dto` in `routes/` (misplaced) or an entity in `contracts/`.
-- Making a port for everything. Add one where there is a boundary (a remote system) worth substituting in tests.
-- Adding configuration classes that duplicate what the starters already configure.
+- Returning a JPA entity from a controller: map it to a response record.
+- Business logic in a controller or a repository: it belongs in `application/service/`.
+- A `providers` or `modules` package "to match the orchestrator": the two runtimes follow their own ecosystems on purpose.
+- An entity without its migration: the service refuses to start (`Schema-validation: missing table`).
+- Configuration classes that duplicate what the PSO starters already configure (security, problems, correlation ids).
+
+## 0.1 services (compatibility)
+
+Services created before 0.2 use a simplified hexagonal layout (`routes/`, `application/`, `ports/`, `adapters/`, `persistence/`,
+`events/`, `contracts/`, `configs/`, `security/`). They keep working, and the generators write into their layout (`make:port` and
+`make:adapter` exist only there). Never add layered packages to such a service: a service with both is refused
+(`PSO_STRUCTURE_MIXED`). [Structure migration](architecture/structure-migration.md) plans the move with `pso structure:inspect`;
+[Hexagonal architecture](microservices/hexagonal-architecture.md) describes the 0.1 layout.
 
 ## Next steps
 
-- [Hexagonal architecture](microservices/hexagonal-architecture.md)
+- [Java microservice structure](architecture/java-microservice.md): the layers, persistence, validation, errors, tests.
+- [The reference CRUD](architecture/reference-crud.md), file by file.
 - [PostgreSQL CRUD](spring/postgresql-crud.md)

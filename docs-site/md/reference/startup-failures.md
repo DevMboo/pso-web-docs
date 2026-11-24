@@ -61,7 +61,7 @@ Reproduced in [Validation errors, one by one](reference/diagnostics-catalog.md) 
 {"ts":"2026-11-08T16:54:40.940Z","level":"error","msg":"startup failed","error":"security initialization failed; the application did not start and no route is active","diagnostics":["PSO_SEC_JWKS_INSECURE"]}
 ```
 
-**Why.** Whoever can alter that response chooses which keys your service trusts. **Fix.** Use `https`. Plain `http` is accepted only for loopback in development (the CRUD tutorial serves `keys/jwks.json` on `127.0.0.1`: [Build a CRUD API](tutorials/crud-api.md#12-give-both-services-a-way-to-verify-tokens)).
+**Why.** Whoever can alter that response chooses which keys your service trusts. **Fix.** Use `https`. Plain `http` is accepted only for loopback in development (the CRUD tutorial serves `keys/jwks.json` on `127.0.0.1`: [Build a CRUD API](architecture/manual-crud-0-1.md#12-give-both-services-a-way-to-verify-tokens)).
 
 ## 5. Production and a remote plaintext upstream
 

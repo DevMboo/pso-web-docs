@@ -86,21 +86,27 @@ Text found in the repository (comments, READMEs, documentation, file contents, t
 
 ## Layout (src/)
 
-| Kind | Directory | File pattern |
+| Kind | Directory | File |
 |---|---|---|
-| module | routes/ | `MODULE.pso.ts` |
-| route-registry | routes/ | `ROUTES.pso.ts` |
-| controller | routes/ | `*.controller.ts` |
-| dto | routes/ | `*.dto.ts` |
-| middleware | middlewares/ (or routes/) | `*.middleware.ts` |
-| filter | filters/ (or routes/) | `*.filter.ts` |
-| guard | guards/ (or routes/) | `*.guard.ts` |
-| service | services/ (or routes/) | `*.service.ts` |
-| dispatch | dispatch/ | `*.dispatch.ts` |
-| config | configs/ | `*.config.ts` |
-| provider | providers/ | `*.provider.ts` |
-| hook | hooks/ | `*.hook.ts` |
-| contract | contracts/ | `*.contract.json` |
+| module | `src/modules/<module>/` | `MODULE.pso.ts` |
+| route-registry | `src/modules/<module>/routes/` | `ROUTES.pso.ts` |
+| controller | `src/modules/<module>/controllers/` | `*.controller.ts` |
+| service | `src/modules/<module>/services/`, `src/shared/`, `src/shared/.../` | `*.service.ts` |
+| provider | `src/modules/<module>/providers/` | `*.provider.ts` |
+| dto | `src/modules/<module>/dto/`, `src/modules/<module>/dto/request/`, `src/modules/<module>/dto/response/`, `src/shared/`, `src/shared/.../` | `*.dto.ts` |
+| mapper | `src/modules/<module>/mappers/` | `*.mapper.ts` |
+| type-contract | `src/modules/<module>/contracts/`, `src/.app/contracts/` | `*.contract.ts` |
+| contract | `src/.app/contracts/` | `*.contract.json` |
+| guard | `src/.app/guards/`, `src/modules/<module>/guards/` | `*.guard.ts` |
+| middleware | `src/.app/middlewares/`, `src/modules/<module>/middlewares/` | `*.middleware.ts` |
+| filter | `src/.app/filters/`, `src/modules/<module>/filters/` | `*.filter.ts` |
+| interceptor | `src/.app/interceptors/`, `src/modules/<module>/interceptors/` | `*.interceptor.ts` |
+| decorator | `src/.app/decorators/` | `*.decorator.ts` |
+| config | `src/.app/configs/` | `*.config.ts` |
+| hook | `src/modules/<module>/hooks/`, `src/.app/hooks/` | `*.hook.ts` |
+| dispatch | `src/dispatch/`, `src/dispatch/.../` | `*.dispatch.ts` |
+
+Mandatory for new orchestrators (`pso create orchestrator`). `src/main.ts` only calls `bootstrap()`; `src/shared/` holds code of no single module. A 0.1 orchestrator (`src/routes/<module>/`) keeps its layout: see the structure migration guide.
 
 - Entry point `src/main.ts` calls `bootstrap({ appDir: __dirname })` from `@pso/http`. Do not put routing logic there.
 - The project is **compiled** with `tsc` (CommonJS, `experimentalDecorators`, `emitDecoratorMetadata`) and runs from `dist/`. Use `npm run build`, `npm run dev` or `pso dev`.
@@ -178,6 +184,6 @@ rate limit (per address; then per principal and route policy after the guards), 
 3. In the new folder: `npm install`.
 4. `pso validate` must print `OK`.
 5. Configure the guard before expecting any guarded route to work: create `<name>/.env` (git-ignored) with `PSO_JWT_ISSUER`, `PSO_JWT_AUDIENCE` and `PSO_JWT_JWKS_URI` or `PSO_JWT_PUBLIC_KEY_FILE`. Never commit it and never invent values; ask the user for the issuer and audience.
-6. Start with `pso dev` (or `pso docker:up` for the whole workspace). `GET /products/options` is public; the other `products` routes need a token with `products:read` / `products:write`. If no service serves `/products` yet, `pso validate` warns `PSO_CRUD_UNBOUND` and those routes answer `502` until `pso create service` binds them: that is expected, not a bug to work around.
+6. Start with `pso dev`, or the whole workspace in Docker: `pso infra:init --identity keycloak --runtime docker` once, then `pso docker:up --vendor` (`--vendor` is needed for image builds with an installed CLI). `GET /products/options` is public; the other `products` routes need a token with `products:read` / `products:write`. If no service serves `/products` yet, `pso validate` warns `PSO_CRUD_UNBOUND` and those routes answer `502` until `pso create service` binds them: that is expected, not a bug to work around.
 
 Do not edit `src/main.ts` to add routes. Add modules with `pso make:module`, or a complete resource with `pso make:crud <name> --service <svc> --orchestrator`. Application-wide guards, middlewares, interceptors and filters live in `src/.app/`; never put them in a module unless only that module uses them.

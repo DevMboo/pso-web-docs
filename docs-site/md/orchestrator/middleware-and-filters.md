@@ -2,24 +2,17 @@
 
 > Named per-route middleware that runs after the guards and exception filters that turn errors into answers - generated, wired, run and verified end to end.
 
-<!-- pso:structure-note -->
-> [!NOTE]
-> Examples on this page use the 0.1 orchestrator layout (`src/routes/<module>/`, `src/guards/`, `src/contracts/`), which existing
-> projects keep. In the official structure of new projects the same files are in `src/modules/<module>/` (`routes/ROUTES.pso.ts`,
-> `controllers/`, `services/`, `providers/`, `dto/`) and in `src/.app/` (`guards/`, `middlewares/`, `filters/`, `contracts/`); what the
-> page describes works the same way. See [TypeScript orchestrator structure](architecture/typescript-orchestrator.md).
-
 Both are **named** files that a route opts into. Nothing runs globally from `main.ts` ([why](decisions/why-minimal-bootstrap.md)). The examples on this page are run by the framework's test suite (`docs-middleware.test.ts`): the behavior described here is verified, not assumed.
 
 ## Middleware
 
-A function exported by `src/middlewares/<name>.middleware.ts`. Routes opt in by name (`middleware: ["audit"]` in `ROUTES.pso.ts`). It runs **after the guards**, so it only sees authenticated requests (public routes excepted). It may end the response; if it does, the action is not run.
+A function exported by `src/.app/middlewares/<name>.middleware.ts`. Routes opt in by name (`middleware: ["audit"]` in `ROUTES.pso.ts`). It runs **after the guards**, so it only sees authenticated requests (public routes excepted). It may end the response; if it does, the action is not run.
 
 ```bash
 pso make:middleware audit
 ```
 
-```typescript title="src/middlewares/audit.middleware.ts"
+```typescript title="src/.app/middlewares/audit.middleware.ts"
 import type { Middleware } from "@pso/http";
 
 const middleware: Middleware = (req, _res, route) => {
@@ -30,7 +23,7 @@ export default middleware;
 
 Wire it in the route:
 
-```typescript title="src/routes/orders/ROUTES.pso.ts"
+```typescript title="src/modules/orders/routes/ROUTES.pso.ts"
 {
   method: "POST", path: "/orders", controller: OrdersController, action: "create",
   security: { guard: "jwt", scopes: ["customers:read"] },
@@ -58,7 +51,7 @@ A filter handles errors thrown by the action. Return `true` once the response ha
 pso make:filter conflict
 ```
 
-```typescript title="src/filters/conflict.filter.ts"
+```typescript title="src/.app/filters/conflict.filter.ts"
 import { HttpError, type Filter } from "@pso/http";
 
 const filter: Filter = (err, _req, res) => {

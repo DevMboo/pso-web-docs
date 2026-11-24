@@ -47,8 +47,8 @@ pso make:route users list --method GET --path /list --public --upstream catalog
 This sample shows the shape of the result. Names, ports, digests and timings may differ in your workspace.
 
 ```text evidence="illustrative"
-updated  src/routes/users/ROUTES.pso.ts
-updated  src/routes/users/users.controller.ts
+updated  src/modules/users/controllers/users.controller.ts
+updated  src/modules/users/routes/ROUTES.pso.ts
 ```
 
 ## Verify the result

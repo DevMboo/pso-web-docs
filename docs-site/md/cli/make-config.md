@@ -24,8 +24,8 @@ pso make:config cache --service catalog   # Spring Boot form: a @Configuration c
 
 ## What it changes
 
-- Orchestrator: writes `src/configs/storage.config.ts`, a plain module whose values are read once when it is first imported. It is used by importing it (`import storageConfig from "../../configs/storage.config"`); the framework neither loads nor injects it.
-- Spring Boot: writes `configs/CacheConfig.java`, a `@Configuration` class found by Spring's component scan like any bean of the service.
+- Orchestrator: writes `src/.app/configs/storage.config.ts`, a plain module whose values are read once when it is first imported. It is used by importing it (from a module controller: `import storageConfig from "../../../.app/configs/storage.config"`); the framework neither loads nor injects it.
+- Spring Boot (layered): writes `infrastructure/config/CacheConfig.java`, a `@Configuration` class found by Spring's component scan like any bean of the service.
 
 ## Verify the result
 

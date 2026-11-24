@@ -2,15 +2,8 @@
 
 > Data transfer classes for request bodies, how to generate them, and how @Body(Dto) validates them.
 
-<!-- pso:structure-note -->
-> [!NOTE]
-> Examples on this page use the 0.1 orchestrator layout (`src/routes/<module>/`, `src/guards/`, `src/contracts/`), which existing
-> projects keep. In the official structure of new projects the same files are in `src/modules/<module>/` (`routes/ROUTES.pso.ts`,
-> `controllers/`, `services/`, `providers/`, `dto/`) and in `src/.app/` (`guards/`, `middlewares/`, `filters/`, `contracts/`); what the
-> page describes works the same way. See [TypeScript orchestrator structure](architecture/typescript-orchestrator.md).
-
 ```ts
-// users/dto/create-user.dto.ts
+// users/dto/request/create-user.dto.ts
 import { Dto, Required, Optional, StringField, MinLength, MaxLength, Email, IntegerField, Min } from "@pso/http";
 
 @Dto()
@@ -30,7 +23,7 @@ export class CreateUserDto {
 pso make:dto users create-user --fields "name:string:min=3:max=80,email:email,age?:integer:min=18"
 ```
 
-creates `src/routes/users/dto/create-user.dto.ts` with a `@Dto()` class like the one above. Without `--fields` the class is empty and accepts only `{}`. Field syntax: `name[?]:type[:min=N][:max=N]` with the types `string`, `integer`, `number`, `boolean`, `email`, `date`, `enum=a|b` and an optional `[]` suffix for arrays; `?` makes the field optional.
+creates `src/modules/users/dto/request/create-user.dto.ts` with a `@Dto()` class like the one above. Without `--fields` the class is empty and accepts only `{}`. Field syntax: `name[?]:type[:min=N][:max=N]` with the types `string`, `integer`, `number`, `boolean`, `email`, `date`, `enum=a|b` and an optional `[]` suffix for arrays; `?` makes the field optional.
 
 ## What the runtime does with `@Body()` and `@Body(Dto)`
 
@@ -45,9 +38,9 @@ A class in the parameter type alone (`@Body() dto: CreateUserDto`) validates not
 
 For a body whose shape is genuinely free-form, accept `unknown` with `@Body()` and check what you need yourself:
 
-```typescript title="users.controller.ts"
+```typescript title="src/modules/users/controllers/users.controller.ts"
 import { Body, Controller, HttpError, Post, RestController } from "@pso/http";
-import { UsersService } from "./users.service";
+import { UsersService } from "../services/users.service";
 
 @Controller()
 @RestController("/users")
@@ -74,7 +67,7 @@ Expected output (for the `orders` module, DTO `create-order`):
 
 ```text evidence="expected"
 $ pso make:dto orders create-order --fields "customer:string:min=3:max=40,email:email,quantity:integer:min=1:max=100"
-created    src/routes/orders/dto/create-order.dto.ts
+created    src/modules/orders/dto/request/create-order.dto.ts
 ```
 
 The class it writes is shown in full on [Validate request bodies](orchestrator/dto-validation.md).

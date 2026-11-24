@@ -4,7 +4,7 @@
 
 **Structural discovery.** From files on disk to a running, validated application. Nothing in the first four steps executes application code.
 
-1. **Project structure** (directories + file names): The layout is the declaration: src/routes/<module>/ holds MODULE.pso.ts, ROUTES.pso.ts and controllers; suffixes such as .guard.ts or Controller.java name the kind of a file.
+1. **Project structure** (directories + file names): The layout is the declaration: src/modules/<module>/ holds MODULE.pso.ts, routes/ROUTES.pso.ts and controllers/; src/.app/ the application-wide components; suffixes such as .guard.ts or Controller.java name the kind of a file.
 2. **PSO discovery** (static, sorted, no execution): @pso/core walks the tree in byte-wise sorted order and classifies files by name and location. Application modules are never imported, so discovery is safe to run on untrusted code and gives identical results on every machine.
 3. **Contract validation** (pso validate): Naming, duplicates, workspace schema (ports, dependency cycles), JSON contracts and the three-way module/route/controller check run on the TypeScript AST. Errors carry stable codes such as PSO_ROUTE_004.
 4. **Manifest generation** (deterministic digest): The resource list is written as .pso/manifest.json with a sha256 digest. There are no timestamps or absolute paths, so identical inputs always produce an identical manifest.
@@ -25,12 +25,12 @@ pso inspect --service catalog
 ```
 
 ```text evidence="verified"
-controller  PingController               src/main/java/com/pso/catalog/routes/PingController.java
-dto         PingDto                      src/main/java/com/pso/catalog/contracts/PingDto.java
-service     PingService                  src/main/java/com/pso/catalog/application/PingService.java
+exception   ConflictException            src/main/java/com/pso/catalog/shared/exception/ConflictException.java
+exception   InvalidRequestException      src/main/java/com/pso/catalog/shared/exception/InvalidRequestException.java
+exception   ResourceNotFoundException    src/main/java/com/pso/catalog/shared/exception/ResourceNotFoundException.java
 ```
 
-(A freshly generated service. Resources you add, such as a `ProductController`, appear in the same list.)
+(A service created with `--template empty`: its shared exceptions. The reference CRUD of a default service adds its controller, service, records, mapper, entity and repository to the list, each in its layer.)
 
 The same model feeds `pso routes:list`, `pso security:check`, Studio and `pso ai:context`, so they cannot disagree about what exists.
 

@@ -4,7 +4,7 @@
 
 Authentication is owned by the `@pso/security` package. A generated orchestrator contains **no JWT code**: the `jwt` guard is provided by the framework and you only declare the policy.
 
-```typescript title="src/guards/jwt.guard.ts"
+```typescript title="src/.app/guards/jwt.guard.ts"
 import { JwtGuard } from "@pso/security";
 
 export default JwtGuard.create();
@@ -109,7 +109,7 @@ The framework `jwt` guard is the default and cannot be replaced by accident: **a
 { "security": { "authentication": { "provider": "custom", "customProvider": "corporate-sso" } } }
 ```
 
-```typescript title="src/guards/jwt.guard.ts"
+```typescript title="src/.app/guards/jwt.guard.ts"
 import { CustomGuard } from "@pso/security";
 
 export default CustomGuard.create({

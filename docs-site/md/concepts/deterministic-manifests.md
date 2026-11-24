@@ -2,13 +2,6 @@
 
 > Reproducible resource manifests with a content digest - what is in them, why they are stable, and how to use them in CI and releases.
 
-<!-- pso:structure-note -->
-> [!NOTE]
-> Examples on this page use the 0.1 orchestrator layout (`src/routes/<module>/`, `src/guards/`, `src/contracts/`), which existing
-> projects keep. In the official structure of new projects the same files are in `src/modules/<module>/` (`routes/ROUTES.pso.ts`,
-> `controllers/`, `services/`, `providers/`, `dto/`) and in `src/.app/` (`guards/`, `middlewares/`, `filters/`, `contracts/`); what the
-> page describes works the same way. See [TypeScript orchestrator structure](architecture/typescript-orchestrator.md).
-
 `pso validate --write-manifest` writes `.pso/manifest.json` for every project. It is the machine-readable answer to "what resources does this project contain?".
 
 ```bash
@@ -16,24 +9,24 @@ pso validate --write-manifest
 ```
 
 ```text evidence="verified"
-gateway: 4 resource(s), digest b003552466a9
-catalog: 3 resource(s), digest 4731e3e29002
+gateway: 4 resource(s), digest 504dbdc1f099
+catalog: 3 resource(s), digest 6c847b46dc80
 OK
 ```
 
-(A workspace with a `product` module in the gateway and the generated `catalog` service. The digests depend on the project's structure, so yours will differ.)
+(A workspace created with `--template empty`, with a `product` module in the gateway and the generated `catalog` service. The digests depend on the project's structure, so yours will differ.)
 
 ```json evidence="verified" title=".pso/manifest.json (gateway; the file ends with the full digest)"
 {
   "schemaVersion": 1,
   "runtime": "node",
   "resources": [
-    { "key": "controller:product/product", "kind": "controller", "id": "product", "file": "src/routes/product/product.controller.ts" },
-    { "key": "guard:jwt", "kind": "guard", "id": "jwt", "file": "src/guards/jwt.guard.ts" },
-    { "key": "module:product", "kind": "module", "id": "product", "file": "src/routes/product/MODULE.pso.ts" },
-    { "key": "route-registry:product", "kind": "route-registry", "id": "product", "file": "src/routes/product/ROUTES.pso.ts" }
+    { "key": "controller:product/product", "kind": "controller", "id": "product", "file": "src/modules/product/controllers/product.controller.ts" },
+    { "key": "guard:jwt", "kind": "guard", "id": "jwt", "file": "src/.app/guards/jwt.guard.ts" },
+    { "key": "module:product", "kind": "module", "id": "product", "file": "src/modules/product/MODULE.pso.ts" },
+    { "key": "route-registry:product", "kind": "route-registry", "id": "product", "file": "src/modules/product/routes/ROUTES.pso.ts" }
   ],
-  "digest": "b003552466a92e96ea0346e0739b6ee187d9e724..."
+  "digest": "504dbdc1f099a93b8588be86a418a5bb12a97883..."
 }
 ```
 

@@ -18,27 +18,30 @@ Install the CLI from [Installation](getting-started/installation.md) and run `ps
 ```bash
 pso create workspace shop
 cd shop
-pso create service catalog
-pso create orchestrator gateway
+pso create service catalog --template empty
+pso create orchestrator gateway --template empty
 pso make:resource product --service catalog --route /products --scopes products:read
 ```
 
-`create workspace` writes `pso.workspace.json`. The next two commands create projects and register them there. `make:resource` writes the gateway route, forwarding controller, Spring controller and DTO, matching contract files, a test and an API page. It generates a **stub** handler that returns an empty list; it does not create a products table. The [CRUD tutorial](tutorials/crud-api.md) shows how to add persistence.
+`create workspace` writes `pso.workspace.json`. The next two commands create projects in the official structure and register them there; `--template empty` leaves out the generated Product CRUD, so this page can build its own `/products` route step by step (without it, the projects already serve a complete Product API: [Build a CRUD API](tutorials/crud-api.md)). `make:resource` writes the gateway route, forwarding controller, Spring controller and DTO, matching contract files, a test and an API page. It generates a **stub** handler that returns an empty list; it does not create a products table. The [CRUD tutorial](tutorials/crud-api.md) shows how to add persistence.
 
 ```tree title="The files to inspect after generation"
 shop/
   pso.workspace.json  # generated: service names, roles, ports and paths
   gateway/
     src/
-      routes/
+      .app/
+        contracts/product.contract.json  # generated: gateway contract copy
+        guards/jwt.guard.ts  # generated: authentication
+      modules/
         product/
           MODULE.pso.ts  # generated: controller composition
-          ROUTES.pso.ts  # generated: GET /products and products:read
-          product.controller.ts  # generated: forwards to catalog
+          routes/ROUTES.pso.ts  # generated: GET /products and products:read
+          controllers/product.controller.ts  # generated: forwards to catalog
   catalog/
     src/
       main/
-        java/com/pso/catalog/routes/ProductController.java  # generated: stub response
+        java/com/pso/catalog/application/rest/ProductController.java  # generated: stub response
         resources/contracts/product.contract.json  # generated: service contract copy
 ```
 
@@ -66,7 +69,7 @@ GET     /products                product.findAll        -> catalog        guard:
 $ pso routes:inspect product
 GET /products  ->  catalog:8081
 access:   guard jwt, scopes products:read
-defined:  gateway/src/routes/product/ROUTES.pso.ts
+defined:  gateway/src/modules/product/routes/ROUTES.pso.ts
 ```
 
 ![The CLI workflow's expected output in the documentation portal, showing validation, the route list and route inspection](../../assets/screenshots/cli-workflow-output.png)

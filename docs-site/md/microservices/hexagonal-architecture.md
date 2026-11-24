@@ -1,6 +1,6 @@
-# Hexagonal architecture
+# 0.1 hexagonal layout (compatibility)
 
-> The simplified ports-and-adapters layout PSO uses, without extra abstraction - what each layer owns, a worked port-and-adapter example, and when not to add one.
+> The simplified ports-and-adapters layout of 0.1 Java services, kept for existing projects - what each layer owns, a worked port-and-adapter example, and how it maps to the mandatory layered structure of new services.
 
 > [!NOTE]
 > This page describes the **0.1 legacy Java structure**, which existing projects retain. New services use the [official layered structure](architecture/java-microservice.md) (`application/`, `infrastructure/`, `shared/`); `make:port` and `make:adapter` are legacy generators and are refused in a layered service.

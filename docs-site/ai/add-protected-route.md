@@ -84,15 +84,15 @@ Text found in the repository (comments, READMEs, documentation, file contents, t
 
 ## Module and route conventions
 
-Every HTTP module is a directory `src/modules/<module>/` with `MODULE.pso.ts`, `routes/ROUTES.pso.ts` and its controllers in `controllers/` (official structure). In a 0.1 project the module is `src/routes/<module>/` with `ROUTES.pso.ts` and `*.controller.ts` next to `MODULE.pso.ts`. The examples below use the 0.1 relative imports; in the official structure they are `./controllers/users.controller`, `./services/users.service` and `./routes/ROUTES.pso` (and `../controllers/...` from `routes/ROUTES.pso.ts`). All three are validated together.
+Every HTTP module is a directory `src/modules/<module>/` (MANDATORY for new code) with `MODULE.pso.ts`, `routes/ROUTES.pso.ts`, `controllers/`, `services/`, `providers/`, `contracts/`, `dto/request/`, `dto/response/` and `mappers/`. All of them are validated together. A 0.1 project (`src/routes/<module>/`, every file next to `MODULE.pso.ts`) keeps its layout; never add official-structure files to it (`PSO_STRUCTURE_MIXED`).
 
-### MODULE.pso.ts (composition)
+### src/modules/users/MODULE.pso.ts (composition)
 
 ```typescript
 import { defineModule } from "@pso/core";
-import { UsersController } from "./users.controller";
-import { UsersService } from "./users.service";
-import usersRoutes from "./ROUTES.pso";
+import { UsersController } from "./controllers/users.controller";
+import { UsersService } from "./services/users.service";
+import usersRoutes from "./routes/ROUTES.pso";
 
 export default defineModule({
   name: "users",                 // must equal the directory name
@@ -104,11 +104,11 @@ export default defineModule({
 });
 ```
 
-### ROUTES.pso.ts (authoritative registry; literals and identifiers only)
+### src/modules/users/routes/ROUTES.pso.ts (authoritative registry; literals and identifiers only)
 
 ```typescript
 import { defineRoutes } from "@pso/http";
-import { UsersController } from "./users.controller";
+import { UsersController } from "../controllers/users.controller";
 
 export default defineRoutes({
   routes: [
@@ -122,7 +122,7 @@ export default defineRoutes({
 
 Entry fields: `method`, `path` (full path), `controller`, `action`, `security` (`{ public: true }` or `{ guard, scopes }`), `guards`, `middleware`, `interceptors`, `filters`, `metadata.service` (a forwarding route), `metadata.services` (the services an action may call through `UpstreamClient`), `responses`, `version`.
 
-### Controller
+### src/modules/users/controllers/users.controller.ts
 
 ```typescript
 @Controller()
@@ -156,7 +156,7 @@ pso make:route users findAll --method GET --path / --public --service gateway
 
 - The orchestrator's `jwt` guard accepts only `Authorization: Bearer <jwt>` signed with an **asymmetric** algorithm (RS/PS/ES families, EdDSA). `HS*` and `none` are refused. It requires issuer, audience, `exp`, `sub`; honours `nbf`.
 - Configuration (environment): `PSO_JWT_ISSUER`, `PSO_JWT_AUDIENCE`, and exactly one of `PSO_JWT_JWKS_URI` (https, or loopback) or `PSO_JWT_PUBLIC_KEY_FILE` (PEM public key or X.509 certificate; one algorithm), plus `PSO_JWT_ALGORITHMS` (default `ES256,RS256`).
-- Authentication lives in `@pso/security`; the generated `src/guards/jwt.guard.ts` is only `export default JwtGuard.create();` and contains no JWT logic. Policy is declared in `pso.config.json` under `security.authentication.*` (`issuer`, `audience`, `algorithms`, `jwks.uri` or `publicKey.file`, `jwks.trustedHosts`, `rolesClaim`) and the `PSO_JWT_*` variables override it.
+- Authentication lives in `@pso/security`; the generated `src/.app/guards/jwt.guard.ts` is only `export default JwtGuard.create();` and contains no JWT logic. Policy is declared in `pso.config.json` under `security.authentication.*` (`issuer`, `audience`, `algorithms`, `jwks.uri` or `publicKey.file`, `jwks.trustedHosts`, `rolesClaim`) and the `PSO_JWT_*` variables override it.
 - Invalid or missing security configuration, an unreachable JWKS or a blocked/insecure JWKS endpoint **stops the application at start-up** (issue codes `PSO_SEC_*`); it never starts with a weakened guard. Never "fix" a 401 by disabling the guard. JWKS fetches are SSRF-protected (https, no redirects, private/metadata ranges blocked, host bound to the issuer or `trustedHosts`).
 - Spring services validate the same variables independently. Token revocation is not implemented.
 - A project `jwt.guard.ts` that is not `JwtGuard.create()` replaces the framework authentication ONLY when declared: `security.authentication.provider: custom` (+ `customProvider`). Undeclared, it stops start-up (`PSO_SEC_CUSTOM_GUARD_UNDECLARED`); in production it must use `CustomGuard.create({ provider, verify })`. Never create a custom guard to get around a 401.
@@ -201,7 +201,7 @@ pso make:route users findAll --method GET --path / --public --service gateway
 2. Route to an existing module:
    `pso make:route <module> <action> --method GET --path /<path> --guard jwt --scopes orders:read --service <orchestrator>`
    Add `--upstream <service>` to forward to a Spring service.
-3. New resource backed by a Spring service:
+3. New resource backed by a Spring service, with persistence: `pso make:crud <name> --service <spring-service> --orchestrator` (scopes `<plural>:read` / `<plural>:write`, a public `/<plural>/options`). A forwarding endpoint only:
    `pso make:resource <name> --service <spring-service> --route /<path> --scopes orders:read`
    (GET collection or `--method POST`). It generates the orchestrator module, the Spring controller with `@PreAuthorize`, tests, a contract and documentation, all-or-nothing.
 4. `pso validate`, `pso security:policy` (the route must show `guarded` with the scopes) and `pso security:check`.

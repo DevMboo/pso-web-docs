@@ -17,7 +17,8 @@ Distributed applications repeat the same work in every project: the same folder 
 
 **Before.** You add `GET /products` to a system with a gateway and a Spring service. You write a Spring controller; a gateway route and handler; a proxy rule; a scope check on both sides; a test; a line in an API document. Nothing checks that the five agree. Six weeks later someone changes the shape of the response on one side only. You find out in production.
 
-**With PSO.** One command writes all of it, consistently:
+**With PSO.** One command writes all of it, consistently (here in projects created with `--template empty`; by default new projects
+already serve a complete, database-backed Product API):
 
 ```bash
 pso make:resource product --service catalog --route /products --scopes products:read
@@ -26,15 +27,15 @@ pso make:resource product --service catalog --route /products --scopes products:
 Expected output:
 
 ```text evidence="expected"
-created    gateway/src/contracts/product.contract.json
-created    catalog/src/main/java/com/pso/catalog/contracts/ProductDto.java
-created    catalog/src/main/java/com/pso/catalog/routes/ProductController.java
+created    gateway/src/.app/contracts/product.contract.json
+created    catalog/src/main/java/com/pso/catalog/application/dto/response/ProductResponse.java
+created    catalog/src/main/java/com/pso/catalog/application/rest/ProductController.java
 created    catalog/src/main/resources/contracts/product.contract.json
-created    catalog/src/test/java/com/pso/catalog/routes/ProductControllerTests.java
+created    catalog/src/test/java/com/pso/catalog/application/rest/ProductControllerTests.java
 created    docs/api/product.md
-created    gateway/src/routes/product/MODULE.pso.ts
-created    gateway/src/routes/product/ROUTES.pso.ts
-created    gateway/src/routes/product/product.controller.ts
+created    gateway/src/modules/product/MODULE.pso.ts
+created    gateway/src/modules/product/controllers/product.controller.ts
+created    gateway/src/modules/product/routes/ROUTES.pso.ts
 ```
 
 The contract is written twice (gateway and service) on purpose. If someone later edits only one copy, `pso validate` fails with `PSO_CONTRACT_DRIFT` before anything runs: the drift is caught by a command, not by an outage. Likewise a route that is not in `ROUTES.pso.ts` simply does not exist, so a forgotten registration is a visible `404`, not a half-exposed endpoint.

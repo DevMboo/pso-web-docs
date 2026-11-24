@@ -2,13 +2,6 @@
 
 > The authoritative route registry, the three-way validation and why decorators alone expose nothing.
 
-<!-- pso:structure-note -->
-> [!NOTE]
-> Examples on this page use the 0.1 orchestrator layout (`src/routes/<module>/`, `src/guards/`, `src/contracts/`), which existing
-> projects keep. In the official structure of new projects the same files are in `src/modules/<module>/` (`routes/ROUTES.pso.ts`,
-> `controllers/`, `services/`, `providers/`, `dto/`) and in `src/.app/` (`guards/`, `middlewares/`, `filters/`, `contracts/`); what the
-> page describes works the same way. See [TypeScript orchestrator structure](architecture/typescript-orchestrator.md).
-
 PSO enforces one invariant at build time and at start-up:
 
 > An HTTP endpoint exists if and only if it is explicitly declared in the route registry, belongs to a valid module, references a compatible decorated controller action, and passes all applicable security and dependency validations.
@@ -22,9 +15,9 @@ PSO enforces one invariant at build time and at start-up:
 ## ROUTES.pso.ts
 
 ```ts
-// users/ROUTES.pso.ts
+// users/routes/ROUTES.pso.ts
 import { defineRoutes } from "@pso/http";
-import { UsersController } from "./users.controller";
+import { UsersController } from "../controllers/users.controller";
 
 export default defineRoutes({
   routes: [
@@ -99,9 +92,9 @@ GET     /reports/summary         reports.summary                          public
 $ pso routes:inspect product.findAll
 GET /products  ->  catalog:8081
 access:   guard jwt, scopes products:read
-defined:  gateway/src/routes/product/ROUTES.pso.ts
+defined:  gateway/src/modules/product/routes/ROUTES.pso.ts
 contract: present
-handlers: catalog/src/main/java/com/pso/catalog/routes/ProductController.java
+handlers: catalog/src/main/java/com/pso/catalog/application/rest/ProductController.java
 ```
 
 Note that the public route's path is the **controller prefix plus the action path**: a module whose controller has `@RestController("/reports")` and an action `@Get("/summary")` is served at `/reports/summary`, and `make:route --path /summary` is relative to the prefix.

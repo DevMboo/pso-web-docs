@@ -24,7 +24,8 @@ the [Upstream contract](orchestrator/upstream-clients.md) before changing how a 
 Why `--template empty` for `orders`: two services with the reference CRUD would both serve `/products`, and `pso create orchestrator`
 would ask which one its `products` module calls (`--crud-service`) instead of guessing.
 
-Start everything with `pso docker:up` (each service gets its own database; neither can read the other's). `pso services:health`
+Start everything with `pso infra:init --identity keycloak --runtime docker` and `pso docker:up --vendor` (each service gets its own
+database; neither can read the other's). `pso services:health`
 distinguishes a registered service from a live one.
 
 If `orders` is down, its routes fail while `/products` keeps working. The orchestrator maps upstream failures to documented HTTP errors;

@@ -2,21 +2,14 @@
 
 > Compose a module - its controllers, providers, route registry, imports and exports - with the generators, the rules, the diagnostics you will see and the shapes modules take in practice.
 
-<!-- pso:structure-note -->
-> [!NOTE]
-> Examples on this page use the 0.1 orchestrator layout (`src/routes/<module>/`, `src/guards/`, `src/contracts/`), which existing
-> projects keep. In the official structure of new projects the same files are in `src/modules/<module>/` (`routes/ROUTES.pso.ts`,
-> `controllers/`, `services/`, `providers/`, `dto/`) and in `src/.app/` (`guards/`, `middlewares/`, `filters/`, `contracts/`); what the
-> page describes works the same way. See [TypeScript orchestrator structure](architecture/typescript-orchestrator.md).
-
 `MODULE.pso.ts` declares what belongs to a module and explicitly imports its route registry.
 
 ```ts
 // users/MODULE.pso.ts
 import { defineModule } from "@pso/core";
-import { UsersController } from "./users.controller";
-import { UsersService } from "./users.service";
-import usersRoutes from "./ROUTES.pso";
+import { UsersController } from "./controllers/users.controller";
+import { UsersService } from "./services/users.service";
+import usersRoutes from "./routes/ROUTES.pso";
 
 export default defineModule({
   name: "users",
@@ -50,11 +43,11 @@ Expected output of the first and a service command (expected):
 
 ```text evidence="expected"
 $ pso make:module orders --service gw
-created  src/routes/orders/MODULE.pso.ts
-created  src/routes/orders/ROUTES.pso.ts
+created  src/modules/orders/MODULE.pso.ts
+created  src/modules/orders/routes/ROUTES.pso.ts
 $ pso make:service orders --service gw
-updated  src/routes/orders/MODULE.pso.ts
-created  src/routes/orders/orders.service.ts
+updated  src/modules/orders/MODULE.pso.ts
+created  src/modules/orders/services/orders.service.ts
 ```
 
 `make:controller` and `make:service` add the class to `controllers` / `providers` through the TypeScript AST, adding the import and leaving everything else in the file untouched. A new module exposes nothing: its `ROUTES.pso.ts` is empty until you add routes.

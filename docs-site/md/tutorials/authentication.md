@@ -109,4 +109,4 @@ The three answers are `401` (no token), `200` and `403` (a valid token without t
 | the orchestrator will not start: `PSO_SEC_MISSING`, `PSO_SEC_ALGORITHM`, `PSO_SEC_PEM_PATH` or `PSO_SEC_JWKS_INSECURE` | incomplete or unsafe JWT settings | the log's `code` | [Why the orchestrator refuses to start](reference/startup-failures.md) has each one reproduced |
 | `401` with a token you just made | issuer, audience, algorithm or expiry differ, or the key does not match | `pso security:validate` | align the values |
 | `403` | the token lacks the scope | the gateway's "authorization denied" line | issue the scope |
-| a Spring service ignores your key file | Spring reads only `PSO_JWT_JWKS_URI` | the service's start-up error | serve `keys/jwks.json` on loopback ([CRUD tutorial](tutorials/crud-api.md#12-give-both-services-a-way-to-verify-tokens)) |
+| a Spring service ignores your key file | Spring reads only `PSO_JWT_JWKS_URI` | the service's start-up error | serve `keys/jwks.json` on loopback ([CRUD tutorial](architecture/manual-crud-0-1.md#12-give-both-services-a-way-to-verify-tokens)) |

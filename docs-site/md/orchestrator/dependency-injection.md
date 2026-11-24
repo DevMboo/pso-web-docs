@@ -2,13 +2,6 @@
 
 > A complete example - a service injected into a controller, exported and imported across modules - with the exact diagnostics for each mistake and the rules of the container.
 
-<!-- pso:structure-note -->
-> [!NOTE]
-> Examples on this page use the 0.1 orchestrator layout (`src/routes/<module>/`, `src/guards/`, `src/contracts/`), which existing
-> projects keep. In the official structure of new projects the same files are in `src/modules/<module>/` (`routes/ROUTES.pso.ts`,
-> `controllers/`, `services/`, `providers/`, `dto/`) and in `src/.app/` (`guards/`, `middlewares/`, `filters/`, `contracts/`); what the
-> page describes works the same way. See [TypeScript orchestrator structure](architecture/typescript-orchestrator.md).
-
 The `users` module injects `UsersService` into `UsersController` through the constructor:
 
 ```typescript {4}
@@ -49,7 +42,7 @@ pso make:module orders
 pso make:controller orders
 ```
 
-2. Make `orders` import `pricing` (edit `src/routes/orders/MODULE.pso.ts`):
+2. Make `orders` import `pricing` (edit `src/modules/orders/MODULE.pso.ts`):
 
 ```typescript
 import pricingModule from "../pricing/MODULE.pso";
@@ -62,7 +55,7 @@ export default defineModule({ name: "orders", controllers: [OrdersController], p
 constructor(private readonly pricing: PricingService) {}
 ```
 
-4. Check. Verified: with the `imports` entry missing, `pso validate` printed `ERROR PSO_MODULE_006 gw/src/routes/orders/MODULE.pso.ts: Dependency cannot be resolved.` (Expected `PricingService` listed in providers or exported by an imported module; Found: not available in this module) and exited 1; with the import added it printed `OK` and exited 0. `pso validate` prints `OK`. If you forget the `imports` entry the diagnostic is `PSO_MODULE_006`; if you import a module that does not exist it is `PSO_MODULE_008`.
+4. Check. Verified: with the `imports` entry missing, `pso validate` printed `ERROR PSO_MODULE_006 gw/src/modules/orders/MODULE.pso.ts: Dependency cannot be resolved.` (Expected `PricingService` listed in providers or exported by an imported module; Found: not available in this module) and exited 1; with the import added it printed `OK` and exited 0. `pso validate` prints `OK`. If you forget the `imports` entry the diagnostic is `PSO_MODULE_006`; if you import a module that does not exist it is `PSO_MODULE_008`.
 
 ## A provider that needs another provider
 

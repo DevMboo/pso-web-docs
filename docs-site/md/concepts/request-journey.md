@@ -2,20 +2,12 @@
 
 > A guided map of the core concepts, from a path on disk to a secured route, service response and diagnostic.
 
-<!-- pso:structure-note -->
-> [!NOTE]
-> Examples on this page use the 0.1 orchestrator layout (`src/routes/<module>/`, `src/guards/`, `src/contracts/`), which existing
-> projects keep. In the official structure of new projects the same files are in `src/modules/<module>/` (`routes/ROUTES.pso.ts`,
-> `controllers/`, `services/`, `providers/`, `dto/`) and in `src/.app/` (`guards/`, `middlewares/`, `filters/`, `contracts/`); what the
-> page describes works the same way. See [TypeScript orchestrator structure](architecture/typescript-orchestrator.md).
-
-
 Consider `GET /products` in a workspace with a TypeScript gateway and a Spring `catalog` service. PSO gives each part a separate question to answer. Follow them in order when learning the framework or diagnosing a request.
 
 | Layer | The question it answers | Where to look | How to check |
 |---|---|---|---|
 | Workspace | Which projects and ports exist? | `pso.workspace.json` | `pso inspect`, `pso services:graph` |
-| Structure | Is this file in a recognized place? | `gateway/src/routes/product/` | `pso inspect --service gateway` |
+| Structure | Is this file in a recognized place? | `gateway/src/modules/product/` | `pso inspect --service gateway` |
 | Module | Which controller and providers belong together? | `MODULE.pso.ts` | `pso validate` |
 | Route | Is this exact method and path exposed? | `ROUTES.pso.ts` | `pso routes:list`, `pso routes:inspect product` |
 | Security | Who may call it? | the route security declaration and the service policy | `pso security:check`, then an HTTP request |

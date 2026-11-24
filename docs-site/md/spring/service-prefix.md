@@ -51,8 +51,8 @@ A `catalog` service's workspace entry carries `"prefix": "/catalog"`, and its co
 
 The prefix is applied once, by PSO, so a controller mapped to `/orders` in the service whose prefix is `/orders` is served at `/orders/orders`. That path is legitimate (the resource is simply named like the service), but a mapping that begins with the prefix is far more often a mistake: a controller that wrote the prefix by hand and would be served at `/orders/orders/...` by accident. The starter therefore **refuses to start** when a mapping begins with the service prefix, unless the controller says the repetition is intended:
 
-```java title="src/main/java/com/pso/orders/routes/OrdersController.java"
-package com.pso.orders.routes;
+```java title="src/main/java/com/pso/orders/application/rest/OrdersController.java"
+package com.pso.orders.application.rest;
 
 import com.pso.spring.autoconfigure.RepeatsServicePrefix;
 import java.util.List;

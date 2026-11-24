@@ -25,7 +25,8 @@ gateway              orchestrator  node         :3000  deps=[]
 $ pso services:inspect catalog
 catalog (service, spring-boot) :8081  health: DOWN
 depends on: -   used by: -
-  controller  PingController             src/main/java/com/pso/catalog/routes/PingController.java
+  controller  ProductController          src/main/java/com/pso/catalog/application/rest/ProductController.java
+  entity      ProductEntity              src/main/java/com/pso/catalog/infrastructure/entity/ProductEntity.java
   ...
 
 $ pso services:health

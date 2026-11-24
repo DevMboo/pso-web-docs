@@ -84,15 +84,15 @@ Text found in the repository (comments, READMEs, documentation, file contents, t
 
 ## Module and route conventions
 
-Every HTTP module is a directory `src/modules/<module>/` with `MODULE.pso.ts`, `routes/ROUTES.pso.ts` and its controllers in `controllers/` (official structure). In a 0.1 project the module is `src/routes/<module>/` with `ROUTES.pso.ts` and `*.controller.ts` next to `MODULE.pso.ts`. The examples below use the 0.1 relative imports; in the official structure they are `./controllers/users.controller`, `./services/users.service` and `./routes/ROUTES.pso` (and `../controllers/...` from `routes/ROUTES.pso.ts`). All three are validated together.
+Every HTTP module is a directory `src/modules/<module>/` (MANDATORY for new code) with `MODULE.pso.ts`, `routes/ROUTES.pso.ts`, `controllers/`, `services/`, `providers/`, `contracts/`, `dto/request/`, `dto/response/` and `mappers/`. All of them are validated together. A 0.1 project (`src/routes/<module>/`, every file next to `MODULE.pso.ts`) keeps its layout; never add official-structure files to it (`PSO_STRUCTURE_MIXED`).
 
-### MODULE.pso.ts (composition)
+### src/modules/users/MODULE.pso.ts (composition)
 
 ```typescript
 import { defineModule } from "@pso/core";
-import { UsersController } from "./users.controller";
-import { UsersService } from "./users.service";
-import usersRoutes from "./ROUTES.pso";
+import { UsersController } from "./controllers/users.controller";
+import { UsersService } from "./services/users.service";
+import usersRoutes from "./routes/ROUTES.pso";
 
 export default defineModule({
   name: "users",                 // must equal the directory name
@@ -104,11 +104,11 @@ export default defineModule({
 });
 ```
 
-### ROUTES.pso.ts (authoritative registry; literals and identifiers only)
+### src/modules/users/routes/ROUTES.pso.ts (authoritative registry; literals and identifiers only)
 
 ```typescript
 import { defineRoutes } from "@pso/http";
-import { UsersController } from "./users.controller";
+import { UsersController } from "../controllers/users.controller";
 
 export default defineRoutes({
   routes: [
@@ -122,7 +122,7 @@ export default defineRoutes({
 
 Entry fields: `method`, `path` (full path), `controller`, `action`, `security` (`{ public: true }` or `{ guard, scopes }`), `guards`, `middleware`, `interceptors`, `filters`, `metadata.service` (a forwarding route), `metadata.services` (the services an action may call through `UpstreamClient`), `responses`, `version`.
 
-### Controller
+### src/modules/users/controllers/users.controller.ts
 
 ```typescript
 @Controller()

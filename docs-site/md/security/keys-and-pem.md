@@ -62,7 +62,7 @@ How long to wait: at least the longest lifetime of a token you issued (its `exp`
 
 ## Using PEM in the guard
 
-Point `PSO_JWT_PUBLIC_KEY_FILE` at a PEM public key or X.509 certificate and set one algorithm ([Authentication](security/authentication.md)). In development that is a file path such as `../keys/<kid>.public.pem`. This applies to **orchestrators only**: a Spring service refuses to start without `PSO_JWT_JWKS_URI` (https, or http on loopback), so give Spring the generated `keys/jwks.json` through a loopback URL ([worked example](tutorials/crud-api.md#12-give-both-services-a-way-to-verify-tokens)).
+Point `PSO_JWT_PUBLIC_KEY_FILE` at a PEM public key or X.509 certificate and set one algorithm ([Authentication](security/authentication.md)). In development that is a file path such as `../keys/<kid>.public.pem`. This applies to **orchestrators only**: a Spring service refuses to start without `PSO_JWT_JWKS_URI` (https, or http on loopback), so give Spring the generated `keys/jwks.json` through a loopback URL ([worked example](architecture/manual-crud-0-1.md#12-give-both-services-a-way-to-verify-tokens)).
 
 ## Variations
 

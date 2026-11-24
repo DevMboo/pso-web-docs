@@ -23,7 +23,7 @@ pso make:provider clock --module users --service gateway
 
 ## What it changes
 
-- Writes `src/providers/clock.provider.ts`: an `@Injectable()` class the framework constructs once per application and injects by constructor type.
+- Writes `src/modules/users/providers/clock.provider.ts`: an `@Injectable()` class the framework constructs once per application and injects by constructor type.
 - `--module users` adds the class to `providers` of that module's `MODULE.pso.ts`. Registration is explicit: a provider that no module lists is never constructed.
 
 ## Illustrative output
@@ -31,8 +31,8 @@ pso make:provider clock --module users --service gateway
 This sample shows the shape of the result. Names, ports, digests and timings may differ in your workspace.
 
 ```text evidence="illustrative"
-created  src/providers/clock.provider.ts
-updated  src/routes/users/MODULE.pso.ts
+updated  src/modules/users/MODULE.pso.ts
+created  src/modules/users/providers/clock.provider.ts
 ```
 
 ## Verify the result
@@ -42,7 +42,7 @@ updated  src/routes/users/MODULE.pso.ts
 ## Failure cases
 
 - `Module "users" does not exist`: create it with `pso make:module users`.
-- Without `--module` the file is written and the command says that nothing uses it yet.
+- `In the modular structure a provider belongs to a module`: pass `--module <module>`.
 - `PSO_MODULE_006` from `pso validate`: a class injects the provider but its module does not list it.
 
 ## Exit codes

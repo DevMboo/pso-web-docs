@@ -4,21 +4,27 @@
 
 ## Layout (src/)
 
-| Kind | Directory | File pattern |
+| Kind | Directory | File |
 |---|---|---|
-| module | routes/ | `MODULE.pso.ts` |
-| route-registry | routes/ | `ROUTES.pso.ts` |
-| controller | routes/ | `*.controller.ts` |
-| dto | routes/ | `*.dto.ts` |
-| middleware | middlewares/ (or routes/) | `*.middleware.ts` |
-| filter | filters/ (or routes/) | `*.filter.ts` |
-| guard | guards/ (or routes/) | `*.guard.ts` |
-| service | services/ (or routes/) | `*.service.ts` |
-| dispatch | dispatch/ | `*.dispatch.ts` |
-| config | configs/ | `*.config.ts` |
-| provider | providers/ | `*.provider.ts` |
-| hook | hooks/ | `*.hook.ts` |
-| contract | contracts/ | `*.contract.json` |
+| module | `src/modules/<module>/` | `MODULE.pso.ts` |
+| route-registry | `src/modules/<module>/routes/` | `ROUTES.pso.ts` |
+| controller | `src/modules/<module>/controllers/` | `*.controller.ts` |
+| service | `src/modules/<module>/services/`, `src/shared/`, `src/shared/.../` | `*.service.ts` |
+| provider | `src/modules/<module>/providers/` | `*.provider.ts` |
+| dto | `src/modules/<module>/dto/`, `src/modules/<module>/dto/request/`, `src/modules/<module>/dto/response/`, `src/shared/`, `src/shared/.../` | `*.dto.ts` |
+| mapper | `src/modules/<module>/mappers/` | `*.mapper.ts` |
+| type-contract | `src/modules/<module>/contracts/`, `src/.app/contracts/` | `*.contract.ts` |
+| contract | `src/.app/contracts/` | `*.contract.json` |
+| guard | `src/.app/guards/`, `src/modules/<module>/guards/` | `*.guard.ts` |
+| middleware | `src/.app/middlewares/`, `src/modules/<module>/middlewares/` | `*.middleware.ts` |
+| filter | `src/.app/filters/`, `src/modules/<module>/filters/` | `*.filter.ts` |
+| interceptor | `src/.app/interceptors/`, `src/modules/<module>/interceptors/` | `*.interceptor.ts` |
+| decorator | `src/.app/decorators/` | `*.decorator.ts` |
+| config | `src/.app/configs/` | `*.config.ts` |
+| hook | `src/modules/<module>/hooks/`, `src/.app/hooks/` | `*.hook.ts` |
+| dispatch | `src/dispatch/`, `src/dispatch/.../` | `*.dispatch.ts` |
+
+Mandatory for new orchestrators (`pso create orchestrator`). `src/main.ts` only calls `bootstrap()`; `src/shared/` holds code of no single module. A 0.1 orchestrator (`src/routes/<module>/`) keeps its layout: see the structure migration guide.
 
 - Entry point `src/main.ts` calls `bootstrap({ appDir: __dirname })` from `@pso/http`. Do not put routing logic there.
 - The project is **compiled** with `tsc` (CommonJS, `experimentalDecorators`, `emitDecoratorMetadata`) and runs from `dist/`. Use `npm run build`, `npm run dev` or `pso dev`.

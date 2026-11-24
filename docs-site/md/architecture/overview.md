@@ -7,6 +7,11 @@
 
 A PSO workspace has one **orchestrator** (TypeScript, the single public entry point) and any number of **microservices** (Spring Boot, each owning its data). Each technology follows the practices of its own ecosystem, so the two are structured differently on purpose; what they share is the PSO identity: declared routes, deny-by-default security, RFC 9457 errors, service discovery, generated infrastructure.
 
+> [!IMPORTANT]
+> The structures on this page are **mandatory for every new PSO application**, not suggestions: `pso create` generates them, every
+> generator writes into them, `pso validate` and the runtime enforce them, and the rest of this documentation and the AI context assume
+> them. The 0.1 layouts appear only in the [compatibility and migration](architecture/structure-migration.md) pages.
+
 ```tree title="A PSO workspace"
 workspace/
   .infra/  # operational infrastructure PSO manages: certificates, secrets, generated configuration (never edited)
@@ -75,3 +80,5 @@ layout for compatibility.
 - [Java microservice](architecture/java-microservice.md): the layered packages, transactions, persistence, errors, tests.
 - [The reference CRUD](architecture/reference-crud.md), file by file, with real requests and answers.
 - [Generators](architecture/generators.md) and [structure migration](architecture/structure-migration.md).
+- [Build a CRUD API](tutorials/crud-api.md): one request followed through every layer.
+- Compatibility: [a CRUD by hand in the 0.1 layout](architecture/manual-crud-0-1.md), [the 0.1 hexagonal Java layout](microservices/hexagonal-architecture.md).

@@ -62,6 +62,10 @@ length=MIN-MAX precision=P scale=S default=true|false sort filter`. Without `--f
 
 ## Limits
 
+- In a layered service the event generators (`make:dispatch-event`, `make:dispatch-handler`, `make:event`, `make:listener`) still
+  write to the 0.1 package `events/`, which `pso validate` refuses: move those classes to `application/event/` and fix their package
+  (`pso structure:inspect` lists the moves). This is a known limitation of 0.2.0-rc.2.
+
 - `make:entity` writes the entity only: its table comes from a migration you add (`pso make:migration`), because Hibernate only
   validates the schema. In a service without a database `make:entity` and `make:repository` are refused with the command that adds one
   (`pso database:enable postgresql --service <svc>`, which also sets the validation of the schema).

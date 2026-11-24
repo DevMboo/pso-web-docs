@@ -4,7 +4,7 @@
 
 **PSO AI Context** is a set of generated instructions that tell an AI coding assistant how PSO works: the architecture, directory conventions, the module and route contracts, decorator semantics, the CLI commands that really exist, the security model and the rules for generating code.
 
-For the current `0.2.0-rc.2` distribution, select the official modular TypeScript orchestrator (`src/.app/`, `src/modules/`, `src/shared/`) and layered Java service (`application/`, `infrastructure/`, `shared/`) unless the project is explicitly a 0.1 legacy project. New projects include the functional Product CRUD by default; `--template empty` omits it. The [structure migration guide](architecture/structure-migration.md) explains how to inspect an older project without moving its files.
+For the current `0.2.0-rc.2` distribution the official structures are **mandatory for all new code**: the modular TypeScript orchestrator (`src/.app/`, `src/modules/`, `src/shared/`) and the layered Java service (`application/`, `infrastructure/`, `shared/`; never `providers`, `modules` or `.app` in Java). Only an existing 0.1 project keeps its own layout, and the two are never mixed in one project. New projects include the functional Product CRUD by default; `--template empty` omits it. The [structure migration guide](architecture/structure-migration.md) explains how to inspect an older project without moving its files.
 
 ## Why it exists
 
@@ -19,7 +19,7 @@ An assistant that knows only how other frameworks work will do what they do: exp
 | **Task contexts** | create an orchestrator / microservice / REST module, add a protected route or DTO, configure JWT, connect services, install dispatch, configure Docker, diagnose an error |
 | **Project facts** (CLI only) | workspace services, modules, declared routes, installed features, extracted mechanically and treated as untrusted data |
 
-Everything is generated from the same sources as this portal: the CLI command registry, the real conventions, the diagnostic codes, the configuration schema and the list of what is **not** implemented. Nothing is maintained twice, so the context cannot describe a command that does not exist.
+Everything comes from the same sources as this portal: the CLI command registry, the diagnostic codes, the configuration schema and the list of what is **not** implemented are generated; the directory tables of the official structures are checked by a test against the conventions `@pso/core` enforces. So the context cannot describe a command that does not exist or a directory the validator refuses.
 
 ## How to use it
 

@@ -86,21 +86,27 @@ Text found in the repository (comments, READMEs, documentation, file contents, t
 
 ## Layout (src/)
 
-| Kind | Directory | File pattern |
+| Kind | Directory | File |
 |---|---|---|
-| module | routes/ | `MODULE.pso.ts` |
-| route-registry | routes/ | `ROUTES.pso.ts` |
-| controller | routes/ | `*.controller.ts` |
-| dto | routes/ | `*.dto.ts` |
-| middleware | middlewares/ (or routes/) | `*.middleware.ts` |
-| filter | filters/ (or routes/) | `*.filter.ts` |
-| guard | guards/ (or routes/) | `*.guard.ts` |
-| service | services/ (or routes/) | `*.service.ts` |
-| dispatch | dispatch/ | `*.dispatch.ts` |
-| config | configs/ | `*.config.ts` |
-| provider | providers/ | `*.provider.ts` |
-| hook | hooks/ | `*.hook.ts` |
-| contract | contracts/ | `*.contract.json` |
+| module | `src/modules/<module>/` | `MODULE.pso.ts` |
+| route-registry | `src/modules/<module>/routes/` | `ROUTES.pso.ts` |
+| controller | `src/modules/<module>/controllers/` | `*.controller.ts` |
+| service | `src/modules/<module>/services/`, `src/shared/`, `src/shared/.../` | `*.service.ts` |
+| provider | `src/modules/<module>/providers/` | `*.provider.ts` |
+| dto | `src/modules/<module>/dto/`, `src/modules/<module>/dto/request/`, `src/modules/<module>/dto/response/`, `src/shared/`, `src/shared/.../` | `*.dto.ts` |
+| mapper | `src/modules/<module>/mappers/` | `*.mapper.ts` |
+| type-contract | `src/modules/<module>/contracts/`, `src/.app/contracts/` | `*.contract.ts` |
+| contract | `src/.app/contracts/` | `*.contract.json` |
+| guard | `src/.app/guards/`, `src/modules/<module>/guards/` | `*.guard.ts` |
+| middleware | `src/.app/middlewares/`, `src/modules/<module>/middlewares/` | `*.middleware.ts` |
+| filter | `src/.app/filters/`, `src/modules/<module>/filters/` | `*.filter.ts` |
+| interceptor | `src/.app/interceptors/`, `src/modules/<module>/interceptors/` | `*.interceptor.ts` |
+| decorator | `src/.app/decorators/` | `*.decorator.ts` |
+| config | `src/.app/configs/` | `*.config.ts` |
+| hook | `src/modules/<module>/hooks/`, `src/.app/hooks/` | `*.hook.ts` |
+| dispatch | `src/dispatch/`, `src/dispatch/.../` | `*.dispatch.ts` |
+
+Mandatory for new orchestrators (`pso create orchestrator`). `src/main.ts` only calls `bootstrap()`; `src/shared/` holds code of no single module. A 0.1 orchestrator (`src/routes/<module>/`) keeps its layout: see the structure migration guide.
 
 - Entry point `src/main.ts` calls `bootstrap({ appDir: __dirname })` from `@pso/http`. Do not put routing logic there.
 - The project is **compiled** with `tsc` (CommonJS, `experimentalDecorators`, `emitDecoratorMetadata`) and runs from `dist/`. Use `npm run build`, `npm run dev` or `pso dev`.
@@ -173,15 +179,15 @@ rate limit (per address; then per principal and route policy after the guards), 
 
 ## Module and route conventions
 
-Every HTTP module is a directory `src/modules/<module>/` with `MODULE.pso.ts`, `routes/ROUTES.pso.ts` and its controllers in `controllers/` (official structure). In a 0.1 project the module is `src/routes/<module>/` with `ROUTES.pso.ts` and `*.controller.ts` next to `MODULE.pso.ts`. The examples below use the 0.1 relative imports; in the official structure they are `./controllers/users.controller`, `./services/users.service` and `./routes/ROUTES.pso` (and `../controllers/...` from `routes/ROUTES.pso.ts`). All three are validated together.
+Every HTTP module is a directory `src/modules/<module>/` (MANDATORY for new code) with `MODULE.pso.ts`, `routes/ROUTES.pso.ts`, `controllers/`, `services/`, `providers/`, `contracts/`, `dto/request/`, `dto/response/` and `mappers/`. All of them are validated together. A 0.1 project (`src/routes/<module>/`, every file next to `MODULE.pso.ts`) keeps its layout; never add official-structure files to it (`PSO_STRUCTURE_MIXED`).
 
-### MODULE.pso.ts (composition)
+### src/modules/users/MODULE.pso.ts (composition)
 
 ```typescript
 import { defineModule } from "@pso/core";
-import { UsersController } from "./users.controller";
-import { UsersService } from "./users.service";
-import usersRoutes from "./ROUTES.pso";
+import { UsersController } from "./controllers/users.controller";
+import { UsersService } from "./services/users.service";
+import usersRoutes from "./routes/ROUTES.pso";
 
 export default defineModule({
   name: "users",                 // must equal the directory name
@@ -193,11 +199,11 @@ export default defineModule({
 });
 ```
 
-### ROUTES.pso.ts (authoritative registry; literals and identifiers only)
+### src/modules/users/routes/ROUTES.pso.ts (authoritative registry; literals and identifiers only)
 
 ```typescript
 import { defineRoutes } from "@pso/http";
-import { UsersController } from "./users.controller";
+import { UsersController } from "../controllers/users.controller";
 
 export default defineRoutes({
   routes: [
@@ -211,7 +217,7 @@ export default defineRoutes({
 
 Entry fields: `method`, `path` (full path), `controller`, `action`, `security` (`{ public: true }` or `{ guard, scopes }`), `guards`, `middleware`, `interceptors`, `filters`, `metadata.service` (a forwarding route), `metadata.services` (the services an action may call through `UpstreamClient`), `responses`, `version`.
 
-### Controller
+### src/modules/users/controllers/users.controller.ts
 
 ```typescript
 @Controller()
@@ -241,9 +247,10 @@ pso make:route users findAll --method GET --path / --public --service gateway
 
 ## Task: create a REST module
 
-1. `pso make:module <name> --service <orchestrator>` creates `MODULE.pso.ts` and an empty `ROUTES.pso.ts`. Nothing is exposed yet.
-2. `pso make:controller <name> --service <orchestrator>` creates `<name>.controller.ts` and lists it in `MODULE.pso.ts`.
-3. Optional: `pso make:service <name> --service <orchestrator> --export` and `pso make:dto <name> <dto-name> --service <orchestrator>`.
+0. A complete resource backed by a Spring service (database, both projects, tests): prefer `pso make:crud <resource> --service <spring-service> --orchestrator [--fields ...]` and stop here.
+1. `pso make:module <name> --service <orchestrator>` creates `src/modules/<name>/MODULE.pso.ts` and an empty `src/modules/<name>/routes/ROUTES.pso.ts`. Nothing is exposed yet.
+2. `pso make:controller <name> --service <orchestrator>` creates `src/modules/<name>/controllers/<name>.controller.ts` and lists it in `MODULE.pso.ts`.
+3. Optional: `pso make:service <name> --service <orchestrator> --export` (`services/`), `pso make:provider <provider> --module <name>` (`providers/`, the call to a microservice), `pso make:dto <name> <dto-name> --service <orchestrator>` (`dto/request/`, `--response` for `dto/response/`), `pso make:mapper <name> <mapper>` (`mappers/`), `pso make:contract <name> <contract>` (`contracts/`).
 4. For each endpoint run `pso make:route <name> <action> --method GET --path / --public --service <orchestrator>` (or `--guard jwt --scopes x:read` for protected routes). This writes the decorated action and the `ROUTES.pso.ts` entry together.
 5. If the endpoint belongs to a Spring service, use `pso make:resource` instead (see the protected-route task).
 6. `pso validate` then `pso routes:list`. Only routes listed there exist.

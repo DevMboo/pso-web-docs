@@ -115,7 +115,8 @@ pso crud:bind products --to catalog
 ## Running it
 
 ```bash
-pso docker:up                 # PostgreSQL, the identity provider, the service and the orchestrator, provisioned by PSO
+pso infra:init --identity keycloak --runtime docker --users "ana,bob:products:read"   # declare Docker, Keycloak, development users
+pso docker:up --vendor        # PostgreSQL, Keycloak, the service, the orchestrator and the edge, provisioned by PSO
 pso studio                    # API client: the "Reference requests" panel holds the collection, sent with the dev user
 ```
 

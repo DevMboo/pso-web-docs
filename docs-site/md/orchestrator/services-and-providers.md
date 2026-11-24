@@ -2,21 +2,14 @@
 
 > Injectable classes that hold logic belonging to the orchestrator - how to create them, inject them into controllers and into each other, share them between modules, and what should not live in them.
 
-<!-- pso:structure-note -->
-> [!NOTE]
-> Examples on this page use the 0.1 orchestrator layout (`src/routes/<module>/`, `src/guards/`, `src/contracts/`), which existing
-> projects keep. In the official structure of new projects the same files are in `src/modules/<module>/` (`routes/ROUTES.pso.ts`,
-> `controllers/`, `services/`, `providers/`, `dto/`) and in `src/.app/` (`guards/`, `middlewares/`, `filters/`, `contracts/`); what the
-> page describes works the same way. See [TypeScript orchestrator structure](architecture/typescript-orchestrator.md).
-
 ## What a provider is
 
 A **provider** is a class the orchestrator creates for you, once, and hands to whoever asks for it in a constructor. "Service" is the usual name for a provider that holds logic. Anything you list in `providers` of `MODULE.pso.ts` is a provider; nothing is discovered by scanning.
 
 ```ts
-// users/users.service.ts
+// users/services/users.service.ts
 import { Injectable } from "@pso/http";
-import type { CreateUserDto } from "./dto/create-user.dto";
+import type { CreateUserDto } from "../dto/request/create-user.dto";
 
 @Injectable()
 export class UsersService {
@@ -44,22 +37,22 @@ A controller should read the request and return a result. If it also composes se
 
 ```bash
 pso make:module orders
-pso make:service orders            # creates src/routes/orders/orders.service.ts and registers it
+pso make:service orders            # creates src/modules/orders/services/orders.service.ts and registers it
 pso make:service orders pricing --export   # a second provider, also exported to modules that import this one
 ```
 
 Expected output:
 
 ```text evidence="expected"
-updated  src/routes/orders/MODULE.pso.ts
-created  src/routes/orders/orders.service.ts
-updated  src/routes/orders/MODULE.pso.ts
-created  src/routes/orders/pricing.service.ts
+updated  src/modules/orders/MODULE.pso.ts
+created  src/modules/orders/services/orders.service.ts
+updated  src/modules/orders/MODULE.pso.ts
+created  src/modules/orders/services/pricing.service.ts
 ```
 
 The module after both commands (you edit the service files; the module is maintained for you):
 
-```typescript title="src/routes/orders/MODULE.pso.ts"
+```typescript title="src/modules/orders/MODULE.pso.ts"
 export default defineModule({
   name: "orders",
   controllers: [],
@@ -74,7 +67,7 @@ The new file is an empty class. Add `@Injectable()` once it has constructor depe
 
 ## 2. Inject it into a controller
 
-```typescript title="orders.controller.ts"
+```typescript title="src/modules/orders/controllers/orders.controller.ts"
 @Controller()
 @RestController("/orders")
 export class OrdersController {
@@ -89,7 +82,7 @@ The route still needs its entry in `ROUTES.pso.ts` (see [routing](orchestrator/r
 
 ## 3. Providers that depend on providers
 
-```typescript title="pricing.service.ts"
+```typescript title="src/modules/orders/services/pricing.service.ts"
 @Injectable()
 export class PricingService {
   total(items: Array<{ priceCents: number; quantity: number }>): number {
@@ -98,7 +91,7 @@ export class PricingService {
 }
 ```
 
-```typescript title="orders.service.ts"
+```typescript title="src/modules/orders/services/orders.service.ts"
 @Injectable()
 export class OrdersService {
   constructor(private readonly pricing: PricingService) {}
@@ -113,7 +106,7 @@ Both are in `providers`, so the container builds `PricingService` first and pass
 Export from the module that owns the provider, import that module from the one that needs it:
 
 ```typescript
-// billing/MODULE.pso.ts
+// src/modules/billing/MODULE.pso.ts
 export default defineModule({ name: "billing", controllers: [], providers: [], routes: billingRoutes, imports: [ordersModule], exports: [] });
 ```
 
@@ -147,7 +140,7 @@ A failure at either step means nothing started: the application never half-works
 |---|---|
 | `PSO_MODULE_006 Dependency cannot be resolved` | the constructor asks for a class that is not a provider of this module, not exported by an imported module and not built in; add it to `providers` or `imports` |
 | `PSO_MODULE_007 Circular provider dependency` | the message shows the cycle; break it |
-| `PSO_MODULE_008 Imported module not found` | `imports` names a module that does not exist under `src/routes` |
+| `PSO_MODULE_008 Imported module not found` | `imports` names a module that does not exist under `src/modules` |
 | a constructor parameter arrives `undefined` | the class is missing `@Injectable()`, or the project is not compiled with `emitDecoratorMetadata` |
 
 ## Production considerations
@@ -156,15 +149,15 @@ Providers live as long as the process. Release resources (timers, connections) i
 
 ## Providers, hooks and configuration files: what each one is
 
-The orchestrator template has four folders next to `src/routes/`. None of them is scanned: a file takes part in the application only through an explicit declaration or an ordinary import.
+A service, a provider and a hook belong to a module and live in its folders; configuration is application-wide and lives in `src/.app/`. None of them is scanned: a file takes part in the application only through an explicit declaration or an ordinary import.
 
 | Artifact | Generator | What it is | How it becomes active |
 |---|---|---|---|
-| Module service | `pso make:service <module> [name]` | a class in the module's folder | listed in `providers` of that `MODULE.pso.ts` (the generator does it) |
-| Provider | `pso make:provider <name> --module <module>` | an `@Injectable()` class in `src/providers/`, for logic shared by several modules | listed in `providers` of each module that uses it (`--module` adds it to one) |
-| Lifecycle hook | `pso make:hook <name> --module <module>` | a provider in `src/hooks/` that implements `onReady` and/or `onShutdown` | listed in `providers` of a module; a hook nobody lists never runs |
-| Configuration | `pso make:config <name>` | a plain module in `src/configs/` that reads its values once | imported where it is needed; the framework neither loads nor injects it |
-| `src/services/` | none | a place for plain classes of your own | imported and listed like any other provider |
+| Module service | `pso make:service <module> [name]` | a class in `src/modules/<module>/services/` that coordinates the module's work | listed in `providers` of that `MODULE.pso.ts` (the generator does it) |
+| Provider | `pso make:provider <name> --module <module>` | an `@Injectable()` class in `src/modules/<module>/providers/`, typically the call to a microservice | listed in `providers` of the module (the generator does it); another module uses it through `exports` / `imports` |
+| Lifecycle hook | `pso make:hook <name> --module <module>` | a provider in `src/modules/<module>/hooks/` that implements `onReady` and/or `onShutdown` | listed in `providers` of the module; a hook nobody lists never runs |
+| Configuration | `pso make:config <name>` | a plain module in `src/.app/configs/` that reads its values once | imported where it is needed; the framework neither loads nor injects it |
+| Shared code | none | plain classes and functions of no single module, in `src/shared/` | imported where needed; listed as a provider only if something injects it |
 
 ```bash
 pso make:provider clock --module users --service gateway
@@ -172,12 +165,12 @@ pso make:hook audit --module users --service gateway
 pso make:config storage --service gateway
 ```
 
-```ts title="src/routes/users/MODULE.pso.ts (after the two commands)"
+```ts title="src/modules/users/MODULE.pso.ts (after the two commands)"
 import { defineModule } from "@pso/core";
-import usersRoutes from "./ROUTES.pso";
-import { UsersController } from "./users.controller";
-import { ClockProvider } from "../../providers/clock.provider";
-import { AuditHook } from "../../hooks/audit.hook";
+import usersRoutes from "./routes/ROUTES.pso";
+import { UsersController } from "./controllers/users.controller";
+import { ClockProvider } from "./providers/clock.provider";
+import { AuditHook } from "./hooks/audit.hook";
 
 export default defineModule({
   name: "users",
@@ -191,7 +184,7 @@ export default defineModule({
 
 ### Lifecycle hooks
 
-```ts title="src/hooks/audit.hook.ts"
+```ts title="src/modules/users/hooks/audit.hook.ts"
 import { Injectable, log, type OnReady, type OnShutdown } from "@pso/http";
 
 @Injectable()
@@ -215,7 +208,7 @@ A hook's constructor dependencies are injected like any provider's (other provid
 
 ### Configuration files
 
-```ts title="src/configs/storage.config.ts"
+```ts title="src/.app/configs/storage.config.ts"
 export default Object.freeze({
   name: "storage",
   bucket: process.env["STORAGE_BUCKET"] ?? "local",

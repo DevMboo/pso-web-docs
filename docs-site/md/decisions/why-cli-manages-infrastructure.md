@@ -23,10 +23,10 @@ One generator writes both sides of a resource and refuses to leave an inconsiste
 
 ```text evidence="expected"
 $ pso make:resource product --service catalog --route /products --scopes products:read
-created    gateway/src/contracts/product.contract.json
-created    catalog/src/main/java/com/pso/catalog/routes/ProductController.java
-created    gateway/src/routes/product/ROUTES.pso.ts
+created    gateway/src/.app/contracts/product.contract.json
+created    catalog/src/main/java/com/pso/catalog/application/rest/ProductController.java
 ...
+created    gateway/src/modules/product/routes/ROUTES.pso.ts
 ```
 
 `--dry-run` shows the plan without writing; a conflict with your edits is reported, never overwritten silently; a change that would fail validation is rolled back ("The change would leave the module inconsistent and was rolled back").
