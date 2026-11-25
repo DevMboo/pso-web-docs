@@ -289,7 +289,7 @@ They are not a promise that your application is correct. They make one kind of m
 | Maven | **not required** | each service carries a project-local Maven Wrapper (Maven 3.9.9, SHA-256 pinned) that downloads Maven from Maven Central on first use |
 | Docker | optional | `pso docker:build`, the generated Compose stack, and running real brokers or PostgreSQL locally |
 
-Windows, macOS and Linux are supported by the CLI from a checkout of the source. The current release, PSO Web V2 `0.2.0-rc.5`, is distributed for Windows 10/11 x64 as a portable ZIP (recommended) and an experimental, unsigned installer that is not validated end to end ([Downloads](downloads/index.md)).
+Windows, macOS and Linux are supported by the CLI from a checkout of the source. The current release, PSO Web V2 `0.2.0-rc.6`, is distributed for Windows 10/11 x64 as a portable ZIP (recommended) and an experimental, unsigned installer that is not validated end to end ([Downloads](downloads/index.md)).
 
 > [!NOTE]
 > **Which Node version?** Node 24 or newer. The framework packages and the generated orchestrator declare `engines.node >=24`, `pso doctor` requires 24 (it prints `>=24`), and every test of this framework ran on Node 24.
@@ -361,11 +361,11 @@ ok      docker  Docker version 29.6.1, build 8900f1d  (optional)
 > Status: PARTIALLY implemented — read the limitations.
 
 > [!NOTE]
-> The current release is **PSO Web V2, `0.2.0-rc.5`**; its CLI reports version `0.2.0`. Download it from [Downloads](downloads/index.md) (the public release [`v0.2.0-rc.5`](https://github.com/DevMboo/pso-web-framework/releases/tag/v0.2.0-rc.5); its Windows files are **not Authenticode-signed**). The 0.1 alpha releases listed there are historical: do not substitute their files for rc.5.
+> The current release is **PSO Web V2, `0.2.0-rc.6`**; its CLI reports version `0.2.0`. Download it from [Downloads](downloads/index.md) (the public release [`v0.2.0-rc.6`](https://github.com/DevMboo/pso-web-framework/releases/tag/v0.2.0-rc.6); its Windows files are **not Authenticode-signed**). The 0.1 alpha releases listed there are historical: do not substitute their files for rc.6.
 
 ## Option 1: the portable Windows distribution (recommended)
 
-The portable ZIP is the supported form for the current release candidate while the Windows installer is unsigned and unvalidated end to end. It needs Windows 10/11 x64, but bundles a private Node.js runtime: you do **not** install Node.js system-wide. Download `PSO-Web-0.2.0-rc.5-win-x64-portable.zip` and its `SHA256SUMS`, `SHA256SUMS.sig` and `release-signing-key.public.pem` from the [release page](https://github.com/DevMboo/pso-web-releases/releases/tag/v0.2.0-rc.5). Confirm the ZIP's SHA-256 (`77eb495bd93a74c22f65c5af8692a535417f5939d95759dfbd9880d6ffca57d0`) before extraction; see [Downloads](downloads/index.md) for verification and security limits. The experimental installer `PSO-Web-0.2.0-rc.5-win-x64.exe` carries the same content but is not validated end to end.
+The portable ZIP is the supported form for the current release candidate while the Windows installer is unsigned and unvalidated end to end. It needs Windows 10/11 x64, but bundles a private Node.js runtime: you do **not** install Node.js system-wide. Download `PSO-Web-0.2.0-rc.6-win-x64-portable.zip` and its `SHA256SUMS`, `SHA256SUMS.sig` and `release-signing-key.public.pem` from the [release page](https://github.com/DevMboo/pso-web-releases/releases/tag/v0.2.0-rc.6). Confirm the ZIP's SHA-256 (`77eb495bd93a74c22f65c5af8692a535417f5939d95759dfbd9880d6ffca57d0`) before extraction; see [Downloads](downloads/index.md) for verification and security limits. The experimental installer `PSO-Web-0.2.0-rc.6-win-x64.exe` carries the same content but is not validated end to end.
 
 1. Extract to a writable folder such as `%LOCALAPPDATA%\PSO` or `C:\Tools\pso`. Avoid `Program Files`; no administrator rights are needed.
 2. Run `pso.cmd` from the extracted folder and check the installation:
@@ -382,7 +382,7 @@ The ZIP writes no registry entries and does not alter a system Node.js installat
 
 ### Matching Java artifacts
 
-For generated Spring services, use JDK 21 or newer and run `pso java:install`. The installed rc.5 distribution contains its matching Maven file repository and generates services that request `com.pso:*:0.2.0-rc.5`; `java:install` copies those artifacts into your local Maven repository. It does not publish them to Maven Central. Then build a generated service with its Maven Wrapper:
+For generated Spring services, use JDK 21 or newer and run `pso java:install`. The installed rc.6 distribution contains its matching Maven file repository and generates services that request `com.pso:*:0.2.0-rc.6`; `java:install` copies those artifacts into your local Maven repository. It does not publish them to Maven Central. Then build a generated service with its Maven Wrapper:
 
 ```powershell
 pso java:install
@@ -418,7 +418,7 @@ npm link
 pso doctor
 ```
 
-Alternatively run `node path/to/pso-web-framework/packages/cli/bin/pso.js` without linking. A checkout also has `pso-java/`; there `pso java:install` builds and installs its `0.1.0-SNAPSHOT` artifacts, which are distinct from the installed rc.5 artifacts. Rebuild the checkout after source changes, and remove the global link with `npm unlink -g @pso/cli` when finished. [Installed versus development CLI](devops/installed-and-development-cli.md) explains how to identify which `pso` is running.
+Alternatively run `node path/to/pso-web-framework/packages/cli/bin/pso.js` without linking. A checkout also has `pso-java/`; there `pso java:install` builds and installs its `0.1.0-SNAPSHOT` artifacts, which are distinct from the installed rc.6 artifacts. Rebuild the checkout after source changes, and remove the global link with `npm unlink -g @pso/cli` when finished. [Installed versus development CLI](devops/installed-and-development-cli.md) explains how to identify which `pso` is running.
 
 ## Start a workspace
 
@@ -439,7 +439,7 @@ New projects use the [layered Java service](architecture/java-microservice.md) a
 | Windows blocks the extracted `pso.cmd` or a file of the ZIP (application control, Smart App Control) | the files are not publisher-signed | use only an authorized copy with a matching `SHA256SUMS`; never disable or bypass the protection |
 | `Get-Command pso -All` lists a development link first | an `npm link` of a checkout shadows the installed command | remove it (`npm unlink -g @pso/cli`) or call the installed `pso.cmd` by its full path |
 | `Non-resolvable import POM: com.pso:pso-bom` in a generated service | the matching Java artifacts are not in the local Maven repository | `pso java:install` with the installed distribution |
-| `does not carry com.pso:*:0.2.0-rc.5` from `pso java:install --from` | the repository is from another release | use the Maven repository of the same distribution |
+| `does not carry com.pso:*:0.2.0-rc.6` from `pso java:install --from` | the repository is from another release | use the Maven repository of the same distribution |
 | `integrity check` reports changed files | a file of the installation was modified or damaged | `pso repair --full`, or `pso update rollback` after a failed update |
 
 ---
@@ -1578,7 +1578,7 @@ All diagnostic codes are listed in the [diagnostics reference](reference/diagnos
 
 # Downloads
 
-> Download PSO Web V2 (0.2.0-rc.5) for Windows x64 - the recommended portable ZIP and the experimental, Authenticode-unsigned installer - verify them, install, update and roll back.
+> Download PSO Web V2 (0.2.0-rc.6) for Windows x64 - the recommended portable ZIP and the experimental, Authenticode-unsigned installer - verify them, install, update and roll back.
 
 > Status: PARTIALLY implemented — read the limitations.
 
@@ -1589,9 +1589,9 @@ All diagnostic codes are listed in the [diagnostics reference](reference/diagnos
 PSO Web Framework is free and open-source software, licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0). It has no telemetry, license check or paid tier ([privacy policy](downloads/privacy-policy.md)). The maintainer is [DevMboo](https://github.com/DevMboo). The source code is public at [github.com/DevMboo/pso-web-framework](https://github.com/DevMboo/pso-web-framework).
 
 > [!NOTE]
-> **The current release is PSO Web V2, `0.2.0-rc.5`** (release candidate, GitHub prerelease of the source repository; `0.2.0-rc.4`
+> **The current release is PSO Web V2, `0.2.0-rc.6`** (release candidate, GitHub prerelease of the source repository; `0.2.0-rc.4`
 > was the first public release). It is the release this documentation describes: the official application structures, the reference Product CRUD, the
-> infrastructure engine, FEI/MEI and the cloud engine. The CLI reports version `0.2.0`; its Java libraries are `com.pso:*:0.2.0-rc.5`
+> infrastructure engine, FEI/MEI and the cloud engine. The CLI reports version `0.2.0`; its Java libraries are `com.pso:*:0.2.0-rc.6`
 > and are included.
 
 > [!WARNING]
@@ -1599,32 +1599,32 @@ PSO Web Framework is free and open-source software, licensed under the [Apache L
 > without a code-signing certificate; it is not a SignPath-signed production release. Windows Smart App Control or SmartScreen may
 > block the installer. Never disable those protections: use the portable ZIP, or wait for a signed release.
 
-## Download PSO Web V2 (0.2.0-rc.5)
+## Download PSO Web V2 (0.2.0-rc.6)
 
 | Release detail | Value |
 | --- | --- |
-| Release | [`v0.2.0-rc.5`](https://github.com/DevMboo/pso-web-framework/releases/tag/v0.2.0-rc.5) (public prerelease, built from commit `cb7cfc8` of the source repository) |
+| Release | [`v0.2.0-rc.6`](https://github.com/DevMboo/pso-web-framework/releases/tag/v0.2.0-rc.6) (public prerelease, built from commit `d6b20b7` of the source repository) |
 | Platform | Windows 10/11 x64 |
-| Recommended asset | `PSO-Web-0.2.0-rc.5-win-x64-portable.zip`, 50.5 MB (50,458,589 bytes) |
-| Experimental asset | `PSO-Web-0.2.0-rc.5-win-x64.exe`, 31.4 MB (31,396,358 bytes), **Authenticode-unsigned** |
-| Also on the release page | the npm tarballs of the 13 `@pso/*` packages (0.2.0) and the `com.pso:*:0.2.0-rc.5` Maven file repository, with their SBOMs |
+| Recommended asset | `PSO-Web-0.2.0-rc.6-win-x64-portable.zip`, 50.5 MB (50,462,355 bytes) |
+| Experimental asset | `PSO-Web-0.2.0-rc.6-win-x64.exe`, 31.4 MB (31,398,546 bytes), **Authenticode-unsigned** |
+| Also on the release page | the npm tarballs of the 13 `@pso/*` packages (0.2.0) and the `com.pso:*:0.2.0-rc.6` Maven file repository, with their SBOMs |
 | Node.js requirement | Bundled private runtime; no system Node.js installation |
 | Java | JDK 21 or newer for Spring services; the matching `com.pso` Maven repository is included (`pso java:install`) |
 | Access | public: no GitHub account needed |
 | Security | No Authenticode signature; `SHA256SUMS` and the package are signed with the project's Ed25519 release key (below) |
 
-:::download-button url="https://github.com/DevMboo/pso-web-framework/releases/download/v0.2.0-rc.5/PSO-Web-0.2.0-rc.5-win-x64-portable.zip" label="Download PSO Web V2 — Windows x64 portable (0.2.0-rc.5, recommended)"
+:::download-button url="https://github.com/DevMboo/pso-web-framework/releases/download/v0.2.0-rc.6/PSO-Web-0.2.0-rc.6-win-x64-portable.zip" label="Download PSO Web V2 — Windows x64 portable (0.2.0-rc.6, recommended)"
 
 The **portable ZIP is the recommended download**. It installs nothing: extract it and run `pso.cmd`
-([Installation](getting-started/installation.md)). The exact ZIP passed 21/21 portable validation checks, and the installed rc.5 CLI passed the 34-check workspace acceptance (structure, validation, infrastructure, Docker, edge, frontends).
+([Installation](getting-started/installation.md)). The exact ZIP passed 21/21 portable validation checks, and the installed rc.6 CLI passed the 35-check integration of `pso frontend:config --env` (two FEIs, Docker, Chrome).
 
-:::download-button url="https://github.com/DevMboo/pso-web-framework/releases/download/v0.2.0-rc.5/PSO-Web-0.2.0-rc.5-win-x64.exe" label="Download the experimental, Authenticode-unsigned Windows x64 installer (0.2.0-rc.5)"
+:::download-button url="https://github.com/DevMboo/pso-web-framework/releases/download/v0.2.0-rc.6/PSO-Web-0.2.0-rc.6-win-x64.exe" label="Download the experimental, Authenticode-unsigned Windows x64 installer (0.2.0-rc.6)"
 
 The **installer is experimental and unsigned**: it carries the same content, but its real Windows installation flow (wizard, PATH
 entry, uninstaller) has not been validated end to end, because Smart App Control on the validation machine refuses unsigned
 installers. It may block it on your machine too. Read `INSTALL.md` on the release page first.
 
-The [release page](https://github.com/DevMboo/pso-web-framework/releases/tag/v0.2.0-rc.5) also holds `PORTABLE.md`, `INSTALL.md`, the checksums, the detached signature, the public key, the
+The [release page](https://github.com/DevMboo/pso-web-framework/releases/tag/v0.2.0-rc.6) also holds `PORTABLE.md`, `INSTALL.md`, the checksums, the detached signature, the public key, the
 release manifest, the SBOMs and the notices.
 
 ## Verify before use
@@ -1632,16 +1632,16 @@ release manifest, the SBOMs and the notices.
 Download `SHA256SUMS`, `SHA256SUMS.sig` and `release-signing-key.public.pem` from the same release, then compare:
 
 ```powershell
-Get-FileHash .\PSO-Web-0.2.0-rc.5-win-x64-portable.zip -Algorithm SHA256
+Get-FileHash .\PSO-Web-0.2.0-rc.6-win-x64-portable.zip -Algorithm SHA256
 Get-Content .\SHA256SUMS
 ```
 
 | File | SHA-256 |
 | --- | --- |
-| `PSO-Web-0.2.0-rc.5-win-x64-portable.zip` | `e3d3c85daf0eea6f1a6a4db812ac0e63a26b9cba77d0df6aade848ba67586187` |
-| `PSO-Web-0.2.0-rc.5-win-x64.exe` | `9099ce0da97327b4857a08262ceaf842dc25b56f73bc68ed577b9948368604db` |
-| `pso-npm-0.2.0-packages.zip` | `03d72525a551529b79dd4e8bd5df6435dbb122fb7f7a79728605f656b904e919` |
-| `pso-java-0.2.0-rc.5-maven-repository.zip` | `ce66786455921667be3c827e908a6f2bcff145fc0232941716fb4f0ef8623f88` |
+| `PSO-Web-0.2.0-rc.6-win-x64-portable.zip` | `45725978c4094112914f66c04ff63ede8897ca05aad4f657b7e4dcde78a0267b` |
+| `PSO-Web-0.2.0-rc.6-win-x64.exe` | `49a9a93429f2770010f48f3ea5f052da8001a98998721ccfdd3a3a6cf054e6a4` |
+| `pso-npm-0.2.0-packages.zip` | `13905e506401e446db56da3987dee493e10eeb259cf909c6d84407819ba9918c` |
+| `pso-java-0.2.0-rc.6-maven-repository.zip` | `27a954e585e1d261ed706e9c3e4a9a5bf34686f6e24c7f9f0b7cf33ac56f734e` |
 
 The Windows files are listed in `SHA256SUMS` and the package archives in `SHA256SUMS-PACKAGES`, both signed.
 
@@ -1653,7 +1653,7 @@ signature differs.
 
 ## Code signing policy
 
-No PSO Web release is Authenticode-signed yet, including 0.2.0-rc.5. The [code signing policy](downloads/code-signing-policy.md) describes how signed releases
+No PSO Web release is Authenticode-signed yet, including 0.2.0-rc.6. The [code signing policy](downloads/code-signing-policy.md) describes how signed releases
 will be built, approved and verified, and who is responsible for them; the [privacy policy](downloads/privacy-policy.md) states what PSO Web
 transfers over the network (nothing unless you ask for it).
 
@@ -1662,7 +1662,7 @@ transfers over the network (nothing unless you ask for it).
 - **New installation:** extract the ZIP into a writable folder (for example `C:\Tools\pso`), run `.\pso.cmd --version` and
   `.\pso.cmd doctor`, and optionally add its `bin` directory to your user PATH. Then `pso java:install` for Spring services. See
   [Installation](getting-started/installation.md).
-- **Update an existing portable installation** that trusts the same key: `pso update install --package <extracted-zip>\.pso-install\packages\0.2.0-rc.5.psopkg`,
+- **Update an existing portable installation** that trusts the same key: `pso update install --package <extracted-zip>\.pso-install\packages\0.2.0-rc.6.psopkg`,
   then `pso integrity check --full` and `pso java:install`. The previous version is kept side by side.
 - **Roll back:** `pso update rollback` returns to the previous version. Workspaces live outside the installation and are not touched
   by an update, a rollback or removal of the folder; migrate them separately ([migration](reference/migration.md)).
@@ -1674,7 +1674,7 @@ your administrator or wait for a signed release. See [Release integrity and sign
 
 | Symptom | Cause | Fix |
 | --- | --- | --- |
-| the download button answers `404` | the asset name changed or the release is not reachable | open the [release page](https://github.com/DevMboo/pso-web-framework/releases/tag/v0.2.0-rc.5) and download from there |
+| the download button answers `404` | the asset name changed or the release is not reachable | open the [release page](https://github.com/DevMboo/pso-web-framework/releases/tag/v0.2.0-rc.6) and download from there |
 | the SHA-256 differs from `SHA256SUMS` | an incomplete or altered download | delete the file and download it again from the release page; never run a file whose hash differs |
 | Windows blocks the installer ("An Application Control policy blocked this file") | Smart App Control or another policy refuses unsigned files | use the portable ZIP, or ask your administrator; do not switch the protection off |
 | `pso update install` refuses the package | the installation trusts another signing key | that is the protection working: extract the ZIP into a new folder instead |
@@ -1698,7 +1698,7 @@ unchanged for rollback but are not public. They are not recommended for new work
 > [!IMPORTANT]
 > **Status: no PSO Web release is Authenticode-signed yet.** The project is preparing an application to the
 > [SignPath Foundation](https://signpath.org) free code-signing program for open-source projects. It has **not** been accepted, no
-> certificate has been issued, and nothing is signed through SignPath. `0.2.0-rc.5` is unsigned; Windows Smart App Control can block its
+> certificate has been issued, and nothing is signed through SignPath. `0.2.0-rc.6` is unsigned; Windows Smart App Control can block its
 > installer. This page describes the policy that signed releases will follow, and it will name the signing service once one is active.
 
 ## What will be signed
@@ -1711,7 +1711,7 @@ unchanged for rollback but are not public. They are not recommended for new work
 | scripts (`pso.cmd`, the Maven wrapper of generated projects) and JavaScript | cannot carry Authenticode signatures; covered by the package's signed per-file inventory (`pso integrity check --full`) |
 
 Only executables built from this project's own source code (Apache License 2.0) are signed. Upstream binaries are never signed with the project's certificate.
-Every signed file carries the product name **PSO Web** and the release version (for example `0.2.0-rc.5`, numerically `0.2.0.0`) in its
+Every signed file carries the product name **PSO Web** and the release version (for example `0.2.0-rc.6`, numerically `0.2.0.0`) in its
 version information, the same values in every file of a release. Signatures use SHA-256 and an RFC 3161 timestamp.
 
 ## How a release is built and approved
@@ -9190,7 +9190,7 @@ reference Product CRUD, PostgreSQL and Flyway; `--template empty` creates the sa
 
 ```tree title="A new service (pso create service catalog)"
 catalog/
-  pom.xml  # generated: Spring Boot 3.5, the PSO BOM 0.2.0-rc.5 and starters
+  pom.xml  # generated: Spring Boot 3.5, the PSO BOM 0.2.0-rc.6 and starters
   mvnw  # generated: Maven Wrapper, with mvnw.cmd and .mvn/wrapper/maven-wrapper.properties
   src/
     main/
@@ -9661,7 +9661,7 @@ DROP TABLE outbox_event;
 
 ## Supported
 
-For the installed `0.2.0-rc.5` distribution, generated services request `com.pso:*:0.2.0-rc.5` through the BOM; its portable package carries matching Maven artifacts for `pso java:install`. A CLI run from this framework checkout instead reads `pso-java/pom.xml` and uses `0.1.0-SNAPSHOT`. See [Maven BOM and Java versions](spring/maven-bom.md). The `0.1.0` release run below is an illustrative older fixed-version example, not the installed rc.5 artifact set.
+For the installed `0.2.0-rc.6` distribution, generated services request `com.pso:*:0.2.0-rc.6` through the BOM; its portable package carries matching Maven artifacts for `pso java:install`. A CLI run from this framework checkout instead reads `pso-java/pom.xml` and uses `0.1.0-SNAPSHOT`. See [Maven BOM and Java versions](spring/maven-bom.md). The `0.1.0` release run below is an illustrative older fixed-version example, not the installed rc.6 artifact set.
 
 - **Maven Wrapper.** Every service has `mvnw`, `mvnw.cmd` and `.mvn/wrapper/maven-wrapper.properties` pinned to Maven 3.9.9 with `distributionSha256Sum`. Builds do not depend on a global Maven.
 - **One BOM.** Generated POMs import `com.pso:pso-bom`, so every PSO starter shares one version (`pso.version`) and Spring Boot's versions stay managed by the parent. See [Maven BOM and SNAPSHOTs](spring/maven-bom.md).
@@ -9903,7 +9903,7 @@ Generated services include Lombok with explicit annotation processing. See [Lomb
 
 ## Development workflow
 
-The artifacts are not published to Maven Central. Install them once into your local Maven repository with `pso java:install`: the installed rc.5 distribution copies its bundled `com.pso:*:0.2.0-rc.5` repository, a framework checkout builds `com.pso:*:0.1.0-SNAPSHOT` (see [Maven BOM and Java versions](spring/maven-bom.md)).
+The artifacts are not published to Maven Central. Install them once into your local Maven repository with `pso java:install`: the installed rc.6 distribution copies its bundled `com.pso:*:0.2.0-rc.6` repository, a framework checkout builds `com.pso:*:0.1.0-SNAPSHOT` (see [Maven BOM and Java versions](spring/maven-bom.md)).
 
 ## Not implemented
 
@@ -9930,11 +9930,11 @@ The artifacts are not published to Maven Central. Install them once into your lo
 
 > How the distributed and source-checkout CLIs select matching PSO Java artifacts, and how Maven builds resolve them.
 
-Generated services import one bill of materials and then declare starters without individual versions. The **installed `0.2.0-rc.5` CLI** sets `pso.version` to `0.2.0-rc.5`; the **framework checkout** reads the current `pso-java/pom.xml`, which is `0.1.0-SNAPSHOT` in this checkout. The CLI selects a matching Java version instead of adopting whichever artifacts happen to be on the machine:
+Generated services import one bill of materials and then declare starters without individual versions. The **installed `0.2.0-rc.6` CLI** sets `pso.version` to `0.2.0-rc.6`; the **framework checkout** reads the current `pso-java/pom.xml`, which is `0.1.0-SNAPSHOT` in this checkout. The CLI selects a matching Java version instead of adopting whichever artifacts happen to be on the machine:
 
 ```xml
 <properties>
-  <pso.version>0.2.0-rc.5</pso.version>
+  <pso.version>0.2.0-rc.6</pso.version>
 </properties>
 <dependencyManagement>
   <dependencies>
@@ -9954,11 +9954,11 @@ The `pso.version` property is the only place a PSO version appears. Spring Boot 
 ## Install the matching artifacts
 
 ```bash
-pso java:install        # installed rc.5: copies its bundled com.pso:*:0.2.0-rc.5 repository into ~/.m2
+pso java:install        # installed rc.6: copies its bundled com.pso:*:0.2.0-rc.6 repository into ~/.m2
 pso create service catalog
 ```
 
-No JAR is copied by hand. The rc.5 portable distribution includes a Maven file repository next to the CLI. If your authorized package ships it separately, run `pso java:install --from <maven-repository-dir>`. `pso create service` reports when matching artifacts are missing. In a **framework checkout**, `pso java:install` builds `pso-java/` and installs `0.1.0-SNAPSHOT`; after changing the starters there, run it again. Do not substitute the checkout's SNAPSHOT for a distributed rc.5 service.
+No JAR is copied by hand. The rc.6 portable distribution includes a Maven file repository next to the CLI. If your authorized package ships it separately, run `pso java:install --from <maven-repository-dir>`. `pso create service` reports when matching artifacts are missing. In a **framework checkout**, `pso java:install` builds `pso-java/` and installs `0.1.0-SNAPSHOT`; after changing the starters there, run it again. Do not substitute the checkout's SNAPSHOT for a distributed rc.6 service.
 
 The group id `com.pso` is **not** an owned Maven Central namespace: the artifacts are never published from this repository. Choose and register a namespace before publishing.
 
@@ -14279,6 +14279,25 @@ The shell never loads a script URL it was handed. Its **runtime configuration** 
 
 Locations must be same-origin under `/_mei/`, or an origin the configuration lists over HTTPS. A failure at any step shows a "module unavailable" page for that MEI and nothing else; configuration, trust, compatibility and signature failures are not retried, network failures are retried a bounded number of times.
 
+## Sign-in mode of a shell in an environment
+
+In a workspace with `pso.infra.json`, each FEI's site configuration is managed by the infrastructure engine. Choose how users sign in to
+one shell in one environment with `--env`; run it from the workspace root:
+
+```bash
+pso frontend:config --env local --fei shop --auth none     # the shop shell becomes public in "local"
+pso frontend:config --env local --fei admin --auth oidc    # admin signs in through the environment's identity provider
+```
+
+The choice is recorded as `environments.<env>.frontends.<fei>.auth` in `pso.infra.json` and the engine re-renders that FEI's
+`pso-runtime-config.json` (`.infra/sites/<env>/<fei>/`), so a later `pso infra:apply`, `pso docker:up` or `pso frontend:publish` keeps it.
+Other FEIs and other environments are unchanged. `--auth none` only removes the shell's sign-in: the shell then shows its full layout to
+every visitor, a microfrontend page that requires scopes answers "Access denied" (no visitor can hold a scope), public microfrontends
+open (they are not listed in the navigation unless their entry in `FEI.pso.ts` sets `nav: true`), routes the orchestrator protects still
+answer `401` to its requests, and the services keep their own rules. A production environment refuses `dev-token`, and a shell whose
+`FEI.pso.ts` declares `security.authentication: "none"` stays without sign-in whatever the environment says. The OIDC, API-path and
+signature options belong to a site you manage yourself (`--site`) and are refused with `--env`.
+
 ## Releases on a site root
 
 ```bash
@@ -15215,7 +15234,7 @@ A 0.1 workspace keeps working with the 0.2.0 CLI without any change: `pso dev`, 
 
 ## Upgrading the CLI first
 
-Download the `0.2.0-rc.5` portable ZIP ([Downloads](downloads/index.md)), or update an installed distribution that trusts the same key with `pso update install --package <extracted-zip>\.pso-install\packages\0.2.0-rc.5.psopkg`. The rc.5 Windows installer is unsigned and unvalidated end to end, so it is not an upgrade path. See [Installation](getting-started/installation.md) and [release integrity and Windows installation](infrastructure/release-integrity-and-signing.md). Workspaces live outside the installation and are not touched by an update, rollback (`pso update rollback`) or removal of the portable folder.
+Download the `0.2.0-rc.6` portable ZIP ([Downloads](downloads/index.md)), or update an installed distribution that trusts the same key with `pso update install --package <extracted-zip>\.pso-install\packages\0.2.0-rc.6.psopkg`. The rc.6 Windows installer is unsigned and unvalidated end to end, so it is not an upgrade path. See [Installation](getting-started/installation.md) and [release integrity and Windows installation](infrastructure/release-integrity-and-signing.md). Workspaces live outside the installation and are not touched by an update, rollback (`pso update rollback`) or removal of the portable folder.
 
 ## Preparing to migrate an application
 
@@ -15325,7 +15344,7 @@ A checksum published next to the file proves integrity only as far as that page 
 ## Installing on Windows
 
 - **Portable ZIP** (recommended while the installer is unsigned): extract to a folder you can write to, run `.\pso.cmd --version`. A private Node.js runtime is bundled; nothing on the machine is changed.
-- **Installer** (`PSO-Web-<version>-win-x64.exe`, Inno Setup): published with rc.5 as an **experimental** asset. It is unsigned, its real installation flow has not been validated end to end, and it is not a supported installation method for rc.3.
+- **Installer** (`PSO-Web-<version>-win-x64.exe`, Inno Setup): published with rc.6 as an **experimental** asset. It is unsigned, its real installation flow has not been validated end to end, and it is not a supported installation method for rc.3.
 
 Maintenance of an installation (both forms):
 
@@ -15348,7 +15367,7 @@ Upgrading from 0.1.x keeps every workspace untouched: workspaces live outside th
 
 ### Windows installer limitations
 
-The installer of `0.2.0-rc.5` is published as an experimental asset; it is not Authenticode-signed and not a supported installation method. A prior rc.1 unsigned build was refused by Smart App Control on the validation machine ("An Application Control policy blocked this file", Code Integrity event 3077), showing that acceptance of one unsigned file does not predict acceptance of another. PSO never asks you to switch Smart App Control, SmartScreen or Defender off. Use the **portable ZIP** ([Downloads](downloads/index.md)) until the installer is signed and its installation flow validated. Both rc.5 files, their checksums and the Ed25519 signature of `SHA256SUMS` (release key `7ebced00…`) are on the public release [`v0.2.0-rc.5`](https://github.com/DevMboo/pso-web-framework/releases/tag/v0.2.0-rc.5).
+The installer of `0.2.0-rc.6` is published as an experimental asset; it is not Authenticode-signed and not a supported installation method. A prior rc.1 unsigned build was refused by Smart App Control on the validation machine ("An Application Control policy blocked this file", Code Integrity event 3077), showing that acceptance of one unsigned file does not predict acceptance of another. PSO never asks you to switch Smart App Control, SmartScreen or Defender off. Use the **portable ZIP** ([Downloads](downloads/index.md)) until the installer is signed and its installation flow validated. Both rc.6 files, their checksums and the Ed25519 signature of `SHA256SUMS` (release key `7ebced00…`) are on the public release [`v0.2.0-rc.6`](https://github.com/DevMboo/pso-web-framework/releases/tag/v0.2.0-rc.6).
 
 ## The permanent PSO release signing identity
 
@@ -15406,7 +15425,7 @@ and never stores keys, passwords or tokens in the repository. A **release gate**
 untrusted, untimestamped or signed by another publisher. An unsigned build exists only as an explicitly labelled development build.
 
 **Status:** the signing pipeline and the release gate are implemented and tested without a certificate. No certificate has been
-provisioned yet, so no PSO release is Authenticode-signed: `0.2.0-rc.5` is unsigned, and Smart App Control can block its installer.
+provisioned yet, so no PSO release is Authenticode-signed: `0.2.0-rc.6` is unsigned, and Smart App Control can block its installer.
 Acceptance of a signed release under Smart App Control is validated on an isolated Windows 11 machine before it is published.
 
 ## Before an official release
@@ -15518,7 +15537,7 @@ Start with [the CLI workflow](cli/workflow.md) to see which commands write files
 | [`pso fei:register`](cli/fei-register.md) | Register a MEI with the FEI: adds it to FEI.pso.ts (mount path, entry scopes, loading) and validates the relationship |
 | [`pso fei:unregister`](cli/fei-unregister.md) | Remove a MEI from FEI.pso.ts (the MEI project itself is not deleted) |
 | [`pso frontend:build`](cli/frontend-build.md) | Build the FEI and/or MEIs independently (hashed assets); a MEI also gets its release manifest (file hashes, contract, shared versions, optional ed25519 signature) |
-| [`pso frontend:config`](cli/frontend-config.md) | Write the FEI's runtime configuration on a site root: where each approved MEI's release pointer is, who may sign releases, how users sign in and the orchestrator's same-origin path. It holds no secret and is never built into the bundle |
+| [`pso frontend:config`](cli/frontend-config.md) | Configure how users sign in to a FEI. With --env: record the sign-in mode of that FEI in that environment of pso.infra.json and re-render its site configuration through the infrastructure engine (other FEIs and environments unchanged). With --site: write the FEI's runtime configuration on a site root you manage: where each approved MEI's release pointer is, who may sign releases, how users sign in and the orchestrator's same-origin path. It holds no secret and is never built into the bundle |
 | [`pso frontend:contracts`](cli/frontend-contracts.md) | Generate typed frontend contracts from the orchestrator's real route metadata and DTO classes into every frontend project (src/models/contract.generated.ts); --check fails when a project's copy is stale |
 | [`pso frontend:declare`](cli/frontend-declare.md) | Write deploy/<name>.deployment.pso.ts for a frontend project so the native deployment engine can plan, deploy, verify and roll it back (`pso release:plan`, `release:deploy`, `release:rollback`) |
 | [`pso frontend:dev`](cli/frontend-dev.md) | Start the development servers: every FEI and its registered MEIs (ports from their declarations), one FEI with its MEIs (--fei), or one MEI alone with the development host adapter (--standalone) |
@@ -18737,33 +18756,38 @@ mei-customers         2.6 s     209.5 KB gzip   release 0.1.0 (signed)
 
 # pso frontend:config
 
-> Write the FEI's runtime configuration on a site root: where each approved MEI's release pointer is, who may sign releases, how users sign in and the orchestrator's same-origin path. It holds no secret and is never built into the bundle
+> Configure how users sign in to a FEI. With --env: record the sign-in mode of that FEI in that environment of pso.infra.json and re-render its site configuration through the infrastructure engine (other FEIs and environments unchanged). With --site: write the FEI's runtime configuration on a site root you manage: where each approved MEI's release pointer is, who may sign releases, how users sign in and the orchestrator's same-origin path. It holds no secret and is never built into the bundle
 
-Write the FEI's runtime configuration on a site root: where each approved MEI's release pointer is, who may sign releases, how users sign in and the orchestrator's same-origin path. It holds no secret and is never built into the bundle.
+Configure how users sign in to a FEI. With --env: record the sign-in mode of that FEI in that environment of pso.infra.json and re-render its site configuration through the infrastructure engine (other FEIs and environments unchanged). With --site: write the FEI's runtime configuration on a site root you manage: where each approved MEI's release pointer is, who may sign releases, how users sign in and the orchestrator's same-origin path. It holds no secret and is never built into the bundle.
 
 ## Usage
 
 ```text
-pso frontend:config --site <dir> [--fei <name>] [--auth dev-token|oidc|none] [--oidc-issuer <url>] [--oidc-authorize <url>] [--oidc-token <url>] [--oidc-client <id>] [--oidc-scope "openid"] [--api-base /api] [--channels-path /channels] [--require-signature] [--trust-signer <name>] [--trust-key <public-or-private-pem>] [--key-id <id>]
+pso frontend:config --env <name> [--fei <name>] --auth oidc|dev-token|none [--json] | --site <dir> [--fei <name>] [--auth dev-token|oidc|none] [--oidc-issuer <url>] [--oidc-authorize <url>] [--oidc-token <url>] [--oidc-client <id>] [--oidc-scope "openid"] [--api-base /api] [--channels-path /channels] [--require-signature] [--trust-signer <name>] [--trust-key <public-or-private-pem>] [--key-id <id>]
 ```
 
 ## Flags
 
-`--site`, `--fei`, `--auth`, `--oidc-issuer`, `--oidc-authorize`, `--oidc-token`, `--oidc-client`, `--oidc-scope`, `--api-base`, `--channels-path`, `--require-signature`, `--trust-signer`, `--trust-key`, `--key-id`.
+`--env`, `--fei`, `--auth`, `--json`, `--site`, `--oidc-issuer`, `--oidc-authorize`, `--oidc-token`, `--oidc-client`, `--oidc-scope`, `--api-base`, `--channels-path`, `--require-signature`, `--trust-signer`, `--trust-key`, `--key-id`.
 
 ## Examples
 
 ```bash
+pso frontend:config --env local --fei shop --auth none
+pso frontend:config --env local --fei admin --auth oidc
 pso frontend:config --site ./site --auth none
 pso frontend:config --site ./site --auth oidc --oidc-issuer https://idp.example --oidc-authorize https://idp.example/authorize --oidc-token https://idp.example/token --oidc-client commerce-web --require-signature --trust-key release.pem --key-id release-1
 ```
 
 ## What it changes
 
-- Writes `pso-runtime-config.json` on the site root: where each approved MEI's pointer is, the sign-in provider, the same-origin API path and the trusted signing keys. It holds no secret and is not built into the bundle.
+- With `--env`: records the sign-in mode of that FEI in that environment (`environments.<env>.frontends.<fei>.auth` in `pso.infra.json`) and lets the infrastructure engine re-render its `pso-runtime-config.json`; later provisioning and publication keep it, and other FEIs and environments are unchanged.
+- With `--site`: writes `pso-runtime-config.json` on a site root you manage: where each approved MEI's pointer is, the sign-in provider, the same-origin API path and the trusted signing keys. It holds no secret and is not built into the bundle.
 
 ## Failure cases
 
+- `--env` with several FEIs needs `--fei`; `--auth` is required with `--env`; the OIDC, API-path and signature options are refused with `--env` (they come from `pso.infra.json`).
+- `dev-token` is refused in a production environment.
 - `--require-signature needs at least one --trust-key`.
 - OpenID Connect endpoints must be `https://` URLs.
 - `dev-token` works only in a shell built with `--allow-dev-token`.
@@ -25172,7 +25196,7 @@ A foreign file placed in the root is left alone (observed in an earlier installe
 ## 3. The Windows installer
 
 > [!NOTE]
-> The current release, PSO Web V2 `0.2.0-rc.5`, publishes its installer as an **experimental, Authenticode-unsigned** asset ([Downloads](downloads/index.md)): an unencrypted developer distribution that bundles its private Node.js, needs no signer fingerprint, and installs silently only with the explicit acknowledgement `/VERYSILENT /SUPPRESSMSGBOXES /ACCEPTUNSIGNEDALPHA=1 /DIR=<folder>` (its `INSTALL.md`). Its Windows installation flow is not validated end to end; the portable ZIP is recommended. The encrypted, recipient-pinned flow below (`/SIGNER=`, Node.js on PATH) is the one of the historical `0.1.0-alpha.1` installer, kept as the reference for private encrypted releases.
+> The current release, PSO Web V2 `0.2.0-rc.6`, publishes its installer as an **experimental, Authenticode-unsigned** asset ([Downloads](downloads/index.md)): an unencrypted developer distribution that bundles its private Node.js, needs no signer fingerprint, and installs silently only with the explicit acknowledgement `/VERYSILENT /SUPPRESSMSGBOXES /ACCEPTUNSIGNEDALPHA=1 /DIR=<folder>` (its `INSTALL.md`). Its Windows installation flow is not validated end to end; the portable ZIP is recommended. The encrypted, recipient-pinned flow below (`/SIGNER=`, Node.js on PATH) is the one of the historical `0.1.0-alpha.1` installer, kept as the reference for private encrypted releases.
 
 ```bash
 pso dist installer --platform windows --package pso.psopkg --bootstrap pso-bootstrap.mjs --trust keys/release.public.pem --name PSO-Web-<version>-win-x64 --out inst
@@ -28011,7 +28035,7 @@ From lowest to highest: framework defaults, workspace, service `pso.config.json`
 
 **PSO AI Context** is a set of generated instructions that tell an AI coding assistant how PSO works: the architecture, directory conventions, the module and route contracts, decorator semantics, the CLI commands that really exist, the security model and the rules for generating code.
 
-PSO Web Framework is free and open-source software under the Apache License 2.0. For the current `0.2.0-rc.5` distribution the official structures are **mandatory for all new code**: the modular TypeScript orchestrator (`src/.app/`, `src/modules/`, `src/shared/`) and the layered Java service (`application/`, `infrastructure/`, `shared/`; never `providers`, `modules` or `.app` in Java). Only an existing 0.1 project keeps its own layout, and the two are never mixed in one project. New projects include the functional Product CRUD by default; `--template empty` omits it. The [structure migration guide](architecture/structure-migration.md) explains how to inspect an older project without moving its files.
+PSO Web Framework is free and open-source software under the Apache License 2.0. For the current `0.2.0-rc.6` distribution the official structures are **mandatory for all new code**: the modular TypeScript orchestrator (`src/.app/`, `src/modules/`, `src/shared/`) and the layered Java service (`application/`, `infrastructure/`, `shared/`; never `providers`, `modules` or `.app` in Java). Only an existing 0.1 project keeps its own layout, and the two are never mixed in one project. New projects include the functional Product CRUD by default; `--template empty` omits it. The [structure migration guide](architecture/structure-migration.md) explains how to inspect an older project without moving its files.
 
 ## Why it exists
 
@@ -28146,7 +28170,7 @@ Every documentation build writes these files from the **same sources** as the HT
 
 All of them carry the framework version (0.2.0). They contain no credentials, keys or environment-specific values: the build never reads `.env` files or key material.
 
-The current release, PSO Web V2 `0.2.0-rc.5` ([Downloads](downloads/index.md)), reports the CLI/API version `0.2.0`; use the release label when matching an installed binary to these files. The current contexts describe the [official application structures](architecture/overview.md), [generator destinations](architecture/generators.md), [infrastructure engine](infrastructure/overview.md) and [migration path](reference/migration.md). Regenerate `pso ai:init` files after changing the installed CLI so an older repository instruction file does not override these conventions.
+The current release, PSO Web V2 `0.2.0-rc.6` ([Downloads](downloads/index.md)), reports the CLI/API version `0.2.0`; use the release label when matching an installed binary to these files. The current contexts describe the [official application structures](architecture/overview.md), [generator destinations](architecture/generators.md), [infrastructure engine](infrastructure/overview.md) and [migration path](reference/migration.md). Regenerate `pso ai:init` files after changing the installed CLI so an older repository instruction file does not override these conventions.
 
 Generate your own copy of the site:
 
@@ -30296,13 +30320,13 @@ Only the current documentation version is published; `docs/versions.json` lists 
 ## An upgrade procedure
 
 1. **Commit** your current state so the upgrade is a reviewable diff.
-2. Update a portable installation with the trusted package of the new release (for rc.5: `pso update install --package <extracted-zip>\.pso-install\packages\0.2.0-rc.5.psopkg`, from the ZIP on [Downloads](downloads/index.md)), or update and rebuild a framework checkout. Run `pso java:install` after changing releases if you use Spring services ([installation](getting-started/installation.md)); the installed rc.5 CLI uses `com.pso:*:0.2.0-rc.5`, while this source checkout builds its own `0.1.0-SNAPSHOT` artifacts.
+2. Update a portable installation with the trusted package of the new release (for rc.6: `pso update install --package <extracted-zip>\.pso-install\packages\0.2.0-rc.6.psopkg`, from the ZIP on [Downloads](downloads/index.md)), or update and rebuild a framework checkout. Run `pso java:install` after changing releases if you use Spring services ([installation](getting-started/installation.md)); the installed rc.6 CLI uses `com.pso:*:0.2.0-rc.6`, while this source checkout builds its own `0.1.0-SNAPSHOT` artifacts.
 3. `pso validate` and `pso config:validate`: new rules show up as diagnostics, not as run-time surprises.
 4. Preview changes to generated files with the generators' `--dry-run`, e.g. `pso docker:init --dry-run`. A differing file is reported as a conflict and never overwritten silently.
 5. Apply what you want by hand or with `--force` for files you never edited; review the diff.
 6. Run `pso test` and your own checks, then a short smoke run (`pso dev --smoke`).
 
-An installed distribution keeps its previous verified package for `pso update rollback`. Rolling back the CLI does not automatically undo workspace migrations: back up or commit each workspace before `pso workspace:migrate --apply`, and use [structure:inspect](architecture/structure-migration.md) before manually moving application files. The unsigned rc.5 installer is not an upgrade path.
+An installed distribution keeps its previous verified package for `pso update rollback`. Rolling back the CLI does not automatically undo workspace migrations: back up or commit each workspace before `pso workspace:migrate --apply`, and use [structure:inspect](architecture/structure-migration.md) before manually moving application files. The unsigned rc.6 installer is not an upgrade path.
 
 ## What changed that generated projects may want to adopt
 
