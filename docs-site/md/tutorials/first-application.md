@@ -127,7 +127,7 @@ several methods shows its `GET`).
   the example.
 - Create the orchestrator first: its `products` module still starts, `pso validate` warns `PSO_CRUD_UNBOUND`, and `pso create service`
   binds it when the service exists.
-- 0.1 layout: `--structure legacy` (see [structure compatibility](architecture/structure-migration.md)).
+- Projects created before 0.2 keep their 0.1 layout; [structure compatibility](architecture/structure-migration.md) explains how to inspect and migrate them.
 
 ## Recovering from mistakes
 

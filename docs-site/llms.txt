@@ -27,10 +27,10 @@ Version: 0.2.0. Features marked "not implemented" in a page are design notes, no
 
 - [Build your first application](md/tutorials/first-application.md): Create a workspace, a Java microservice and a TypeScript orchestrator with the reference Product CRUD, start them with PostgreSQL and the identity provider, call the API, then generate a second resource the same way.
 - [Build a CRUD API](md/tutorials/crud-api.md): The generated Product CRUD from the first command to real requests - what each layer does, one request followed from the client through the orchestrator's route, controller, service and provider to the Spring controller, service, repository and PostgreSQL, then a second resource generated the same way.
-- [Protect an API with JWT scopes](md/tutorials/authentication.md): Configure a trusted issuer, declare public and protected routes, and diagnose 401 versus 403.
+- [Protect an API with JWT scopes](md/tutorials/authentication.md): How the generated Product API is protected - Keycloak declared by pso infra:init, the jwt guard in .app, public and guarded routes in ROUTES.pso.ts, the same scopes checked again by Spring - and how to tell 401 from 403 with real answers.
 - [Connect multiple services](md/tutorials/multiple-services.md): Two Spring services with their own databases, an orchestrator module for each, calls by service name, and the topology PSO derives from the declarations.
 - [Publish and consume an event](md/tutorials/event-driven.md): Publish an event from an orchestrator action, consume it with a registered consumer over Redis Streams, and watch acknowledgement, retry and dead-lettering happen - with a failing handler on purpose.
-- [Make an event follow a database commit](md/tutorials/transactional-outbox.md): Add the Spring transactional outbox, relay rows and handle duplicate delivery safely.
+- [Make an event follow a database commit](md/tutorials/transactional-outbox.md): Add PSO Dispatch and the Spring transactional outbox to a generated layered CRUD service, publish an event in the same transaction as the business change, and handle duplicate delivery safely.
 - [Diagnose a local workspace](md/tutorials/local-debugging.md): Use static checks, route inspection, health, logs and Studio in a reliable order.
 - [Prepare a native deployment](md/tutorials/production-deployment.md): Validate, build, inspect a release plan and activate a version with health checks.
 
@@ -293,7 +293,7 @@ Version: 0.2.0. Features marked "not implemented" in a page are design notes, no
 - [pso make:files](md/cli/make-files.md): Generate a Spring files controller (upload, download, metadata, list, move, delete on PsoStorageService with scope checks) and its test
 - [pso make:filter](md/cli/make-filter.md): Generate an error filter. Orchestrator: src/.app/filters/ (0.1: src/filters/), run for the routes that name it; Spring (layered): a servlet filter in infrastructure/filter
 - [pso make:guard](md/cli/make-guard.md): Generate a guard (orchestrator: inside a module; Spring: hexagonal layout)
-- [pso make:hook](md/cli/make-hook.md): Generate a lifecycle hook (onReady / onShutdown) in src/hooks/ and, with --module, list it in that module's providers (a hook nobody lists never runs)
+- [pso make:hook](md/cli/make-hook.md): Generate a lifecycle hook (onReady / onShutdown) in the module's `hooks/` folder (`src/modules/<module>/hooks/`, `--module` is required in the official structure) and list it in that module's providers (a hook nobody lists never runs); a 0.1 project writes `src/hooks/`
 - [pso make:interceptor](md/cli/make-interceptor.md): Generate an interceptor in src/.app/interceptors/ (modular orchestrator). It runs around the action of the routes that name it (interceptors: [...] in ROUTES.pso.ts)
 - [pso make:listener](md/cli/make-listener.md): Generate a LOCAL Spring @EventListener for the application event of the same name (same process). For an event from another service use make:dispatch-handler
 - [pso make:mapper](md/cli/make-mapper.md): Generate a mapper. Orchestrator (modular): a mapping function in modules/<module>/mappers/; Spring: a mapper component (layered: application/mapper)
@@ -302,7 +302,7 @@ Version: 0.2.0. Features marked "not implemented" in a page are design notes, no
 - [pso make:module](md/cli/make-module.md): Create an HTTP module: MODULE.pso.ts + an empty ROUTES.pso.ts (no endpoint is exposed yet)
 - [pso make:notifier](md/cli/make-notifier.md): Generate a typed Spring publisher for a channel event (a record and a service on PsoChannelPublisher; --durable stores the event in the transactional outbox)
 - [pso make:port](md/cli/make-port.md): Generate a port interface (Spring, 0.1 hexagonal layout only: ports/; the layered structure has no ports)
-- [pso make:provider](md/cli/make-provider.md): Generate an injectable provider class in src/providers/ and, with --module, list it in that module's providers (explicit registration: a provider nobody lists is never constructed)
+- [pso make:provider](md/cli/make-provider.md): Generate an injectable provider class in the module's `providers/` folder (`src/modules/<module>/providers/`, `--module` is required in the official structure) and list it in that module's providers (explicit registration: a provider nobody lists is never constructed); a 0.1 project writes `src/providers/`
 - [pso make:repository](md/cli/make-repository.md): Generate a Spring Data repository (layered: infrastructure/persistence, for an existing entity; 0.1: persistence/). It does not enable a database: see `pso database:enable`
 - [pso make:request](md/cli/make-request.md): Generate a request record with Jakarta Validation in application/dto/request (layered Spring service)
 - [pso make:resource](md/cli/make-resource.md): Generate a connected route + contract in the orchestrator and controller + DTO + test in a Spring service

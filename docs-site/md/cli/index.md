@@ -146,7 +146,7 @@ Start with [the CLI workflow](cli/workflow.md) to see which commands write files
 | [`pso make:files`](cli/make-files.md) | Generate a Spring files controller (upload, download, metadata, list, move, delete on PsoStorageService with scope checks) and its test |
 | [`pso make:filter`](cli/make-filter.md) | Generate an error filter. Orchestrator: src/.app/filters/ (0.1: src/filters/), run for the routes that name it; Spring (layered): a servlet filter in infrastructure/filter |
 | [`pso make:guard`](cli/make-guard.md) | Generate a guard (orchestrator: inside a module; Spring: hexagonal layout) |
-| [`pso make:hook`](cli/make-hook.md) | Generate a lifecycle hook (onReady / onShutdown) in src/hooks/ and, with --module, list it in that module's providers (a hook nobody lists never runs) |
+| [`pso make:hook`](cli/make-hook.md) | Generate a lifecycle hook (onReady / onShutdown) in the module's `hooks/` folder (`src/modules/<module>/hooks/`, `--module` is required in the official structure) and list it in that module's providers (a hook nobody lists never runs); a 0.1 project writes `src/hooks/` |
 | [`pso make:interceptor`](cli/make-interceptor.md) | Generate an interceptor in src/.app/interceptors/ (modular orchestrator). It runs around the action of the routes that name it (interceptors: [...] in ROUTES.pso.ts) |
 | [`pso make:listener`](cli/make-listener.md) | Generate a LOCAL Spring @EventListener for the application event of the same name (same process). For an event from another service use make:dispatch-handler |
 | [`pso make:mapper`](cli/make-mapper.md) | Generate a mapper. Orchestrator (modular): a mapping function in modules/<module>/mappers/; Spring: a mapper component (layered: application/mapper) |
@@ -155,7 +155,7 @@ Start with [the CLI workflow](cli/workflow.md) to see which commands write files
 | [`pso make:module`](cli/make-module.md) | Create an HTTP module: MODULE.pso.ts + an empty ROUTES.pso.ts (no endpoint is exposed yet) |
 | [`pso make:notifier`](cli/make-notifier.md) | Generate a typed Spring publisher for a channel event (a record and a service on PsoChannelPublisher; --durable stores the event in the transactional outbox) |
 | [`pso make:port`](cli/make-port.md) | Generate a port interface (Spring, 0.1 hexagonal layout only: ports/; the layered structure has no ports) |
-| [`pso make:provider`](cli/make-provider.md) | Generate an injectable provider class in src/providers/ and, with --module, list it in that module's providers (explicit registration: a provider nobody lists is never constructed) |
+| [`pso make:provider`](cli/make-provider.md) | Generate an injectable provider class in the module's `providers/` folder (`src/modules/<module>/providers/`, `--module` is required in the official structure) and list it in that module's providers (explicit registration: a provider nobody lists is never constructed); a 0.1 project writes `src/providers/` |
 | [`pso make:repository`](cli/make-repository.md) | Generate a Spring Data repository (layered: infrastructure/persistence, for an existing entity; 0.1: persistence/). It does not enable a database: see `pso database:enable` |
 | [`pso make:request`](cli/make-request.md) | Generate a request record with Jakarta Validation in application/dto/request (layered Spring service) |
 | [`pso make:resource`](cli/make-resource.md) | Generate a connected route + contract in the orchestrator and controller + DTO + test in a Spring service |

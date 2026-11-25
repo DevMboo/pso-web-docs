@@ -8,33 +8,35 @@ In PSO the **path** of a file and its **name** are part of the program. `src/mod
 |---|---|
 | Workspace | `pso.workspace.json` lists services, ports, dependencies |
 | Project | A Node orchestrator has `src/`; a Spring service has `src/main/java/<pkg>/` |
-| Module | `src/modules/<module>/` holds `MODULE.pso.ts`, `ROUTES.pso.ts`, controllers, providers, DTOs |
+| Module | `src/modules/<module>/` holds `MODULE.pso.ts`, `routes/ROUTES.pso.ts`, and `controllers/`, `services/`, `providers/`, `dto/` |
 | File | A suffix names the kind: `.controller.ts`, `.guard.ts`, `.contract.json`, `Controller.java` |
 
 The framework reads the structure, validates it and composes the application from it. Because reading the structure does not run code, tools such as `pso validate`, `pso routes:list`, Studio and the AI context can all use it safely.
 
 ```tree title="A module inside an orchestrator"
 src/
-  routes/
+  .app/
+    guards/jwt.guard.ts  # generated: the application-wide "jwt" guard
+    contracts/users.contract.json  # optional: a machine-readable description of the API
+  modules/
     users/
       MODULE.pso.ts  # manual: composition - which controllers and providers belong together
-      ROUTES.pso.ts  # manual: declaration - which endpoints are exposed
-      users.controller.ts  # manual: implementation
-      users.service.ts  # manual
-      dto/create-user.dto.ts  # manual
-      guards/users-key.guard.ts  # manual
-  guards/jwt.guard.ts  # generated: the shared "jwt" guard
-  contracts/users.contract.json  # optional: a machine-readable description of the API
+      routes/ROUTES.pso.ts  # manual: declaration - which endpoints are exposed
+      controllers/users.controller.ts  # manual: implementation
+      services/users.service.ts  # manual
+      dto/request/create-user.dto.ts  # manual
+      guards/users-key.guard.ts  # manual: a guard only this module uses
+  shared/  # reusable code that belongs to no single module
 ```
 
 ## A walkthrough: from a file name to an endpoint
 
 Take `src/modules/product/controllers/product.controller.ts` (a real generated file).
 
-1. **Its path says it is part of the module `product`.** The directory under `routes/` is the module.
+1. **Its path says it is part of the module `product`.** The directory under `modules/` is the module.
 2. **Its suffix says it is a controller.** `.controller.ts` is classified as a controller; the same name with `.guard.ts` would be a guard.
-3. **`MODULE.pso.ts` in the same directory says it belongs to the module.** If it is missing from `controllers`, discovery reports `PSO_MODULE_003`.
-4. **`ROUTES.pso.ts` says which of its actions are endpoints.** Only listed ones are reachable.
+3. **`MODULE.pso.ts` of that module directory says it belongs to the module.** If it is missing from `controllers`, discovery reports `PSO_MODULE_003`.
+4. **`routes/ROUTES.pso.ts` says which of its actions are endpoints.** Only listed ones are reachable.
 5. **`pso.workspace.json` says the module forwards to the service `catalog`** (through `metadata.service`).
 6. **The runtime activates it** only if every earlier statement holds.
 

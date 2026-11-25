@@ -144,8 +144,8 @@ A `PsoHttpException` you do not handle becomes a problem that never contains the
 
 Earlier versions answered `502 PSO_UPSTREAM_BAD_GATEWAY` ("an upstream service returned an invalid response") for a remote 404 as well, which described a failure that had not happened. When a remote answer has a meaning in your domain, translate it on purpose:
 
-```java title="src/main/java/com/pso/orders/application/CustomerLookup.java"
-package com.pso.orders.application;
+```java title="src/main/java/com/pso/orders/application/service/CustomerLookup.java"
+package com.pso.orders.application.service;
 
 import com.pso.spring.http.PsoHttpClient;
 import com.pso.spring.http.PsoHttpException;

@@ -1,8 +1,8 @@
 # pso make:hook
 
-> Generate a lifecycle hook (onReady / onShutdown) in src/hooks/ and, with --module, list it in that module's providers (a hook nobody lists never runs)
+> Generate a lifecycle hook (onReady / onShutdown) in the module's `hooks/` folder (`src/modules/<module>/hooks/`, `--module` is required in the official structure) and list it in that module's providers (a hook nobody lists never runs); a 0.1 project writes `src/hooks/`
 
-Generate a lifecycle hook (onReady / onShutdown) in src/hooks/ and, with --module, list it in that module's providers (a hook nobody lists never runs).
+Generate a lifecycle hook (onReady / onShutdown) in the module's `hooks/` folder (`src/modules/<module>/hooks/`, `--module` is required in the official structure) and list it in that module's providers (a hook nobody lists never runs); a 0.1 project writes `src/hooks/`.
 
 ## Usage
 

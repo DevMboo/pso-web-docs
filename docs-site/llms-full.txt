@@ -1730,7 +1730,7 @@ several methods shows its `GET`).
   the example.
 - Create the orchestrator first: its `products` module still starts, `pso validate` warns `PSO_CRUD_UNBOUND`, and `pso create service`
   binds it when the service exists.
-- 0.1 layout: `--structure legacy` (see [structure compatibility](architecture/structure-migration.md)).
+- Projects created before 0.2 keep their 0.1 layout; [structure compatibility](architecture/structure-migration.md) explains how to inspect and migrate them.
 
 ## Recovering from mistakes
 
@@ -1950,73 +1950,118 @@ without a restart. `./mvnw test` and `npm test` run the generated tests of both 
 
 # Protect an API with JWT scopes
 
-> Configure a trusted issuer, declare public and protected routes, and diagnose 401 versus 403.
+> How the generated Product API is protected - Keycloak declared by pso infra:init, the jwt guard in .app, public and guarded routes in ROUTES.pso.ts, the same scopes checked again by Spring - and how to tell 401 from 403 with real answers.
 
-The gateway verifies callers before forwarding a protected route. The Spring service verifies the bearer token again: the service does not trust the gateway's network position as proof of identity.
+Every route of a PSO orchestrator is denied unless `ROUTES.pso.ts` declares who may call it, and every microservice checks the
+token again: the service does not trust the orchestrator's network position as proof of identity. This tutorial uses the generated
+Product API, so nothing is written by hand: you read the declarations, start the workspace with its identity provider, and send
+requests as two development users with different scopes.
 
-## 1. Configure a verifier
+## 1. The workspace
 
-Use an identity provider's issuer, audience and HTTPS JWKS URI. This example uses placeholders; replace them with values from your provider:
-
-```json title="gateway/pso.config.json" evidence="illustrative"
-{
-  "security": {
-    "authentication": {
-      "provider": "jwt",
-      "issuer": "https://idp.example.com",
-      "audience": "shop-api",
-      "algorithms": ["ES256"],
-      "jwks": { "uri": "https://idp.example.com/.well-known/jwks.json" }
-    }
-  }
-}
+```bash
+pso create workspace shop
+cd shop
+pso create service catalog
+pso create orchestrator gateway
+pso infra:init --identity keycloak --runtime docker --users "ana,bob:products:read"
 ```
 
-The generated Spring service reads its `PSO_JWT_*` environment settings; configure them for the same issuer, audience and key source. For local keys, use `pso security:keys --generate` and [the PEM setup](security/keys-and-pem.md). Never commit a private key or bearer token.
+`infra:init` writes `pso.infra.json`: a local environment on Docker with a Keycloak realm that PSO generates and reconciles. The
+development users are declared there, not in code: `ana` receives every scope the routes declare (`products:read`, `products:write`),
+`bob` only `products:read`. The issuer, the audience and the key source of each project are generated into `.infra/` when the
+environment is applied (`pso infra:plan` lists them as `env:gateway` and `env:catalog`); you never write them into source.
 
-## 2. Declare access per route
+## 2. Read the declarations
 
-In `ROUTES.pso.ts`, a health or other intentionally anonymous endpoint uses `security: { public: true }`. A protected operation uses `security: { guard: "jwt", scopes: ["products:read"] }`. The exact route shape is shown in [Secure routing](security/secure-routing.md). A decorator cannot weaken the registry policy. Public and guarded on the same route is an error.
+The orchestrator's application-wide guard is generated in `src/.app/guards/`:
 
-## 3. Check behavior
+```ts title="gateway/src/.app/guards/jwt.guard.ts"
+import { JwtGuard } from "@pso/security";
 
-Run `pso security:check` and `pso validate`, then start the workspace. Call the public route without a token; it should work. Call the protected route without a token; expect `401`. A valid token lacking the required scope is authenticated but not authorized, so expect `403`. A valid token with the scope reaches the handler. Use a test identity provider or `pso-test` in Spring tests; do not paste real tokens into documentation or logs.
+// Authentication policy for every route that uses the "jwt" guard.
+// Keys, issuer, audience and algorithms are declared in pso.config.json (security.authentication.*)
+// and validated before the application starts. Run `pso security:validate` to check that configuration and `pso security:policy` to see the effective policy of every route.
+export default JwtGuard.create();
+```
 
-If every protected request is `401`, compare issuer, audience, allowed algorithms and the signing key in **both** processes. If only a scoped request is `403`, inspect the token's scope claim and route declaration. For a corporate verifier with different credentials, see [Custom guards](security/authentication.md#custom-guards); it requires explicit configuration.
+The module's routes decide which URL exists and who may call it. One route is intentionally public; the others name the guard and
+the scope:
 
-## What you will see
+```ts title="gateway/src/modules/products/routes/ROUTES.pso.ts"
+    { method: "GET", path: "/products/options", controller: ProductController, action: "options", security: { public: true } },
+    { method: "GET", path: "/products", controller: ProductController, action: "list", security: { guard: "jwt", scopes: ["products:read"] }, metadata: { services: ["catalog"] }, responses: { 200: "ProductPageResponse", 400: "problem", 401: "problem", 403: "problem" } },
+    { method: "POST", path: "/products", controller: ProductController, action: "create", security: { guard: "jwt", scopes: ["products:write"] }, metadata: { services: ["catalog"] }, responses: { 201: "ProductResponse", 400: "problem", 409: "problem" } },
+```
 
-Expected outputs from a gateway protected this way, with a token minted for the test (issuer, audience and signing key were test values):
+A decorator on the controller cannot weaken this policy, a route that is both public and guarded is an error, and a route that is
+not listed does not exist. The microservice repeats the check on its own controller:
+
+```java title="catalog/src/main/java/com/pso/catalog/application/rest/ProductController.java"
+    @PostMapping
+    @PreAuthorize("hasAuthority('SCOPE_products:write')")
+```
+
+`pso security:policy` prints the effective policy without starting anything:
+
+```text evidence="verified"
+default: deny
+GET     /products                guarded:jwt scopes=[products:read]  -> catalog
+POST    /products                guarded:jwt scopes=[products:write]  -> catalog
+DELETE  /products/:id            guarded:jwt scopes=[products:write]  -> catalog
+GET     /products/:id            guarded:jwt scopes=[products:read]  -> catalog
+PUT     /products/:id            guarded:jwt scopes=[products:write]  -> catalog
+GET     /products/options        public  -> (orchestrator)
+service catalog: deny by default
+```
+
+## 3. Start it and send requests
+
+```bash
+pso docker:up --vendor
+```
+
+`docker:up` applies the environment (certificate authority, certificates, the realm with the two users, the database password, the
+environment of each project), builds the images and starts PostgreSQL, Keycloak, `catalog`, `gateway` and the edge. Then, in
+PowerShell:
+
+```powershell
+$ANA = pso infra:token --user ana
+$BOB = pso infra:token --user bob
+$API = "https://api.pso.localhost:8443"
+curl --cacert .infra/ca/local/ca.crt "$API/products/options"
+curl --cacert .infra/ca/local/ca.crt "$API/products"
+curl --cacert .infra/ca/local/ca.crt -H "authorization: Bearer $BOB" -H "content-type: application/json" `
+  -d '{"sku":"KB-100","name":"Keyboard KB-100","price":"49.90","active":true}' "$API/products"
+curl --cacert .infra/ca/local/ca.crt -H "authorization: Bearer $ANA" -H "content-type: application/json" `
+  -d '{"sku":"KB-100","name":"Keyboard KB-100","price":"49.90","active":true}' "$API/products"
+```
+
+`infra:token` obtains a real token for a declared development user from the environment's Keycloak; it is refused for a production
+environment. The answers of a real run of the generated workspace ([all recorded answers](architecture/reference-crud.md#requests-and-answers)):
+
+```text evidence="verified"
+GET /products/options                         (no token)
+200 {"sort":["sku","name","price","createdAt","updatedAt"],"directions":["asc","desc"],"filters":["sku","name","active"],"maxPageSize":100,"defaultPageSize":20}
+
+GET /products                                 (no token)
+401 {"type":"urn:pso:problem:auth-unauthorized","title":"Authentication required","status":401,"detail":"Valid credentials are required to access this resource.","code":"PSO_AUTH_UNAUTHORIZED","error":"unauthorized","instance":"/products","correlationId":"07ecab4f-cb24-4c42-bfe6-603eb9e49478"}
+
+POST /products  (token with products:read only)
+403 {"type":"urn:pso:problem:auth-forbidden","title":"Access denied","status":403,"detail":"The authenticated caller is not allowed to perform this operation.","code":"PSO_AUTH_FORBIDDEN","error":"forbidden","instance":"/products","correlationId":"6e486629-9a7e-413a-a87b-75393fc7e087"}
+```
+
+With `ana`'s token the same `POST` answers `201` with a `Location` header. The `401` and the `403` are decided by the orchestrator
+before any module code runs and before `catalog` is called. The body never says which check failed; the orchestrator's log does,
+with the same `correlationId` (`pso docker:logs gateway`):
 
 ```text evidence="expected"
-GET /reports/summary   (public route)                       -> 200
-GET /customers         (no token)                           -> 401 PSO_AUTH_UNAUTHORIZED
-GET /customers         (valid token, wrong scope)           -> 403 PSO_AUTH_FORBIDDEN
-GET /customers         (valid token, scope customers:read)  -> forwarded to the service
+WARN  [security] authentication failed  reason=missing_header route="GET /products"
+WARN  [security] authorization denied  missing=scope:products:write route="POST /products"
 ```
 
-and the orchestrator says *why* in its log (never in the response body):
-
-```text evidence="expected"
-WARN  [security] authentication failed  reason=missing_header route="GET /customers"
-WARN  [security] authorization denied (doc-corr-0003)  missing=scope:customers:read route="GET /customers"
-```
-
-`pso security:check` reads the same settings as the orchestrator: the `security.authentication.*` keys shown above, the legacy `security.jwt.*` keys (mapped onto them) and the `PSO_JWT_*` variables. With the configuration of step 1 in place it reports no `SEC005`. If you have not configured the verifier yet, it says so before you run anything:
-
-```text evidence="expected"
-HIGH     SEC005 gateway
-         jwt guard is used but security.authentication.issuer, security.authentication.audience, a key source (security.authentication.jwks.uri or security.authentication.publicKey.file) is not configured for "production"; the orchestrator will refuse to start
-```
-
-## Variations
-
-| You want | Do |
-|---|---|
-| a local development key | `pso security:keys --generate`, point `PSO_JWT_PUBLIC_KEY_FILE` (orchestrator) or a loopback `PSO_JWT_JWKS_URI` (Spring) at the public key ([keys](security/keys-and-pem.md)) |
-| a role instead of a scope | `security: { guard: "jwt", roles: ["admin"] }` |
-| the same check in the Spring service | `@PreAuthorize("hasAuthority('SCOPE_products:read')")`, already generated ([security integration](microservices/security-integration.md)) |
-| a custom verifier | a custom guard with an explicit `custom` provider declaration ([authentication](security/authentication.md)) |
+In Studio (`pso studio`, API Client, **Reference requests**) the same requests are sent with a development user; the token is
+obtained by Studio's server and never shown.
 
 ## 401 or 403: a quick guide
 
@@ -2026,40 +2071,35 @@ HIGH     SEC005 gateway
 | is it signed by a key you trust, with the right issuer and audience, unexpired? | no | yes |
 | does it carry the scope or role the route needs? | not evaluated | **no** |
 
-## Getting a token without an identity provider
+## Variations
 
-Every request in this tutorial needs a signed JWT. On a development machine the CLI provides one:
-
-```bash
-pso idp:dev init
-pso idp:dev serve
-```
-
-`serve` prints the `PSO_JWT_*` lines to put in the orchestrator's and the services' `.env`. In another terminal:
-
-```bash
-pso dev
-curl -i http://127.0.0.1:3000/customers
-curl -i -H "Authorization: Bearer $(pso idp:dev token --scopes customers:read)" http://127.0.0.1:3000/customers
-curl -i -H "Authorization: Bearer $(pso idp:dev token --scopes other:scope)" http://127.0.0.1:3000/customers
-```
-
-The three answers are `401` (no token), `200` and `403` (a valid token without the scope). The issuer is for development only; see [authentication](security/authentication.md) for what keeps it out of production.
+| You want | Do |
+|---|---|
+| another scope for a route | change `scopes` in `ROUTES.pso.ts` and the `@PreAuthorize` of the Spring action; the next reconciliation (`pso docker:up`) gives `ana`, the user declared without explicit scopes, the new scope in Keycloak; a user declared with scopes keeps exactly those |
+| another development user | `pso infra:init --users "ana,bob:products:read,carol:products:write" --force`, then `pso docker:up` |
+| a role instead of a scope | `security: { guard: "jwt", roles: ["admin"] }` |
+| a route without a token | `security: { public: true }`; `pso security:check` reports every public route (`SEC004`) so it stays a decision |
+| your own identity provider | `identity.provider: "external"` in `pso.infra.json` ([the infrastructure contract](infrastructure/contract.md)) |
+| a custom verifier | a custom guard with an explicit `custom` provider declaration ([authentication](security/authentication.md)) |
+| an orchestrator run as a process, without the infrastructure engine | the `PSO_JWT_*` variables in its `.env` and `pso idp:dev` for tokens ([authentication](security/authentication.md), [keys and PEM](security/keys-and-pem.md)) |
 
 ## Common mistakes
 
 - Making a route public to get past a `401`.
 - Using one broad scope for every route.
-- Configuring the gateway and forgetting the Spring service: both verify.
+- Changing a scope in `ROUTES.pso.ts` and not in the Spring controller: the orchestrator lets the call through, the service answers
+  `403`. Both check, on purpose.
+- Pasting a real token into a ticket or into documentation.
 
 ## Troubleshooting
 
 | Symptom | Cause | Check | Fix |
 |---|---|---|---|
-| the orchestrator will not start: `PSO_SEC_MISSING`, `PSO_SEC_ALGORITHM`, `PSO_SEC_PEM_PATH` or `PSO_SEC_JWKS_INSECURE` | incomplete or unsafe JWT settings | the log's `code` | [Why the orchestrator refuses to start](reference/startup-failures.md) has each one reproduced |
-| `401` with a token you just made | issuer, audience, algorithm or expiry differ, or the key does not match | `pso security:validate` | align the values |
-| `403` | the token lacks the scope | the gateway's "authorization denied" line | issue the scope |
-| a Spring service ignores your key file | Spring reads only `PSO_JWT_JWKS_URI` | the service's start-up error | serve `keys/jwks.json` on loopback ([CRUD tutorial](architecture/manual-crud-0-1.md#12-give-both-services-a-way-to-verify-tokens)) |
+| `pso security:check` reports `SEC005` for `gateway` | it reads `pso.config.json` and the shell's environment; with the infrastructure engine the verifier settings are generated into the environment of each project when it is applied | `pso infra:plan` (`env:gateway`) | `pso docker:up`; or set `PSO_JWT_*` for a process run |
+| every request is `401`, even with a token | the token comes from another issuer or audience | decode the token's `iss` / `aud`; `pso infra:token --user <name>` | use a token of this environment's identity provider |
+| `403` with `ana` after adding a scope | the realm was not reconciled yet | `pso infra:plan` (identity) | `pso docker:up` again |
+| `infra:token` refuses the user | the user is not declared in `pso.infra.json` | the `users` of the identity | `pso infra:init --users ... --force` |
+| the orchestrator will not start: `PSO_SEC_MISSING`, `PSO_SEC_ALGORITHM` or `PSO_SEC_JWKS_INSECURE` | incomplete or unsafe JWT settings | the log's `code` | [Why the orchestrator refuses to start](reference/startup-failures.md) has each one reproduced |
 
 ---
 
@@ -2176,8 +2216,21 @@ This tutorial builds one small flow in an orchestrator: `POST /orders` **publish
 
 ## Prerequisites
 
-- A workspace with an orchestrator named `gw`, signing keys (`pso security:keys --generate`) and a token helper: steps 1, 3 and 12 of [Build a CRUD API](tutorials/crud-api.md) create exactly these, including `dev-token.mjs`. The `.env` below uses the same issuer and audience as that tutorial.
-- Docker, for Redis. Node 24 or newer.
+Node 24 or newer, Docker (for Redis) and the `pso` CLI. The tutorial runs the orchestrator alone, as a local process, so that the
+broker is the only moving part; an application started with `pso infra:init` and `pso docker:up` ([Build your first
+application](tutorials/first-application.md)) adds Dispatch with the same commands and files.
+
+```bash
+pso create workspace lab
+cd lab
+pso create orchestrator gw --template empty
+pso idp:dev init --issuer https://shop.local --audience shop-api
+```
+
+`create orchestrator` writes the official modular structure (`src/.app/`, `src/modules/`, `src/shared/`); `--template empty` leaves out
+the Product CRUD. `idp:dev init` is the development identity provider: it generates a signing key on this machine
+(`idp/keys/<kid>.private.pem`, git-ignored) and its public key, and `pso idp:dev token` signs development tokens with it. It is
+refused in production.
 
 ## 1. Install the provider
 
@@ -2230,7 +2283,8 @@ export class OrdersController {
 
 ## 3. The contract and the consumer
 
-Create `gw/src/dispatch/orders/` with three files. The contract declares both events; the schema is the payload contract of `orders.placed`; the consumer is registered in `consumers`, and a class that is not listed there is never started (`PSO_DISPATCH_008`).
+Dispatch declarations live in `src/dispatch/<module>/` of the orchestrator, next to `.app/` and `modules/`: this is where
+`pso make:dispatch-event` and `make:dispatch-handler` write. Create `gw/src/dispatch/orders/` with three files. The contract declares both events; the schema is the payload contract of `orders.placed`; the consumer is registered in `consumers`, and a class that is not listed there is never started (`PSO_DISPATCH_008`).
 
 ```tree title="What you add under gw/src/dispatch/"
 gw/src/dispatch/orders/
@@ -2294,12 +2348,12 @@ The first command prints that `INFO` line (it does not fail validation) followed
 docker compose -f infra/dispatch/redis.compose.yml up -d
 ```
 
-Add to `gw/.env` (the key file name is the one `pso security:keys` printed):
+Add to `gw/.env` (the key file name is the one `pso idp:dev init` printed):
 
 ```ini title="gw/.env"
 PSO_JWT_ISSUER=https://shop.local
 PSO_JWT_AUDIENCE=shop-api
-PSO_JWT_PUBLIC_KEY_FILE=../keys/<kid>.public.pem
+PSO_JWT_PUBLIC_KEY_FILE=../idp/keys/<kid>.public.pem
 PSO_JWT_ALGORITHMS=ES256
 PSO_WORKSPACE=../pso.workspace.json
 PSO_DISPATCH_ENABLED=true
@@ -2316,12 +2370,12 @@ Check the connection without starting anything else: `pso dispatch:doctor` answe
 ## 6. Publish an event
 
 ```bash
-TOKEN=$(node dev-token.mjs "orders:write")
+TOKEN=$(pso idp:dev token --scopes orders:write --audience shop-api)
 curl -i -X POST http://127.0.0.1:3000/orders -H "authorization: Bearer $TOKEN" -H "content-type: application/json" -d '{"orderId":"o-100"}'
 ```
 
 ```json evidence="verified"
-{"accepted":true,"eventId":"36330c52-d417-42b7-80c0-dc4c691ed687"}
+{"accepted":true,"eventId":"c6568cf7-2d50-41ab-89e5-dc3d70f1b664"}
 ```
 
 The status is `201` and the body carries the id of the published event (yours differs). What happened, in order:
@@ -2338,7 +2392,7 @@ docker compose -f infra/dispatch/redis.compose.yml exec redis redis-cli XRANGE o
 ```
 
 ```json evidence="verified"
-{"envelopeVersion":1,"id":"9fc1fc51-108a-4997-a9ae-7f31d808a00d","type":"orders.confirmed","version":1,"source":"gw","occurredAt":"2026-11-08T20:06:02.828Z","correlationId":"59e546d6-22be-4823-a8d4-4145cbeb83e8","contentType":"application/json","payload":{"orderId":"o-100"}}
+{"envelopeVersion":1,"id":"b77e95fe-b89d-44e2-ba95-829fb883ec31","type":"orders.confirmed","version":1,"source":"gw","occurredAt":"2026-11-25T05:18:33.326Z","correlationId":"b42a1458-c146-4841-a57b-b91c50a107e6","contentType":"application/json","payload":{"orderId":"o-100"}}
 ```
 
 This is the value of the `envelope` field of the stream entry. And the consumer group has nothing left to do:
@@ -2348,7 +2402,7 @@ docker compose -f infra/dispatch/redis.compose.yml exec redis redis-cli XINFO GR
 ```
 
 ```json evidence="verified"
-{"name":"gw","consumers":1,"pending":0,"last-delivered-id":"1794168362822-0","entries-read":1,"lag":0}
+{"name":"gw","consumers":1,"pending":0,"last-delivered-id":"1795583913322-0","entries-read":1,"lag":0}
 ```
 
 (Shown as JSON for readability; `redis-cli` prints the same pairs as a list.) `pending 0` and `lag 0` mean the message was acknowledged: the consumer finished before the broker was told so.
@@ -2364,9 +2418,9 @@ curl -s -X POST http://127.0.0.1:3000/orders -H "authorization: Bearer $TOKEN" -
 The publish succeeds (`201`) because publishing and handling are independent. The orchestrator terminal shows the handler failing and being retried in-process while the message stays **unacknowledged**:
 
 ```text evidence="verified"
-2026-11-08 20:06:04.348 WARN  consumer failed  event=orders.placed id=ad640284-549c-4c4d-b583-f94c33855f7f attempt=1 error=Error
-2026-11-08 20:06:04.558 WARN  consumer failed  event=orders.placed id=ad640284-549c-4c4d-b583-f94c33855f7f attempt=2 error=Error
-2026-11-08 20:06:04.962 WARN  consumer failed  event=orders.placed id=ad640284-549c-4c4d-b583-f94c33855f7f attempt=3 error=Error
+2026-11-25 05:18:34.846 WARN  consumer failed  event=orders.placed id=fcbc689d-1641-4e38-ab23-a25d2b7dde1f attempt=1 error=Error
+2026-11-25 05:18:35.059 WARN  consumer failed  event=orders.placed id=fcbc689d-1641-4e38-ab23-a25d2b7dde1f attempt=2 error=Error
+2026-11-25 05:18:35.466 WARN  consumer failed  event=orders.placed id=fcbc689d-1641-4e38-ab23-a25d2b7dde1f attempt=3 error=Error
 ```
 
 (The run used `PSO_CFG_dispatch__retry__initialDelay=200ms` and `maxDelay=400ms` to keep the gaps short; the defaults are 3 attempts, 1 s initial delay, 30 s maximum.) The log names the event type, the id and the attempt; the error is the class, not the message, because messages can contain secrets.
@@ -2391,7 +2445,28 @@ The entry's fields include `h:x-pso-reason` = `handler-failed:Error` and `h:x-ps
 
 ## In a Spring service
 
-The same flow uses `PsoDispatch` and an `@PsoEventHandler("orders.created")` method with `ConsumeContext`, and the events are declared in `src/main/resources/dispatch/orders.events.json`. This part was not run for this tutorial: see [Events and consumers](dispatch/events-and-consumers.md) and [Dispatch and Spring](spring/dispatch.md). To avoid losing an event between a database commit and the publish, use the [transactional outbox](tutorials/transactional-outbox.md).
+A Spring service declares the same events in `src/main/resources/dispatch/<service>.events.json` and generates its classes in the
+layered package `application/event/`:
+
+```bash
+pso dispatch:install redis --service orders
+pso make:dispatch-event orders.placed --service orders --fields "orderId:string,total:number" --key orderId
+pso make:dispatch-handler orders.placed --service orders
+pso dispatch:validate
+```
+
+```text evidence="expected"
+created    src/main/resources/dispatch/orders.events.json
+created    src/main/java/com/pso/orders/application/event/OrdersPlacedEvent.java
+created    src/main/java/com/pso/orders/application/event/OrdersPlacedHandler.java
+```
+
+The record `OrdersPlacedEvent` (package `com.pso.orders.application.event`) is the payload; `OrdersPlacedHandler` has an
+`@PsoEventHandler("orders.placed")` method that receives it with a `ConsumeContext`; an `application/service/` class publishes it with
+the injected `PsoDispatch`. These generators were run with the installed CLI (the service validates and compiles); the broker
+delivery shown above was run with the orchestrator only. See [Events and consumers](dispatch/events-and-consumers.md) and
+[Dispatch and Spring](spring/dispatch.md). To avoid losing an event between a database commit and the publish, use the
+[transactional outbox](tutorials/transactional-outbox.md).
 
 ## Variations
 
@@ -2412,50 +2487,129 @@ The same flow uses `PsoDispatch` and an `@PsoEventHandler("orders.created")` met
 
 # Make an event follow a database commit
 
-> Add the Spring transactional outbox, relay rows and handle duplicate delivery safely.
+> Add PSO Dispatch and the Spring transactional outbox to a generated layered CRUD service, publish an event in the same transaction as the business change, and handle duplicate delivery safely.
 
 > Status: PARTIALLY implemented — read the limitations.
 
-Suppose an order must be saved and an `orders.created` event published. A direct `save()` followed by `publish()` can lose the event when the process dies between those calls. The Spring outbox inserts the event in the same database transaction as the order; a relay publishes committed rows later.
+Suppose an order must be saved and an `orders.created` event published. A direct `save()` followed by `publish()` can lose the
+event when the process dies between those calls. The Spring outbox inserts the event in the same database transaction as the order;
+a relay publishes committed rows later.
 
-## Prepare the service
+This tutorial starts from a generated layered service (`application/`, `infrastructure/`, `shared/`) with an `Order` CRUD and adds
+the outbox to its transactional service. Every command and file below was generated and run with the installed CLI; the service's
+generated tests (16) pass with the change, against an embedded PostgreSQL.
+
+## 1. A service with an Order resource
 
 ```bash
-pso database:enable postgresql --service orders
+pso create workspace shop
+cd shop
+pso create service orders --template empty --db postgres
+pso make:crud order --service orders --fields "code:string:unique:length=3-32,total:decimal:precision=12:scale=2:min=0"
+```
+
+`make:crud` writes the layered resource: `infrastructure/entity/OrderEntity.java`, `infrastructure/persistence/OrderRepository.java`,
+the request and response records in `application/dto/`, the mapper, the transactional `application/service/OrderService.java`, the
+controller in `application/rest/` and the migration `V1__create_orders.sql`.
+
+## 2. Dispatch, the outbox and the event
+
+```bash
 pso dispatch:install redis --service orders
 pso dispatch:outbox --service orders
+pso make:dispatch-event orders.created --service orders --fields "orderId:string" --key orderId
 pso dispatch:validate
 ```
 
-Configure the PostgreSQL connection and Redis URL through environment variables, and declare `orders.created` as in [the event tutorial](tutorials/event-driven.md). The outbox command creates a Flyway migration for `pso_outbox` and enables `pso.dispatch.outbox.enabled`. Verify the generated service configuration before starting. (A service created before 2026-11-14 may also contain an unrelated `outbox_event` table from an earlier template; it is not the relay's table.)
+```text evidence="expected"
+src/main/resources/db/migration/V2__pso_outbox.sql: the pso_outbox table
+application.yml: pso.dispatch.outbox.enabled = true
+updated    src/main/resources/dispatch/orders.events.json
+created    src/main/java/com/pso/orders/application/event/OrdersCreatedEvent.java
+```
 
-## Write atomically
+`dispatch:install` adds the Redis starter (and an in-process adapter for the service's tests); `dispatch:outbox` adds the next Flyway
+migration with the `pso_outbox` table and enables the relay; `make:dispatch-event` declares `orders.created` in
+`src/main/resources/dispatch/orders.events.json` and writes its payload record in the layered package `application/event/`.
 
-Inject the starter's `Outbox` and your repository into a Spring service. Inside one Spring `@Transactional` method, save the order and call `outbox.publish("orders.created", Map.of("orderId", order.id()))`. If event schema validation or the database insert fails, the order transaction rolls back. The [Outbox reference](dispatch/outbox.md) shows the method in context.
+## 3. Write atomically
 
-The relay claims rows with `FOR UPDATE SKIP LOCKED` and marks one published after broker acknowledgement. A crash between broker acknowledgement and the row update can publish the **same event id** again. Consumers must therefore remain idempotent, even with the outbox. On broker outage, inspect `attempts`, `last_error` and `failed_at`; failed rows remain for investigation. Published rows are eventually removed according to retention.
+Change the generated service: inject the starter's `Outbox` and store the event in the transaction that creates the order.
 
-## Exercise failure recovery
+```java title="orders/src/main/java/com/pso/orders/application/service/OrderService.java"
+package com.pso.orders.application.service;
 
-In a non-production test environment, commit an order while the broker is unavailable. The order and outbox row should remain. Restore the broker, then verify the relay publishes the row and the consumer handles it once in business terms. Also roll back a transaction and verify it leaves neither order nor outbox row. Run the service's integration tests for repeatable coverage.
+import com.pso.orders.application.dto.request.CreateOrderRequest;
+import com.pso.orders.application.dto.response.OrderResponse;
+import com.pso.orders.application.event.OrdersCreatedEvent;
+import com.pso.orders.application.mapper.OrderMapper;
+import com.pso.orders.infrastructure.entity.OrderEntity;
+import com.pso.orders.infrastructure.persistence.OrderRepository;
+import com.pso.spring.autoconfigure.dispatch.Outbox;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+...
+@Service
+@RequiredArgsConstructor
+public class OrderService {
 
-> [!STATUS]
-> This outbox is implemented for Spring Boot with JDBC. There is no TypeScript outbox, and delivery remains at least once. See [outbox limits](dispatch/outbox.md).
+    private final OrderRepository repository;
+    private final OrderMapper mapper;
+    private final Outbox outbox;
 
-## What it looks like
-
-The migration the command adds is named `V<n>__pso_outbox.sql` and creates the `pso_outbox` table. Inside the transaction, the order row and the outbox row commit or roll back together:
-
-```java
-@Transactional
-public OrderResponse create(OrderRequest r) {
-    Order saved = orders.save(mapper.toEntity(r));
-    outbox.publish("orders.created", Map.of("orderId", saved.getId().toString()));   // rolls back with the order
-    return mapper.toResponse(saved);
+    @Transactional
+    public OrderResponse create(CreateOrderRequest request) {
+        if (repository.existsByCode(request.code().strip())) {
+            throw duplicateCode();
+        }
+        OrderEntity entity = mapper.toEntity(request);
+        OrderResponse created = mapper.toResponse(saveAndFlush(entity));
+        outbox.publish("orders.created", new OrdersCreatedEvent(created.id().toString()));   // an INSERT into pso_outbox, in this transaction
+        return created;
+    }
+    ...
 }
 ```
 
-During a broker outage the request still succeeds: the row waits (with its attempt count and the error class) and the relay publishes it when the broker returns. The behavior (commit and rollback atomicity, relay, broker failure and recovery, maximum attempts, concurrent relays, retention) is covered by the framework's tests against a real PostgreSQL and Redis; the page [Transactional outbox](dispatch/outbox.md) lists them.
+If the schema check of the event or the database insert fails, the whole transaction rolls back: neither the order nor the event is
+kept. `Outbox.publish` applies the same checks as `PsoDispatch.publish` (declared, publishable, schema, size) at insert time. The
+event is not sent here; the relay sends committed rows.
+
+## 4. Enable Dispatch where the outbox runs
+
+The outbox stores events only while Dispatch is enabled. With `pso.dispatch.enabled: false` (the generated default) `Outbox.publish`
+throws `PSO_DISPATCH_DISABLED` and the transaction is not completed: the order is not created either. Enable it for the service's
+tests, which use the in-process adapter and need no broker:
+
+```yaml title="orders/src/main/resources/application-test.yml"
+pso:
+  dispatch:
+    enabled: true      # the outbox stores events only while Dispatch is enabled; the memory provider needs no broker
+    provider: memory   # tests publish and consume in process (com.pso:pso-dispatch-test): no broker is needed
+```
+
+```bash
+cd orders
+./mvnw test
+```
+
+`Tests run: 16, Failures: 0, Errors: 0` in the run made for this page. For a running environment set `PSO_DISPATCH_ENABLED=true`
+and the broker URL in the service's environment (an environment managed by `pso infra:init` and `pso docker:up` generates the
+service's environment into `.infra/`).
+
+## How the relay behaves
+
+The relay claims rows with `FOR UPDATE SKIP LOCKED` and marks one published after broker acknowledgement. A crash between broker
+acknowledgement and the row update can publish the **same event id** again. Consumers must therefore remain idempotent, even with
+the outbox. On broker outage, inspect `attempts`, `last_error` and `failed_at`; failed rows remain for investigation. Published rows
+are eventually removed according to retention. These behaviours (commit and rollback atomicity, relay, broker failure and recovery,
+maximum attempts, concurrent relays, retention) are covered by the framework's tests against a real PostgreSQL and Redis; the page
+[Transactional outbox](dispatch/outbox.md) lists them.
+
+> [!STATUS]
+> This outbox is implemented for Spring Boot with JDBC. There is no TypeScript outbox, and delivery remains at least once. See
+> [outbox limits](dispatch/outbox.md).
 
 ## Check it yourself
 
@@ -2463,19 +2617,31 @@ During a broker outage the request still succeeds: the row waits (with its attem
 SELECT id, attempts, published_at IS NOT NULL AS published, failed_at IS NOT NULL AS failed, left(coalesce(last_error, ''), 40) AS last_error FROM pso_outbox ORDER BY created_at;
 ```
 
-The columns come from the generated migration (verified from the command's source): `id`, `created_at`, `attempts`, `next_attempt_at`, `last_error`, `published_at`, `failed_at` (plus the event's own columns). Expected behavior, not captured in a transcript: a freshly committed row has `attempts = 0`, `published = false`; after the relay runs, `published = true`. With the broker down the row stays unpublished and `attempts` grows with the error class in `last_error`; after `max-attempts` the row gets `failed_at` and stays for you to inspect.
+The columns come from the generated migration: `id`, `created_at`, `attempts`, `next_attempt_at`, `last_error`, `published_at`,
+`failed_at` (plus the event's own columns). Expected behaviour, not captured in a transcript: a freshly committed row has
+`attempts = 0`, `published = false`; after the relay runs, `published = true`. With the broker down the row stays unpublished and
+`attempts` grows with the error class in `last_error`; after `max-attempts` the row gets `failed_at` and stays for you to inspect.
+
+## Exercise failure recovery
+
+In a non-production environment, create an order while the broker is unavailable: the order and the outbox row remain. Restore the
+broker, then verify the relay publishes the row and the consumer (`pso make:dispatch-handler orders.created` in the consuming service,
+written to its `application/event/`) handles it once in business terms. Also make the transaction fail after `publish` and verify it
+leaves neither order nor outbox row.
 
 ## Variations and decisions
 
 | Question | Answer |
 |---|---|
-| must the event be atomic with my data? | yes: outbox. no: direct publish is simpler ([decision](decisions/outbox-or-direct-publish.md)) |
+| must the event be atomic with my data? | yes: outbox. no: direct publish with `PsoDispatch` is simpler ([decision](decisions/outbox-or-direct-publish.md)) |
 | the orchestrator needs this | it has no outbox by design ([why](decisions/why-no-typescript-outbox.md)): emit the event from the owning Spring service |
 | duplicates | possible after a crash between acknowledgement and marking published; consumers deduplicate on the event id |
+| a service created before 0.2 (0.1 layout) | the same commands work; its classes live in `application/` and `events/` ([compatibility](architecture/structure-migration.md)) |
 
 ## Common mistakes
 
 - Calling `publish` on the broker client directly inside the transaction.
+- Leaving `pso.dispatch.enabled` false where the outbox runs: every create fails with `PSO_DISPATCH_DISABLED`.
 - Expecting the consumer to have run when the HTTP response returns.
 - Deleting failed rows to "clean up" before understanding the error.
 
@@ -2487,18 +2653,30 @@ The columns come from the generated migration (verified from the command's sourc
 
 When an endpoint fails, first find out whether the declaration is valid, then whether the process is running, and finally whether the request satisfies its policy. This order avoids treating a missing route as a network or JWT problem.
 
+The examples use the workspace of [Build your first application](tutorials/first-application.md): the `catalog` service and the
+`gateway` orchestrator with its `products` module, started with `pso infra:init --identity keycloak --runtime docker` and
+`pso docker:up --vendor`.
+
 ```bash
 pso validate
 pso config:validate
 pso security:check
 pso routes:list
-pso routes:inspect product
+pso routes:inspect products
 pso services:health
+pso docker:ps
 ```
 
 `pso validate` reads workspace structure, modules, route declarations and dispatch contracts statically. Fix its errors before starting the server; a broken route does not become partially active. `routes:list` and `routes:inspect` answer whether the desired path is declared and which service receives it. `services:health` checks a live process rather than assuming that registration means readiness.
 
-Run `pso dev` in one terminal and `pso studio` in another. Studio links routes, diagnostics, configuration and log lines to the corresponding documentation. It binds to loopback and gives you a one-time URL; keep that URL private. Logs written by `pso dev` are under `.pso/logs/`. Studio masks secrets and does not expose remote access or process controls.
+Run `pso studio` in another terminal. Studio links routes, diagnostics, configuration and log lines to the corresponding documentation, and its API client sends the module's reference requests with a development user. It binds to loopback and gives you a one-time URL; keep that URL private. Studio masks secrets and does not expose remote access or process controls.
+
+Where the logs are depends on how the workspace runs:
+
+| Runtime | Status | Logs |
+|---|---|---|
+| Docker (`pso docker:up`, the default of `pso infra:init --runtime docker`) | `pso docker:ps` | `pso docker:logs gateway`, `pso docker:logs catalog` (tokens and secrets masked) |
+| processes (`pso dev`, a workspace without `pso.infra.json`) | `pso services:health` | `.pso/logs/<service>.log` |
 
 ## Interpret the HTTP result
 
@@ -2515,10 +2693,10 @@ For a specific diagnostic code, open [Diagnostics](reference/diagnostics.md). Fo
 
 ## A worked session
 
-Suppose `GET /customers` answers `503`. Following the order above:
+Suppose `GET /products` answers `503`. Following the order above:
 
 1. `pso validate` prints `OK`: the declarations are fine.
-2. `pso routes:inspect customer` shows `GET /customers -> catalog:8081` with the guard and scope: the route points at the service you expect.
+2. `pso routes:inspect products` shows `GET /products  ->  catalog:8081` with `guard jwt, scopes products:read` and the Spring handler `application/rest/ProductController.java`: the route points at the service you expect.
 3. `pso services:health` (Expected output when nothing runs):
 
 ```text evidence="expected"
@@ -2527,16 +2705,16 @@ DOWN  gateway            http://127.0.0.1:3000/health/ready
 ```
 
    exit code 1: the service is down. That explains the `503`; it is not a routing or token problem.
-4. Start the service and read its log; then repeat the request.
+4. Start the service (`pso docker:up`) and read its log (`pso docker:logs catalog`); then repeat the request.
 
-For a `401` or `403`, step 3 is replaced by the orchestrator's log: it states the reason (`reason=missing_header`, `missing=scope:customers:read`) with the correlation id that is also in the response body, so you can match a client's report to the exact line ([logging](devops/logging.md)).
+For a `401` or `403`, step 3 is replaced by the orchestrator's log: it states the reason (`reason=missing_header`, `missing=scope:products:read`) with the correlation id that is also in the response body, so you can match a client's report to the exact line ([logging](devops/logging.md)).
 
 ## The same request, three layers
 
 | Layer | Where to look |
 |---|---|
 | declaration | `pso validate`, `pso routes:list` |
-| process | `pso services:health`, `.pso/logs/<service>.log` |
+| process | `pso docker:ps`, `pso docker:logs <name>`; or `pso services:health` and `.pso/logs/<service>.log` for processes |
 | policy | the `WARN [security]` lines; `pso security:policy` |
 
 ## Common mistakes
@@ -2715,33 +2893,35 @@ In PSO the **path** of a file and its **name** are part of the program. `src/mod
 |---|---|
 | Workspace | `pso.workspace.json` lists services, ports, dependencies |
 | Project | A Node orchestrator has `src/`; a Spring service has `src/main/java/<pkg>/` |
-| Module | `src/modules/<module>/` holds `MODULE.pso.ts`, `ROUTES.pso.ts`, controllers, providers, DTOs |
+| Module | `src/modules/<module>/` holds `MODULE.pso.ts`, `routes/ROUTES.pso.ts`, and `controllers/`, `services/`, `providers/`, `dto/` |
 | File | A suffix names the kind: `.controller.ts`, `.guard.ts`, `.contract.json`, `Controller.java` |
 
 The framework reads the structure, validates it and composes the application from it. Because reading the structure does not run code, tools such as `pso validate`, `pso routes:list`, Studio and the AI context can all use it safely.
 
 ```tree title="A module inside an orchestrator"
 src/
-  routes/
+  .app/
+    guards/jwt.guard.ts  # generated: the application-wide "jwt" guard
+    contracts/users.contract.json  # optional: a machine-readable description of the API
+  modules/
     users/
       MODULE.pso.ts  # manual: composition - which controllers and providers belong together
-      ROUTES.pso.ts  # manual: declaration - which endpoints are exposed
-      users.controller.ts  # manual: implementation
-      users.service.ts  # manual
-      dto/create-user.dto.ts  # manual
-      guards/users-key.guard.ts  # manual
-  guards/jwt.guard.ts  # generated: the shared "jwt" guard
-  contracts/users.contract.json  # optional: a machine-readable description of the API
+      routes/ROUTES.pso.ts  # manual: declaration - which endpoints are exposed
+      controllers/users.controller.ts  # manual: implementation
+      services/users.service.ts  # manual
+      dto/request/create-user.dto.ts  # manual
+      guards/users-key.guard.ts  # manual: a guard only this module uses
+  shared/  # reusable code that belongs to no single module
 ```
 
 ## A walkthrough: from a file name to an endpoint
 
 Take `src/modules/product/controllers/product.controller.ts` (a real generated file).
 
-1. **Its path says it is part of the module `product`.** The directory under `routes/` is the module.
+1. **Its path says it is part of the module `product`.** The directory under `modules/` is the module.
 2. **Its suffix says it is a controller.** `.controller.ts` is classified as a controller; the same name with `.guard.ts` would be a guard.
-3. **`MODULE.pso.ts` in the same directory says it belongs to the module.** If it is missing from `controllers`, discovery reports `PSO_MODULE_003`.
-4. **`ROUTES.pso.ts` says which of its actions are endpoints.** Only listed ones are reachable.
+3. **`MODULE.pso.ts` of that module directory says it belongs to the module.** If it is missing from `controllers`, discovery reports `PSO_MODULE_003`.
+4. **`routes/ROUTES.pso.ts` says which of its actions are endpoints.** Only listed ones are reachable.
 5. **`pso.workspace.json` says the module forwards to the service `catalog`** (through `metadata.service`).
 6. **The runtime activates it** only if every earlier statement holds.
 
@@ -2895,6 +3075,9 @@ The directory routes/ghost/ contains HTTP code but no MODULE.pso.ts. There is no
 No route of this directory is activated.
 FAILED
 ```
+
+The message names the module directory `routes/ghost/` in every structure; in the official structure that directory is
+`src/modules/ghost/`.
 
 The message names the code, the project, the module and the consequence, and `validate` exits with code 1. The orchestrator would also refuse to start, so the problem cannot reach a running system.
 
@@ -3050,6 +3233,9 @@ ERROR   PSO_MODULE_001 gateway: Module declaration missing.
 Module: ghost
 The directory routes/ghost/ contains HTTP code but no MODULE.pso.ts. There is no fallback discovery.
 ```
+
+The message names the module directory `routes/ghost/` in every structure; in the official structure that directory is
+`src/modules/ghost/`.
 *(expected output)*
 
 ## What reading syntax cannot see
@@ -6242,8 +6428,8 @@ That is the essential entry point (the generated file also wires a workspace fil
 The steps, in the order the framework performs and logs them (security and telemetry initialisation are reported by their own log lines before the listener line):
 
 1. Reads the effective configuration (variables, `PSO_CFG_*`, `pso.config*.json`), including logging and HTTP limits. An invalid value stops start-up.
-2. Loads the named guards, middleware and filters from the compiled app directory, including module-local guards.
-3. Loads every `routes/<module>/MODULE.pso.js` and `ROUTES.pso.js`. Controller files are reached only through a module's `controllers`; an undeclared controller is never loaded.
+2. Loads the named guards, middleware, filters and interceptors from the compiled app directory (`.app/guards/`, `.app/middlewares/`, `.app/filters/`, `.app/interceptors/`), including module-local ones (`modules/<module>/guards/`).
+3. Loads every `modules/<module>/MODULE.pso.js` and its `routes/ROUTES.pso.js`. Controller files (`modules/<module>/controllers/`) are reached only through a module's `controllers`; an undeclared controller is never loaded. A 0.1 project keeps `routes/<module>/` ([compatibility](architecture/structure-migration.md)).
 4. Builds the neutral model and runs the **same validator** as `pso validate`. Any error aborts start-up with a `StartupError` and nothing listens.
 5. Initialises security (JWT keys, JWKS); a configuration problem stops start-up.
 6. Constructs providers and controllers through the dependency container, and registers the business validators of DTOs.
@@ -6254,7 +6440,7 @@ The steps, in the order the framework performs and logs them (security and telem
 
 | Option | Meaning |
 |---|---|
-| `appDir` | directory of the **compiled** application (contains `routes/`, `guards/`, `middlewares/`, `filters/`); required |
+| `appDir` | directory of the **compiled** application (contains `.app/` and `modules/`; a 0.1 build contains `routes/`, `guards/`, `middlewares/`, `filters/`); required |
 | `projectDir` | the project directory where `pso.config.json` lives; defaults to the parent of `appDir` |
 | `workspaceFile` | `pso.workspace.json`, the upstream registry in development |
 | `port`, `host` | listen address (`3000`, `127.0.0.1` by default; the environment `PORT`/`HOST` is applied by the generated `main.ts`) |
@@ -10098,8 +10284,8 @@ A `PsoHttpException` you do not handle becomes a problem that never contains the
 
 Earlier versions answered `502 PSO_UPSTREAM_BAD_GATEWAY` ("an upstream service returned an invalid response") for a remote 404 as well, which described a failure that had not happened. When a remote answer has a meaning in your domain, translate it on purpose:
 
-```java title="src/main/java/com/pso/orders/application/CustomerLookup.java"
-package com.pso.orders.application;
+```java title="src/main/java/com/pso/orders/application/service/CustomerLookup.java"
+package com.pso.orders.application.service;
 
 import com.pso.spring.http.PsoHttpClient;
 import com.pso.spring.http.PsoHttpException;
@@ -11476,7 +11662,7 @@ The reasons appear in the log, never in the response body: `authentication faile
 | any authenticated caller | `security: { guard: "jwt" }` |
 | a specific scope | `security: { guard: "jwt", scopes: ["orders:write"] }` |
 | a role | `security: { guard: "jwt", roles: ["admin"] }` |
-| a custom check | a named guard in `guards/` ([guards](orchestrator/guards.md)) |
+| a custom check | a named guard in `src/.app/guards/` (application-wide) or `src/modules/<module>/guards/` ([guards](orchestrator/guards.md)) |
 | a public read-only route | `security: { public: true }` on a `GET` |
 
 ## Common mistakes
@@ -12691,20 +12877,42 @@ pso dispatch:install redis --service orders-service
 pso dispatch:outbox --service orders-service     # migration V<n>__pso_outbox.sql + pso.dispatch.outbox.enabled=true
 ```
 
-```java
+In a layered service the event is published from the transactional service in `application/service/`, with its payload record
+from `application/event/` (`pso make:dispatch-event orders.created --fields "orderId:string"`):
+
+```java title="orders-service/src/main/java/com/pso/orders/application/service/OrderService.java"
+package com.pso.orders.application.service;
+
+import com.pso.orders.application.dto.request.CreateOrderRequest;
+import com.pso.orders.application.dto.response.OrderResponse;
+import com.pso.orders.application.event.OrdersCreatedEvent;
+import com.pso.orders.application.mapper.OrderMapper;
+import com.pso.orders.infrastructure.persistence.OrderRepository;
+import com.pso.spring.autoconfigure.dispatch.Outbox;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 @Service
-class Orders {
+@RequiredArgsConstructor
+public class OrderService {
+
+    private final OrderRepository repository;
+    private final OrderMapper mapper;
     private final Outbox outbox;
-    private final OrderRepository repo;
-    Orders(Outbox outbox, OrderRepository repo) { this.outbox = outbox; this.repo = repo; }
 
     @Transactional
-    void create(Order o) {
-        repo.save(o);
-        outbox.publish("orders.created", Map.of("orderId", o.id()));   // rolls back with the order
+    public OrderResponse create(CreateOrderRequest request) {
+        OrderResponse created = mapper.toResponse(repository.saveAndFlush(mapper.toEntity(request)));
+        outbox.publish("orders.created", new OrdersCreatedEvent(created.id().toString()));   // rolls back with the order
+        return created;
     }
 }
 ```
+
+The outbox stores events only while Dispatch is enabled (`pso.dispatch.enabled: true`, also in the test profile): otherwise
+`Outbox.publish` throws `PSO_DISPATCH_DISABLED` and the transaction is not completed. [The outbox tutorial](tutorials/transactional-outbox.md)
+does this on a generated CRUD service and runs its tests.
 
 `Outbox.publish` applies the same checks as `PsoDispatch.publish` (declared, publishable, schema, size) at insert time, so an invalid event fails in your transaction, not later.
 
@@ -15112,7 +15320,7 @@ Start with [the CLI workflow](cli/workflow.md) to see which commands write files
 | [`pso make:files`](cli/make-files.md) | Generate a Spring files controller (upload, download, metadata, list, move, delete on PsoStorageService with scope checks) and its test |
 | [`pso make:filter`](cli/make-filter.md) | Generate an error filter. Orchestrator: src/.app/filters/ (0.1: src/filters/), run for the routes that name it; Spring (layered): a servlet filter in infrastructure/filter |
 | [`pso make:guard`](cli/make-guard.md) | Generate a guard (orchestrator: inside a module; Spring: hexagonal layout) |
-| [`pso make:hook`](cli/make-hook.md) | Generate a lifecycle hook (onReady / onShutdown) in src/hooks/ and, with --module, list it in that module's providers (a hook nobody lists never runs) |
+| [`pso make:hook`](cli/make-hook.md) | Generate a lifecycle hook (onReady / onShutdown) in the module's `hooks/` folder (`src/modules/<module>/hooks/`, `--module` is required in the official structure) and list it in that module's providers (a hook nobody lists never runs); a 0.1 project writes `src/hooks/` |
 | [`pso make:interceptor`](cli/make-interceptor.md) | Generate an interceptor in src/.app/interceptors/ (modular orchestrator). It runs around the action of the routes that name it (interceptors: [...] in ROUTES.pso.ts) |
 | [`pso make:listener`](cli/make-listener.md) | Generate a LOCAL Spring @EventListener for the application event of the same name (same process). For an event from another service use make:dispatch-handler |
 | [`pso make:mapper`](cli/make-mapper.md) | Generate a mapper. Orchestrator (modular): a mapping function in modules/<module>/mappers/; Spring: a mapper component (layered: application/mapper) |
@@ -15121,7 +15329,7 @@ Start with [the CLI workflow](cli/workflow.md) to see which commands write files
 | [`pso make:module`](cli/make-module.md) | Create an HTTP module: MODULE.pso.ts + an empty ROUTES.pso.ts (no endpoint is exposed yet) |
 | [`pso make:notifier`](cli/make-notifier.md) | Generate a typed Spring publisher for a channel event (a record and a service on PsoChannelPublisher; --durable stores the event in the transactional outbox) |
 | [`pso make:port`](cli/make-port.md) | Generate a port interface (Spring, 0.1 hexagonal layout only: ports/; the layered structure has no ports) |
-| [`pso make:provider`](cli/make-provider.md) | Generate an injectable provider class in src/providers/ and, with --module, list it in that module's providers (explicit registration: a provider nobody lists is never constructed) |
+| [`pso make:provider`](cli/make-provider.md) | Generate an injectable provider class in the module's `providers/` folder (`src/modules/<module>/providers/`, `--module` is required in the official structure) and list it in that module's providers (explicit registration: a provider nobody lists is never constructed); a 0.1 project writes `src/providers/` |
 | [`pso make:repository`](cli/make-repository.md) | Generate a Spring Data repository (layered: infrastructure/persistence, for an existing entity; 0.1: persistence/). It does not enable a database: see `pso database:enable` |
 | [`pso make:request`](cli/make-request.md) | Generate a request record with Jakarta Validation in application/dto/request (layered Spring service) |
 | [`pso make:resource`](cli/make-resource.md) | Generate a connected route + contract in the orchestrator and controller + DTO + test in a Spring service |
@@ -15783,7 +15991,7 @@ pso channels:contracts --service gw --out web/src/integrations/pso/types.ts
 
 ## Failure cases
 
-- The folder must be a PSO orchestrator (src/routes). An existing file that was not generated by PSO is left untouched.
+- The folder must be a PSO orchestrator (official `src/.app/` and `src/modules/`, or a 0.1 `src/routes/`). An existing file that was not generated by PSO is left untouched.
 
 ## Exit codes
 
@@ -20663,9 +20871,9 @@ pso make:guard users users-key
 
 # pso make:hook
 
-> Generate a lifecycle hook (onReady / onShutdown) in src/hooks/ and, with --module, list it in that module's providers (a hook nobody lists never runs)
+> Generate a lifecycle hook (onReady / onShutdown) in the module's `hooks/` folder (`src/modules/<module>/hooks/`, `--module` is required in the official structure) and list it in that module's providers (a hook nobody lists never runs); a 0.1 project writes `src/hooks/`
 
-Generate a lifecycle hook (onReady / onShutdown) in src/hooks/ and, with --module, list it in that module's providers (a hook nobody lists never runs).
+Generate a lifecycle hook (onReady / onShutdown) in the module's `hooks/` folder (`src/modules/<module>/hooks/`, `--module` is required in the official structure) and list it in that module's providers (a hook nobody lists never runs); a 0.1 project writes `src/hooks/`.
 
 ## Usage
 
@@ -21050,9 +21258,9 @@ pso make:port payment --service orders
 
 # pso make:provider
 
-> Generate an injectable provider class in src/providers/ and, with --module, list it in that module's providers (explicit registration: a provider nobody lists is never constructed)
+> Generate an injectable provider class in the module's `providers/` folder (`src/modules/<module>/providers/`, `--module` is required in the official structure) and list it in that module's providers (explicit registration: a provider nobody lists is never constructed); a 0.1 project writes `src/providers/`
 
-Generate an injectable provider class in src/providers/ and, with --module, list it in that module's providers (explicit registration: a provider nobody lists is never constructed).
+Generate an injectable provider class in the module's `providers/` folder (`src/modules/<module>/providers/`, `--module` is required in the official structure) and list it in that module's providers (explicit registration: a provider nobody lists is never constructed); a 0.1 project writes `src/providers/`.
 
 ## Usage
 
@@ -26472,6 +26680,9 @@ The directory routes/ghost/ contains HTTP code but no MODULE.pso.ts. There is no
 FAILED
 ```
 
+The message names the module directory `routes/ghost/` in every structure; in the official structure that directory is
+`src/modules/ghost/`.
+
 and the same tree gives the same answer on every machine: `pso validate --write-manifest` produced identical manifests on repeated runs ([deterministic manifests](concepts/deterministic-manifests.md)).
 
 ## The cost
@@ -26509,7 +26720,7 @@ Scanning all `*.controller.ts` files (implicit and unsafe: a stray file would lo
 
 ## What it looks like in practice
 
-A controller that exists on disk but is not listed is neither loaded nor exposed. Create `routes/ghost/ghost.controller.ts` without a `MODULE.pso.ts` and validation says so (expected):
+A controller that exists on disk but is not listed is neither loaded nor exposed. Create `src/modules/ghost/controllers/ghost.controller.ts` without a `MODULE.pso.ts` and validation says so (expected):
 
 ```text evidence="expected"
 ERROR   PSO_MODULE_001 gateway: Module declaration missing.

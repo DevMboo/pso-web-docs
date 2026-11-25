@@ -15,20 +15,42 @@ pso dispatch:install redis --service orders-service
 pso dispatch:outbox --service orders-service     # migration V<n>__pso_outbox.sql + pso.dispatch.outbox.enabled=true
 ```
 
-```java
+In a layered service the event is published from the transactional service in `application/service/`, with its payload record
+from `application/event/` (`pso make:dispatch-event orders.created --fields "orderId:string"`):
+
+```java title="orders-service/src/main/java/com/pso/orders/application/service/OrderService.java"
+package com.pso.orders.application.service;
+
+import com.pso.orders.application.dto.request.CreateOrderRequest;
+import com.pso.orders.application.dto.response.OrderResponse;
+import com.pso.orders.application.event.OrdersCreatedEvent;
+import com.pso.orders.application.mapper.OrderMapper;
+import com.pso.orders.infrastructure.persistence.OrderRepository;
+import com.pso.spring.autoconfigure.dispatch.Outbox;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 @Service
-class Orders {
+@RequiredArgsConstructor
+public class OrderService {
+
+    private final OrderRepository repository;
+    private final OrderMapper mapper;
     private final Outbox outbox;
-    private final OrderRepository repo;
-    Orders(Outbox outbox, OrderRepository repo) { this.outbox = outbox; this.repo = repo; }
 
     @Transactional
-    void create(Order o) {
-        repo.save(o);
-        outbox.publish("orders.created", Map.of("orderId", o.id()));   // rolls back with the order
+    public OrderResponse create(CreateOrderRequest request) {
+        OrderResponse created = mapper.toResponse(repository.saveAndFlush(mapper.toEntity(request)));
+        outbox.publish("orders.created", new OrdersCreatedEvent(created.id().toString()));   // rolls back with the order
+        return created;
     }
 }
 ```
+
+The outbox stores events only while Dispatch is enabled (`pso.dispatch.enabled: true`, also in the test profile): otherwise
+`Outbox.publish` throws `PSO_DISPATCH_DISABLED` and the transaction is not completed. [The outbox tutorial](tutorials/transactional-outbox.md)
+does this on a generated CRUD service and runs its tests.
 
 `Outbox.publish` applies the same checks as `PsoDispatch.publish` (declared, publishable, schema, size) at insert time, so an invalid event fails in your transaction, not later.
 

@@ -1,8 +1,8 @@
 # pso make:provider
 
-> Generate an injectable provider class in src/providers/ and, with --module, list it in that module's providers (explicit registration: a provider nobody lists is never constructed)
+> Generate an injectable provider class in the module's `providers/` folder (`src/modules/<module>/providers/`, `--module` is required in the official structure) and list it in that module's providers (explicit registration: a provider nobody lists is never constructed); a 0.1 project writes `src/providers/`
 
-Generate an injectable provider class in src/providers/ and, with --module, list it in that module's providers (explicit registration: a provider nobody lists is never constructed).
+Generate an injectable provider class in the module's `providers/` folder (`src/modules/<module>/providers/`, `--module` is required in the official structure) and list it in that module's providers (explicit registration: a provider nobody lists is never constructed); a 0.1 project writes `src/providers/`.
 
 ## Usage
 

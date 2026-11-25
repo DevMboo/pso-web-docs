@@ -23,7 +23,7 @@ Scanning all `*.controller.ts` files (implicit and unsafe: a stray file would lo
 
 ## What it looks like in practice
 
-A controller that exists on disk but is not listed is neither loaded nor exposed. Create `routes/ghost/ghost.controller.ts` without a `MODULE.pso.ts` and validation says so (expected):
+A controller that exists on disk but is not listed is neither loaded nor exposed. Create `src/modules/ghost/controllers/ghost.controller.ts` without a `MODULE.pso.ts` and validation says so (expected):
 
 ```text evidence="expected"
 ERROR   PSO_MODULE_001 gateway: Module declaration missing.

@@ -56,7 +56,7 @@ The reasons appear in the log, never in the response body: `authentication faile
 | any authenticated caller | `security: { guard: "jwt" }` |
 | a specific scope | `security: { guard: "jwt", scopes: ["orders:write"] }` |
 | a role | `security: { guard: "jwt", roles: ["admin"] }` |
-| a custom check | a named guard in `guards/` ([guards](orchestrator/guards.md)) |
+| a custom check | a named guard in `src/.app/guards/` (application-wide) or `src/modules/<module>/guards/` ([guards](orchestrator/guards.md)) |
 | a public read-only route | `security: { public: true }` on a `GET` |
 
 ## Common mistakes

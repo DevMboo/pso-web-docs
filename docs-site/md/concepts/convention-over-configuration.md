@@ -85,6 +85,9 @@ No route of this directory is activated.
 FAILED
 ```
 
+The message names the module directory `routes/ghost/` in every structure; in the official structure that directory is
+`src/modules/ghost/`.
+
 The message names the code, the project, the module and the consequence, and `validate` exits with code 1. The orchestrator would also refuse to start, so the problem cannot reach a running system.
 
 ## Working with the conventions

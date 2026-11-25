@@ -8,8 +8,21 @@ This tutorial builds one small flow in an orchestrator: `POST /orders` **publish
 
 ## Prerequisites
 
-- A workspace with an orchestrator named `gw`, signing keys (`pso security:keys --generate`) and a token helper: steps 1, 3 and 12 of [Build a CRUD API](tutorials/crud-api.md) create exactly these, including `dev-token.mjs`. The `.env` below uses the same issuer and audience as that tutorial.
-- Docker, for Redis. Node 24 or newer.
+Node 24 or newer, Docker (for Redis) and the `pso` CLI. The tutorial runs the orchestrator alone, as a local process, so that the
+broker is the only moving part; an application started with `pso infra:init` and `pso docker:up` ([Build your first
+application](tutorials/first-application.md)) adds Dispatch with the same commands and files.
+
+```bash
+pso create workspace lab
+cd lab
+pso create orchestrator gw --template empty
+pso idp:dev init --issuer https://shop.local --audience shop-api
+```
+
+`create orchestrator` writes the official modular structure (`src/.app/`, `src/modules/`, `src/shared/`); `--template empty` leaves out
+the Product CRUD. `idp:dev init` is the development identity provider: it generates a signing key on this machine
+(`idp/keys/<kid>.private.pem`, git-ignored) and its public key, and `pso idp:dev token` signs development tokens with it. It is
+refused in production.
 
 ## 1. Install the provider
 
@@ -62,7 +75,8 @@ export class OrdersController {
 
 ## 3. The contract and the consumer
 
-Create `gw/src/dispatch/orders/` with three files. The contract declares both events; the schema is the payload contract of `orders.placed`; the consumer is registered in `consumers`, and a class that is not listed there is never started (`PSO_DISPATCH_008`).
+Dispatch declarations live in `src/dispatch/<module>/` of the orchestrator, next to `.app/` and `modules/`: this is where
+`pso make:dispatch-event` and `make:dispatch-handler` write. Create `gw/src/dispatch/orders/` with three files. The contract declares both events; the schema is the payload contract of `orders.placed`; the consumer is registered in `consumers`, and a class that is not listed there is never started (`PSO_DISPATCH_008`).
 
 ```tree title="What you add under gw/src/dispatch/"
 gw/src/dispatch/orders/
@@ -126,12 +140,12 @@ The first command prints that `INFO` line (it does not fail validation) followed
 docker compose -f infra/dispatch/redis.compose.yml up -d
 ```
 
-Add to `gw/.env` (the key file name is the one `pso security:keys` printed):
+Add to `gw/.env` (the key file name is the one `pso idp:dev init` printed):
 
 ```ini title="gw/.env"
 PSO_JWT_ISSUER=https://shop.local
 PSO_JWT_AUDIENCE=shop-api
-PSO_JWT_PUBLIC_KEY_FILE=../keys/<kid>.public.pem
+PSO_JWT_PUBLIC_KEY_FILE=../idp/keys/<kid>.public.pem
 PSO_JWT_ALGORITHMS=ES256
 PSO_WORKSPACE=../pso.workspace.json
 PSO_DISPATCH_ENABLED=true
@@ -148,12 +162,12 @@ Check the connection without starting anything else: `pso dispatch:doctor` answe
 ## 6. Publish an event
 
 ```bash
-TOKEN=$(node dev-token.mjs "orders:write")
+TOKEN=$(pso idp:dev token --scopes orders:write --audience shop-api)
 curl -i -X POST http://127.0.0.1:3000/orders -H "authorization: Bearer $TOKEN" -H "content-type: application/json" -d '{"orderId":"o-100"}'
 ```
 
 ```json evidence="verified"
-{"accepted":true,"eventId":"36330c52-d417-42b7-80c0-dc4c691ed687"}
+{"accepted":true,"eventId":"c6568cf7-2d50-41ab-89e5-dc3d70f1b664"}
 ```
 
 The status is `201` and the body carries the id of the published event (yours differs). What happened, in order:
@@ -170,7 +184,7 @@ docker compose -f infra/dispatch/redis.compose.yml exec redis redis-cli XRANGE o
 ```
 
 ```json evidence="verified"
-{"envelopeVersion":1,"id":"9fc1fc51-108a-4997-a9ae-7f31d808a00d","type":"orders.confirmed","version":1,"source":"gw","occurredAt":"2026-11-08T20:06:02.828Z","correlationId":"59e546d6-22be-4823-a8d4-4145cbeb83e8","contentType":"application/json","payload":{"orderId":"o-100"}}
+{"envelopeVersion":1,"id":"b77e95fe-b89d-44e2-ba95-829fb883ec31","type":"orders.confirmed","version":1,"source":"gw","occurredAt":"2026-11-25T05:18:33.326Z","correlationId":"b42a1458-c146-4841-a57b-b91c50a107e6","contentType":"application/json","payload":{"orderId":"o-100"}}
 ```
 
 This is the value of the `envelope` field of the stream entry. And the consumer group has nothing left to do:
@@ -180,7 +194,7 @@ docker compose -f infra/dispatch/redis.compose.yml exec redis redis-cli XINFO GR
 ```
 
 ```json evidence="verified"
-{"name":"gw","consumers":1,"pending":0,"last-delivered-id":"1794168362822-0","entries-read":1,"lag":0}
+{"name":"gw","consumers":1,"pending":0,"last-delivered-id":"1795583913322-0","entries-read":1,"lag":0}
 ```
 
 (Shown as JSON for readability; `redis-cli` prints the same pairs as a list.) `pending 0` and `lag 0` mean the message was acknowledged: the consumer finished before the broker was told so.
@@ -196,9 +210,9 @@ curl -s -X POST http://127.0.0.1:3000/orders -H "authorization: Bearer $TOKEN" -
 The publish succeeds (`201`) because publishing and handling are independent. The orchestrator terminal shows the handler failing and being retried in-process while the message stays **unacknowledged**:
 
 ```text evidence="verified"
-2026-11-08 20:06:04.348 WARN  consumer failed  event=orders.placed id=ad640284-549c-4c4d-b583-f94c33855f7f attempt=1 error=Error
-2026-11-08 20:06:04.558 WARN  consumer failed  event=orders.placed id=ad640284-549c-4c4d-b583-f94c33855f7f attempt=2 error=Error
-2026-11-08 20:06:04.962 WARN  consumer failed  event=orders.placed id=ad640284-549c-4c4d-b583-f94c33855f7f attempt=3 error=Error
+2026-11-25 05:18:34.846 WARN  consumer failed  event=orders.placed id=fcbc689d-1641-4e38-ab23-a25d2b7dde1f attempt=1 error=Error
+2026-11-25 05:18:35.059 WARN  consumer failed  event=orders.placed id=fcbc689d-1641-4e38-ab23-a25d2b7dde1f attempt=2 error=Error
+2026-11-25 05:18:35.466 WARN  consumer failed  event=orders.placed id=fcbc689d-1641-4e38-ab23-a25d2b7dde1f attempt=3 error=Error
 ```
 
 (The run used `PSO_CFG_dispatch__retry__initialDelay=200ms` and `maxDelay=400ms` to keep the gaps short; the defaults are 3 attempts, 1 s initial delay, 30 s maximum.) The log names the event type, the id and the attempt; the error is the class, not the message, because messages can contain secrets.
@@ -223,7 +237,28 @@ The entry's fields include `h:x-pso-reason` = `handler-failed:Error` and `h:x-ps
 
 ## In a Spring service
 
-The same flow uses `PsoDispatch` and an `@PsoEventHandler("orders.created")` method with `ConsumeContext`, and the events are declared in `src/main/resources/dispatch/orders.events.json`. This part was not run for this tutorial: see [Events and consumers](dispatch/events-and-consumers.md) and [Dispatch and Spring](spring/dispatch.md). To avoid losing an event between a database commit and the publish, use the [transactional outbox](tutorials/transactional-outbox.md).
+A Spring service declares the same events in `src/main/resources/dispatch/<service>.events.json` and generates its classes in the
+layered package `application/event/`:
+
+```bash
+pso dispatch:install redis --service orders
+pso make:dispatch-event orders.placed --service orders --fields "orderId:string,total:number" --key orderId
+pso make:dispatch-handler orders.placed --service orders
+pso dispatch:validate
+```
+
+```text evidence="expected"
+created    src/main/resources/dispatch/orders.events.json
+created    src/main/java/com/pso/orders/application/event/OrdersPlacedEvent.java
+created    src/main/java/com/pso/orders/application/event/OrdersPlacedHandler.java
+```
+
+The record `OrdersPlacedEvent` (package `com.pso.orders.application.event`) is the payload; `OrdersPlacedHandler` has an
+`@PsoEventHandler("orders.placed")` method that receives it with a `ConsumeContext`; an `application/service/` class publishes it with
+the injected `PsoDispatch`. These generators were run with the installed CLI (the service validates and compiles); the broker
+delivery shown above was run with the orchestrator only. See [Events and consumers](dispatch/events-and-consumers.md) and
+[Dispatch and Spring](spring/dispatch.md). To avoid losing an event between a database commit and the publish, use the
+[transactional outbox](tutorials/transactional-outbox.md).
 
 ## Variations
 

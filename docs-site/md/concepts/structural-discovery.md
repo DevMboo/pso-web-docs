@@ -55,6 +55,9 @@ ERROR   PSO_MODULE_001 gateway: Module declaration missing.
 Module: ghost
 The directory routes/ghost/ contains HTTP code but no MODULE.pso.ts. There is no fallback discovery.
 ```
+
+The message names the module directory `routes/ghost/` in every structure; in the official structure that directory is
+`src/modules/ghost/`.
 *(expected output)*
 
 ## What reading syntax cannot see

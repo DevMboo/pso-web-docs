@@ -16,8 +16,8 @@ That is the essential entry point (the generated file also wires a workspace fil
 The steps, in the order the framework performs and logs them (security and telemetry initialisation are reported by their own log lines before the listener line):
 
 1. Reads the effective configuration (variables, `PSO_CFG_*`, `pso.config*.json`), including logging and HTTP limits. An invalid value stops start-up.
-2. Loads the named guards, middleware and filters from the compiled app directory, including module-local guards.
-3. Loads every `routes/<module>/MODULE.pso.js` and `ROUTES.pso.js`. Controller files are reached only through a module's `controllers`; an undeclared controller is never loaded.
+2. Loads the named guards, middleware, filters and interceptors from the compiled app directory (`.app/guards/`, `.app/middlewares/`, `.app/filters/`, `.app/interceptors/`), including module-local ones (`modules/<module>/guards/`).
+3. Loads every `modules/<module>/MODULE.pso.js` and its `routes/ROUTES.pso.js`. Controller files (`modules/<module>/controllers/`) are reached only through a module's `controllers`; an undeclared controller is never loaded. A 0.1 project keeps `routes/<module>/` ([compatibility](architecture/structure-migration.md)).
 4. Builds the neutral model and runs the **same validator** as `pso validate`. Any error aborts start-up with a `StartupError` and nothing listens.
 5. Initialises security (JWT keys, JWKS); a configuration problem stops start-up.
 6. Constructs providers and controllers through the dependency container, and registers the business validators of DTOs.
@@ -28,7 +28,7 @@ The steps, in the order the framework performs and logs them (security and telem
 
 | Option | Meaning |
 |---|---|
-| `appDir` | directory of the **compiled** application (contains `routes/`, `guards/`, `middlewares/`, `filters/`); required |
+| `appDir` | directory of the **compiled** application (contains `.app/` and `modules/`; a 0.1 build contains `routes/`, `guards/`, `middlewares/`, `filters/`); required |
 | `projectDir` | the project directory where `pso.config.json` lives; defaults to the parent of `appDir` |
 | `workspaceFile` | `pso.workspace.json`, the upstream registry in development |
 | `port`, `host` | listen address (`3000`, `127.0.0.1` by default; the environment `PORT`/`HOST` is applied by the generated `main.ts`) |

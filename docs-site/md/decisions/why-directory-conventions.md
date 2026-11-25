@@ -31,6 +31,9 @@ The directory routes/ghost/ contains HTTP code but no MODULE.pso.ts. There is no
 FAILED
 ```
 
+The message names the module directory `routes/ghost/` in every structure; in the official structure that directory is
+`src/modules/ghost/`.
+
 and the same tree gives the same answer on every machine: `pso validate --write-manifest` produced identical manifests on repeated runs ([deterministic manifests](concepts/deterministic-manifests.md)).
 
 ## The cost
