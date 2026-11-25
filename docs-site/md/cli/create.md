@@ -7,13 +7,14 @@ Create a workspace, an orchestrator, a Spring Boot service, or a frontend projec
 ## Usage
 
 ```text
-pso create workspace <name> | orchestrator <name> [--crud-service <service>] | service <name> --runtime spring-boot [--package com.example.name] [--db postgres|none] | fei <name> | mei <name> [--host <fei>] [--register [--public | --scopes a,b]] [--install] [--template crud|empty] [--structure legacy] [--port <1024-65535>] [--prefix /path] [--dry-run] [--force] [--json]
+pso create workspace <name> [--layout standard|flat] | orchestrator <name> [--crud-service <service>] | service <name> --runtime spring-boot [--package com.example.name] [--db postgres|none] | fei <name> | mei <name> [--host <fei>] [--register [--public | --scopes a,b]] [--install] [--template crud|empty] [--structure legacy] [--port <1024-65535>] [--prefix /path] [--dry-run] [--force] [--json]
 ```
 
 ## Flags
 
 | Flag | What it does |
 |---|---|
+| `--layout` | `create workspace` only: `standard` (default) or `flat` (the 0.1 layout, kept for compatibility). |
 | `--crud-service` | The service the orchestrator's products module calls (default: the service that serves /products). |
 | `--runtime` | See the usage line and the task guide for this option. |
 | `--package` | The Java base package of a service (default `com.pso.<name>`). |
@@ -45,8 +46,8 @@ pso create mei customers --register --install
 
 ## What it changes
 
-- `workspace` creates `shop/pso.workspace.json`; it does not start a process.
-- `orchestrator` and `service` create projects and register their names, ports and roles in the workspace file.
+- `workspace` creates `shop/` with the standard layout: `.infra/` (only its ignore rule; nothing is provisioned), `orchestrators/`, `services/`, `frontends/`, `frontends/modules/`, `shared/`, `docs/`, `tests/`, `pso.workspace.json` and `README.md`; it does not start a process. `--layout flat` keeps the 0.1 layout.
+- `orchestrator` goes to `orchestrators/<name>`, `service` to `services/<name>`, `fei` to `frontends/fei-<name>` and `mei` to `frontends/modules/mei-<name>`; each path is registered with the name, port and role in the workspace file. In a flat 0.1 workspace new projects follow the existing ones (root and `frontend/`).
 - `--db postgres` adds the Spring data dependency, datasource configuration and a Flyway migration template.
 
 ## Illustrative output
@@ -54,8 +55,8 @@ pso create mei customers --register --install
 This sample shows the shape of the result. Names, ports, digests and timings may differ in your workspace.
 
 ```text evidence="illustrative"
-created    gateway/src/main.ts
-created    gateway/package.json
+created    orchestrators/gateway/src/main.ts
+created    orchestrators/gateway/package.json
 ...
 registered "gateway" in pso.workspace.json (port 3000)
 ```

@@ -1,8 +1,8 @@
 # pso structure:inspect
 
-> Show the structural convention of each project (modular / layered / 0.1), mixed or contradictory structures, and for a 0.1 project the migration plan: every file to move, the imports, route declarations, module registrations and Java package declarations it affects. Read-only: nothing is moved
+> Show the workspace layout (standard, or flat with the plan to move its projects into orchestrators/, services/, frontends/ and frontends/modules/), the structural convention of each project (modular / layered / 0.1), mixed or contradictory structures, and for a 0.1 project the migration plan: every file to move, the imports, route declarations, module registrations and Java package declarations it affects. Read-only: nothing is moved
 
-Show the structural convention of each project (modular / layered / 0.1), mixed or contradictory structures, and for a 0.1 project the migration plan: every file to move, the imports, route declarations, module registrations and Java package declarations it affects. Read-only: nothing is moved.
+Show the workspace layout (standard, or flat with the plan to move its projects into orchestrators/, services/, frontends/ and frontends/modules/), the structural convention of each project (modular / layered / 0.1), mixed or contradictory structures, and for a 0.1 project the migration plan: every file to move, the imports, route declarations, module registrations and Java package declarations it affects. Read-only: nothing is moved.
 
 ## Usage
 

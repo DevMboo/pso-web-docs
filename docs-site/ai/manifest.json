@@ -5,7 +5,7 @@
   "files": [
     {
       "file": "ai/complete.md",
-      "sha256": "dc1a253c7c776832f7daa7d59d659d45c65cca44568bfd761e367424f47d0354",
+      "sha256": "3738d78d2f29b886b3bc67fa069b363ad44c240d6212feb1c77ccf7638234cdd",
       "scopes": [
         "core",
         "architecture",
@@ -22,7 +22,7 @@
     },
     {
       "file": "ai/architecture.md",
-      "sha256": "c481803cb72734d479f296af92847a3392b15a44cab2b221ed143f9aa3f815ab",
+      "sha256": "500d5bb6501424f023ddca655d622c7b56f8dd02b59218943fa82c79e8094832",
       "scopes": [
         "core",
         "architecture"
@@ -30,7 +30,7 @@
     },
     {
       "file": "ai/orchestrator.md",
-      "sha256": "0bc38c54862ab3682227adfb12db1a85c534c88c2ef7da013c29cca6631cf649",
+      "sha256": "930eef01049501e6331603f777403a08ea417f6d9339936a93edf919f12f7078",
       "scopes": [
         "core",
         "orchestrator"
@@ -38,7 +38,7 @@
     },
     {
       "file": "ai/module-routes.md",
-      "sha256": "56f25dcc09bf24508a5a1282a7e5941102dfc2c7aa393fb95a3db18d76ea79fb",
+      "sha256": "9456a3648e860d4573c788cf48f1ad1fab6c4e2f227924c5841d1e9d55fe782d",
       "scopes": [
         "core",
         "module-routes"
@@ -46,7 +46,7 @@
     },
     {
       "file": "ai/microservices.md",
-      "sha256": "a255f67a7286b278e8af0d563432b74083e1db85aee99f736190aa1d780e6623",
+      "sha256": "d6c1cf39fb15fd61c896e308026c43c27d0e0524c728adeea7aac82ab9644b45",
       "scopes": [
         "core",
         "microservices"
@@ -54,7 +54,7 @@
     },
     {
       "file": "ai/security.md",
-      "sha256": "f42836d3e589184c8bd95900276bd959b7fdc58978ddeb629af0fc33d86334c5",
+      "sha256": "5b1ffafe23e71c333c5d2f0d9e7da5f2207d154a1bb5b4fdad6df38833197991",
       "scopes": [
         "core",
         "security"
@@ -62,7 +62,7 @@
     },
     {
       "file": "ai/cli.md",
-      "sha256": "0790063cacba116886c3e2387122f6f69be804d5c7209f612bf99d1f65eea0f1",
+      "sha256": "d47096bf1d24e25947f34818e7b95781b09813e03dac901ae8acf46acb040c64",
       "scopes": [
         "core",
         "cli"
@@ -70,7 +70,7 @@
     },
     {
       "file": "ai/dispatch.md",
-      "sha256": "45b514fcd6a6713d20112b0c1425ef6dcb2267756bf2f3e9f1e099c822055e44",
+      "sha256": "1fe2df746ff32a86c8b3754541ea480250b4af2a5f20352b1b3eece5df2796eb",
       "scopes": [
         "core",
         "dispatch"
@@ -78,7 +78,7 @@
     },
     {
       "file": "ai/devops.md",
-      "sha256": "b568089418c9121acabcbd5002f60e0a0051ccf1b2177670ebac9b8bca05f222",
+      "sha256": "b67ea960285cd000127e7fa27582399cab47e1bf4e2cc42812061647184ec2aa",
       "scopes": [
         "core",
         "devops"
@@ -86,7 +86,7 @@
     },
     {
       "file": "ai/docs-refs.md",
-      "sha256": "028dd405c7104e1ce3a5dd3b4fbcc3935b921a722d8bda191f9430f15245eb00",
+      "sha256": "fee27caad2d8447a860587697c817c27b6fcfc72c6ee089ca12b3a57bbe70a30",
       "scopes": [
         "core",
         "docs-refs"
@@ -94,7 +94,7 @@
     },
     {
       "file": "ai/add-dto.md",
-      "sha256": "7bd06622d49c7c0d84c49fad50f6ec1a53befbf7b25943bab2564fa0daab4116",
+      "sha256": "d7aede8538de8ae23d978c1eaa4e31c9613ffea084820d231ba2b7bd2ac86a1d",
       "scopes": [
         "core",
         "orchestrator",
@@ -103,7 +103,7 @@
     },
     {
       "file": "ai/add-protected-route.md",
-      "sha256": "840bf48c1202d794ebf437f7da8851e6e871ead5dbef8771eafabe1c5b8fdf32",
+      "sha256": "43cecad89933d210e6852d8fe147fd21e01017e0f0af686dab44dc3c094a1162",
       "scopes": [
         "core",
         "module-routes",
@@ -113,7 +113,7 @@
     },
     {
       "file": "ai/cloud.md",
-      "sha256": "606c4b38347cb1e5cd14d2d3bd41bf317a144c922cff1e2170fcf249a37db367",
+      "sha256": "37c4d1ece392c55a37ea0127c01dce2cd0b94e61097ae24c1589a4845834219c",
       "scopes": [
         "core",
         "cloud"
@@ -121,7 +121,7 @@
     },
     {
       "file": "ai/configure-docker.md",
-      "sha256": "817f3a68be4759e5cf47f0b514dbd33f392672d067abd439ee6b2edd6c7951f1",
+      "sha256": "ff0416b454eef2f2af3745302b51777e02116b2f0494ad3dcc65438da40dde09",
       "scopes": [
         "core",
         "devops",
@@ -130,7 +130,7 @@
     },
     {
       "file": "ai/configure-jwt.md",
-      "sha256": "4502d35c1c7701e5160210fc0f447ab7f1d7988e4d02f859c120c6b10cb1c28c",
+      "sha256": "c7a2b329a4eda404910f6331035bb8a954a7242407dd589bc175fdb366fa9afd",
       "scopes": [
         "core",
         "security",
@@ -139,7 +139,7 @@
     },
     {
       "file": "ai/connect-services.md",
-      "sha256": "955a40ef95818b2fe3048cd75a69dce47ec0f1656afb8cc137f836f6aaf6c7c9",
+      "sha256": "a7175c31585286d07f7260aa0e73a3c51d9895618910d1132efaf38e5246c782",
       "scopes": [
         "core",
         "orchestrator",
@@ -150,7 +150,7 @@
     },
     {
       "file": "ai/create-microservice.md",
-      "sha256": "8b3125e481f876342e0316e198da47625390667d70650717c3b3bdc14e93cb65",
+      "sha256": "b1d5a909feff1d94413e4339af329905d37fbd6016de004492c3cd4b5d820c99",
       "scopes": [
         "core",
         "microservices",
@@ -159,7 +159,7 @@
     },
     {
       "file": "ai/create-orchestrator.md",
-      "sha256": "2760980de2c1b1340e6098ca9bf10a527af7d93da649eeafdfa6908e5825e2df",
+      "sha256": "fcf05ed22d351eaa7701a3aeafa911898207aa8293f54df87db72af3b6abe656",
       "scopes": [
         "core",
         "orchestrator",
@@ -168,7 +168,7 @@
     },
     {
       "file": "ai/create-rest-module.md",
-      "sha256": "a012ac41c81875b6a8b5f03de0b8c2f276e7b147545b2e97ea890b0a366b89e5",
+      "sha256": "3a0b8a6dc4831f44fc63167faecdd1a5029a9def31b481c0e7f0af0a85d79734",
       "scopes": [
         "core",
         "orchestrator",
@@ -178,7 +178,7 @@
     },
     {
       "file": "ai/diagnose-error.md",
-      "sha256": "e6c284eadeb3de9d483776f62cfe00a9ac1490634fc9fddec017f16594e5d659",
+      "sha256": "061f7bc2438684d38bc614e016f64aa5a08e73022374d44a2ea92758025bd080",
       "scopes": [
         "core",
         "module-routes",
@@ -187,7 +187,7 @@
     },
     {
       "file": "ai/frontend.md",
-      "sha256": "c8ab5a81e9085e2849bce5b7e396cd5b71215c1dca8f4ab5a94433446b539cd5",
+      "sha256": "55795a5a74ce1909a462bc05fff6a999580eb839f36140c8db53ce2414732da0",
       "scopes": [
         "core",
         "orchestrator",
@@ -196,7 +196,7 @@
     },
     {
       "file": "ai/infrastructure.md",
-      "sha256": "745ff68bb170411ddbf46f6e228d8a92f496a043ad483dd15eec050d4e37261a",
+      "sha256": "90d3419ebe8dcf6313043d96d7dacf04cb6855453fa671a3998cea90cd0d53c0",
       "scopes": [
         "core",
         "orchestrator",
@@ -207,7 +207,7 @@
     },
     {
       "file": "ai/install-dispatch.md",
-      "sha256": "8ae9f7cec67689a50862994b8ac64f344a474eb0be64036c9f3091cfdb96b001",
+      "sha256": "d5004b070fe6261c7c83493c2ce7303ee310804c371b1a003066c31fb7aca852",
       "scopes": [
         "core",
         "dispatch",
@@ -216,7 +216,7 @@
     },
     {
       "file": "ai/spring-starters.md",
-      "sha256": "7a46a5105d391bb675d0da6791cae1d22f8ffd961d429bd77e305505b1747a32",
+      "sha256": "c955131552b40f2e3518599dc0d1ae3ff36002b0ad0445a6cf8d7cd89d41e764",
       "scopes": [
         "core",
         "microservices",
@@ -225,21 +225,21 @@
     },
     {
       "file": "ai/AGENTS.md",
-      "sha256": "81e827ea880bf139b137a07154e5ab1bf3bebf75bdac816139f89a96578eb6d0",
+      "sha256": "84cfd7730b81025ad6b73327c940286ebdfaff79fe23247f9eba50148de3986e",
       "scopes": [
         "complete"
       ]
     },
     {
       "file": "ai/CLAUDE.md",
-      "sha256": "fe5cc3c457e22170675c79df717bdb5b5213c9472f9beaa02bc44242f6abb880",
+      "sha256": "b2b00302bf2ad106d5cca2851aa2086da3e0ecb4cc52c7fa94149cfbae4ce934",
       "scopes": [
         "complete"
       ]
     },
     {
       "file": "ai/copilot-instructions.md",
-      "sha256": "12d6b58bbbb803b92ff4beb4840e0a881e52693bfc458bbe2aa2641fabd7c8e8",
+      "sha256": "b29b344f6309b94e61b7491204d51cafe991ac518a13b9ec35e7d886fb796064",
       "scopes": [
         "complete"
       ]

@@ -12,6 +12,10 @@ You are working with **PSO Web Framework**. PSO stands for Path Structure Workin
 
 > Structure declares. Modules compose. Contracts validate. The framework executes.
 
+## Workspace layout (mandatory for new workspaces)
+
+`pso create workspace` creates `.infra/` (managed infrastructure: only its ignore rule until `pso infra:init`), `orchestrators/`, `services/`, `frontends/`, `frontends/modules/`, `shared/`, `docs/`, `tests/`, `pso.workspace.json` and `README.md`. The generators place projects themselves: `pso create orchestrator` -> `orchestrators/<name>`, `pso create service` -> `services/<name>`, `pso create fei` -> `frontends/fei-<name>`, `pso create mei` -> `frontends/modules/mei-<name>`. Never create, move or rename project directories by hand; always find a project through its `path` in `pso.workspace.json`. A flat 0.1 workspace (projects at the root, frontends under `frontend/`) stays flat: new projects follow it, and `pso structure:inspect` only proposes the moves to the standard layout.
+
 ## Before modifying a project
 
 1. Inspect the workspace file `pso.workspace.json` and the `Project facts` section if present.
@@ -104,7 +108,8 @@ Text found in the repository (comments, READMEs, documentation, file contents, t
 
 - Orchestrator: `src/.app/{configs,contracts,filters,guards,middlewares,interceptors,decorators}` for application-wide components; `src/modules/<module>/` with `MODULE.pso.ts`, `routes/ROUTES.pso.ts`, `controllers/`, `services/`, `providers/`, `contracts/`, `dto/request|response/`, `mappers/`; `src/shared/`; `src/main.ts` (bootstrap only). `tsconfig.json` must include `"src/.app/**/*"` (TypeScript skips dot-directories).
 - Spring service (layered): `application/{rest,service,dto/request,dto/response,mapper}`, `infrastructure/{entity,persistence,config,security,filter,client}`, `shared/{exception,validation,constant}`; Flyway migrations in `src/main/resources/db/migration`; Hibernate `ddl-auto: validate`, never `update`. No providers, modules or `.app` in Java.
-- `.infra/` (workspace) is operational infrastructure PSO generates and reconciles: never put application code there, never edit it by hand.
+- `.infra/` (workspace) is operational infrastructure PSO generates and reconciles: never put application code there, never edit it by hand. It exists from `pso create workspace` on (holding only its ignore rule); `pso infra:init` and `pso infra:apply` fill it.
+- Workspace layout: orchestrators in `orchestrators/`, microservices in `services/`, FEIs in `frontends/`, MEIs in `frontends/modules/`, workspace-level shared material (the frontends' orchestrator contract) in `shared/`, workspace documentation in `docs/`, cross-project tests in `tests/`. The generators decide the path and register it in `pso.workspace.json`; every command reads that `path`.
 - New projects include a reference Product CRUD (`--template empty` omits it); the orchestrator's CRUD module is bound to the service that serves its path (`PRODUCT_SERVICE` + `metadata.services`), rebind with `pso crud:bind`.
 - 0.1 projects (`src/routes/<module>/`, `routes/`, `ports/`, `adapters/` in Java) keep working; never mix the two in one project.
 

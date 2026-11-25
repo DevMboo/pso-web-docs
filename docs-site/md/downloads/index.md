@@ -1,6 +1,6 @@
 # Downloads
 
-> Download PSO Web V2 (0.2.0-rc.4), the first public release, for Windows x64 - the recommended portable ZIP and the experimental, Authenticode-unsigned installer - verify them, install, update and roll back.
+> Download PSO Web V2 (0.2.0-rc.5) for Windows x64 - the recommended portable ZIP and the experimental, Authenticode-unsigned installer - verify them, install, update and roll back.
 
 > Status: PARTIALLY implemented — read the limitations.
 
@@ -11,9 +11,9 @@
 PSO Web Framework is free and open-source software, licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0). It has no telemetry, license check or paid tier ([privacy policy](downloads/privacy-policy.md)). The maintainer is [DevMboo](https://github.com/DevMboo). The source code is public at [github.com/DevMboo/pso-web-framework](https://github.com/DevMboo/pso-web-framework).
 
 > [!NOTE]
-> **The current release is PSO Web V2, `0.2.0-rc.4`**, the first public release (release candidate, GitHub prerelease of the source
-> repository). It is the release this documentation describes: the official application structures, the reference Product CRUD, the
-> infrastructure engine, FEI/MEI and the cloud engine. The CLI reports version `0.2.0`; its Java libraries are `com.pso:*:0.2.0-rc.4`
+> **The current release is PSO Web V2, `0.2.0-rc.5`** (release candidate, GitHub prerelease of the source repository; `0.2.0-rc.4`
+> was the first public release). It is the release this documentation describes: the official application structures, the reference Product CRUD, the
+> infrastructure engine, FEI/MEI and the cloud engine. The CLI reports version `0.2.0`; its Java libraries are `com.pso:*:0.2.0-rc.5`
 > and are included.
 
 > [!WARNING]
@@ -21,32 +21,32 @@ PSO Web Framework is free and open-source software, licensed under the [Apache L
 > without a code-signing certificate; it is not a SignPath-signed production release. Windows Smart App Control or SmartScreen may
 > block the installer. Never disable those protections: use the portable ZIP, or wait for a signed release.
 
-## Download PSO Web V2 (0.2.0-rc.4)
+## Download PSO Web V2 (0.2.0-rc.5)
 
 | Release detail | Value |
 | --- | --- |
-| Release | [`v0.2.0-rc.4`](https://github.com/DevMboo/pso-web-framework/releases/tag/v0.2.0-rc.4) (public prerelease, built from commit `a56a6ac` of the source repository) |
+| Release | [`v0.2.0-rc.5`](https://github.com/DevMboo/pso-web-framework/releases/tag/v0.2.0-rc.5) (public prerelease, built from commit `cb7cfc8` of the source repository) |
 | Platform | Windows 10/11 x64 |
-| Recommended asset | `PSO-Web-0.2.0-rc.4-win-x64-portable.zip`, 50.4 MB (50,448,335 bytes) |
-| Experimental asset | `PSO-Web-0.2.0-rc.4-win-x64.exe`, 31.4 MB (31,392,131 bytes), **Authenticode-unsigned** |
-| Also on the release page | the npm tarballs of the 13 `@pso/*` packages (0.2.0) and the `com.pso:*:0.2.0-rc.4` Maven file repository, with their SBOMs |
+| Recommended asset | `PSO-Web-0.2.0-rc.5-win-x64-portable.zip`, 50.5 MB (50,458,589 bytes) |
+| Experimental asset | `PSO-Web-0.2.0-rc.5-win-x64.exe`, 31.4 MB (31,396,358 bytes), **Authenticode-unsigned** |
+| Also on the release page | the npm tarballs of the 13 `@pso/*` packages (0.2.0) and the `com.pso:*:0.2.0-rc.5` Maven file repository, with their SBOMs |
 | Node.js requirement | Bundled private runtime; no system Node.js installation |
 | Java | JDK 21 or newer for Spring services; the matching `com.pso` Maven repository is included (`pso java:install`) |
 | Access | public: no GitHub account needed |
 | Security | No Authenticode signature; `SHA256SUMS` and the package are signed with the project's Ed25519 release key (below) |
 
-:::download-button url="https://github.com/DevMboo/pso-web-framework/releases/download/v0.2.0-rc.4/PSO-Web-0.2.0-rc.4-win-x64-portable.zip" label="Download PSO Web V2 — Windows x64 portable (0.2.0-rc.4, recommended)"
+:::download-button url="https://github.com/DevMboo/pso-web-framework/releases/download/v0.2.0-rc.5/PSO-Web-0.2.0-rc.5-win-x64-portable.zip" label="Download PSO Web V2 — Windows x64 portable (0.2.0-rc.5, recommended)"
 
 The **portable ZIP is the recommended download**. It installs nothing: extract it and run `pso.cmd`
-([Installation](getting-started/installation.md)). The exact ZIP passed 21/21 portable validation checks (isolated folder, no Node.js on PATH: checksums, signature, launcher, doctor, integrity, tamper detection, repair, relocation, foreign-signer refusal).
+([Installation](getting-started/installation.md)). The exact ZIP passed 21/21 portable validation checks, and the installed rc.5 CLI passed the 34-check workspace acceptance (structure, validation, infrastructure, Docker, edge, frontends).
 
-:::download-button url="https://github.com/DevMboo/pso-web-framework/releases/download/v0.2.0-rc.4/PSO-Web-0.2.0-rc.4-win-x64.exe" label="Download the experimental, Authenticode-unsigned Windows x64 installer (0.2.0-rc.4)"
+:::download-button url="https://github.com/DevMboo/pso-web-framework/releases/download/v0.2.0-rc.5/PSO-Web-0.2.0-rc.5-win-x64.exe" label="Download the experimental, Authenticode-unsigned Windows x64 installer (0.2.0-rc.5)"
 
 The **installer is experimental and unsigned**: it carries the same content, but its real Windows installation flow (wizard, PATH
 entry, uninstaller) has not been validated end to end, because Smart App Control on the validation machine refuses unsigned
-installers. This build did run there once (installation, full integrity check, real uninstaller), which does not predict your machine: it may block it. Read `INSTALL.md` on the release page first.
+installers. It may block it on your machine too. Read `INSTALL.md` on the release page first.
 
-The [release page](https://github.com/DevMboo/pso-web-framework/releases/tag/v0.2.0-rc.4) also holds `PORTABLE.md`, `INSTALL.md`, the checksums, the detached signature, the public key, the
+The [release page](https://github.com/DevMboo/pso-web-framework/releases/tag/v0.2.0-rc.5) also holds `PORTABLE.md`, `INSTALL.md`, the checksums, the detached signature, the public key, the
 release manifest, the SBOMs and the notices.
 
 ## Verify before use
@@ -54,18 +54,20 @@ release manifest, the SBOMs and the notices.
 Download `SHA256SUMS`, `SHA256SUMS.sig` and `release-signing-key.public.pem` from the same release, then compare:
 
 ```powershell
-Get-FileHash .\PSO-Web-0.2.0-rc.4-win-x64-portable.zip -Algorithm SHA256
+Get-FileHash .\PSO-Web-0.2.0-rc.5-win-x64-portable.zip -Algorithm SHA256
 Get-Content .\SHA256SUMS
 ```
 
 | File | SHA-256 |
 | --- | --- |
-| `PSO-Web-0.2.0-rc.4-win-x64-portable.zip` | `ef1d6cfd67c1db3982a604e4caef3a8d6f8f85c0326102eb5915944bf1bfd9bf` |
-| `PSO-Web-0.2.0-rc.4-win-x64.exe` | `04dad81fc929449c75ca8c894452b13837d0b948c0f5669ffbf5c1f480130d30` |
-| `pso-npm-0.2.0-packages.zip` | `134e15e567ae5520eff71a0816ce4a8dc849821d69a708196682f3b78639880d` |
-| `pso-java-0.2.0-rc.4-maven-repository.zip` | `ff3b111cb2dad1ff86dda59d7068dc2444176c3ba4298bcda6895f922af2a975` |
+| `PSO-Web-0.2.0-rc.5-win-x64-portable.zip` | `e3d3c85daf0eea6f1a6a4db812ac0e63a26b9cba77d0df6aade848ba67586187` |
+| `PSO-Web-0.2.0-rc.5-win-x64.exe` | `9099ce0da97327b4857a08262ceaf842dc25b56f73bc68ed577b9948368604db` |
+| `pso-npm-0.2.0-packages.zip` | `03d72525a551529b79dd4e8bd5df6435dbb122fb7f7a79728605f656b904e919` |
+| `pso-java-0.2.0-rc.5-maven-repository.zip` | `ce66786455921667be3c827e908a6f2bcff145fc0232941716fb4f0ef8623f88` |
 
-The package archives are listed in `SHA256SUMS-PACKAGES`, signed the same way (`SHA256SUMS-PACKAGES.sig`). `SHA256SUMS` is signed with Ed25519 by the
+The Windows files are listed in `SHA256SUMS` and the package archives in `SHA256SUMS-PACKAGES`, both signed.
+
+ `SHA256SUMS` is signed with Ed25519 by the
 release key `7ebced006968027b3ca9939c1e245637ce93ba8bb6261a125a0fd31f957dcc89` (fingerprint of `release-signing-key.public.pem`,
 also published in this repository's documentation). The signature proves integrity relative to that key; the key travels with the
 release, so confirm the fingerprint here, through a channel other than the download, before relying on it. Stop if a checksum or the
@@ -73,7 +75,7 @@ signature differs.
 
 ## Code signing policy
 
-No PSO Web release is Authenticode-signed yet, including 0.2.0-rc.4. The [code signing policy](downloads/code-signing-policy.md) describes how signed releases
+No PSO Web release is Authenticode-signed yet, including 0.2.0-rc.5. The [code signing policy](downloads/code-signing-policy.md) describes how signed releases
 will be built, approved and verified, and who is responsible for them; the [privacy policy](downloads/privacy-policy.md) states what PSO Web
 transfers over the network (nothing unless you ask for it).
 
@@ -82,7 +84,7 @@ transfers over the network (nothing unless you ask for it).
 - **New installation:** extract the ZIP into a writable folder (for example `C:\Tools\pso`), run `.\pso.cmd --version` and
   `.\pso.cmd doctor`, and optionally add its `bin` directory to your user PATH. Then `pso java:install` for Spring services. See
   [Installation](getting-started/installation.md).
-- **Update an existing portable installation** that trusts the same key: `pso update install --package <extracted-zip>\.pso-install\packages\0.2.0-rc.4.psopkg`,
+- **Update an existing portable installation** that trusts the same key: `pso update install --package <extracted-zip>\.pso-install\packages\0.2.0-rc.5.psopkg`,
   then `pso integrity check --full` and `pso java:install`. The previous version is kept side by side.
 - **Roll back:** `pso update rollback` returns to the previous version. Workspaces live outside the installation and are not touched
   by an update, a rollback or removal of the folder; migrate them separately ([migration](reference/migration.md)).
@@ -94,7 +96,7 @@ your administrator or wait for a signed release. See [Release integrity and sign
 
 | Symptom | Cause | Fix |
 | --- | --- | --- |
-| the download button answers `404` | the asset name changed or the release is not reachable | open the [release page](https://github.com/DevMboo/pso-web-framework/releases/tag/v0.2.0-rc.4) and download from there |
+| the download button answers `404` | the asset name changed or the release is not reachable | open the [release page](https://github.com/DevMboo/pso-web-framework/releases/tag/v0.2.0-rc.5) and download from there |
 | the SHA-256 differs from `SHA256SUMS` | an incomplete or altered download | delete the file and download it again from the release page; never run a file whose hash differs |
 | Windows blocks the installer ("An Application Control policy blocked this file") | Smart App Control or another policy refuses unsigned files | use the portable ZIP, or ask your administrator; do not switch the protection off |
 | `pso update install` refuses the package | the installation trusts another signing key | that is the protection working: extract the ZIP into a new folder instead |
