@@ -285,7 +285,7 @@ They are not a promise that your application is correct. They make one kind of m
 | Maven | **not required** | each service carries a project-local Maven Wrapper (Maven 3.9.9, SHA-256 pinned) that downloads Maven from Maven Central on first use |
 | Docker | optional | `pso docker:build`, the generated Compose stack, and running real brokers or PostgreSQL locally |
 
-Windows, macOS and Linux are supported by the CLI from an authorized checkout. The current portable distribution is Windows 10/11 x64; its unsigned installer candidate is not a supported installation method ([Downloads](downloads/index.md)).
+Windows, macOS and Linux are supported by the CLI from an authorized checkout. The current release, PSO Web V2 `0.2.0-rc.3`, is distributed for Windows 10/11 x64 as a portable ZIP (recommended) and an experimental, unsigned installer that is not validated end to end ([Downloads](downloads/index.md)).
 
 > [!NOTE]
 > **Which Node version?** Node 24 or newer. The framework packages and the generated orchestrator declare `engines.node >=24`, `pso doctor` requires 24 (it prints `>=24`), and every test of this framework ran on Node 24.
@@ -357,11 +357,11 @@ ok      docker  Docker version 29.6.1, build 8900f1d  (optional)
 > Status: PARTIALLY implemented — read the limitations.
 
 > [!NOTE]
-> The installed distribution on the validation machine is `0.2.0-rc.3`; its CLI reports version `0.2.0`. That candidate is not yet published in the private releases repository. [Downloads](downloads/index.md) identifies the older, published alpha.2 portable preview. Do not substitute its files for rc.3.
+> The current release is **PSO Web V2, `0.2.0-rc.3`**; its CLI reports version `0.2.0`. Download it from [Downloads](downloads/index.md) (the private release [`v0.2.0-rc.3`](https://github.com/DevMboo/pso-web-releases/releases/tag/v0.2.0-rc.3)). The 0.1 alpha releases listed there are historical: do not substitute their files for rc.3.
 
-## Option 1: an authorized portable Windows distribution
+## Option 1: the portable Windows distribution (recommended)
 
-The portable ZIP is the supported form for the current release candidate while the Windows installer is unsigned and unvalidated end to end. It needs Windows 10/11 x64, but bundles a private Node.js runtime: you do **not** install Node.js system-wide. Obtain the ZIP and its matching `SHA256SUMS`, detached signature and public key from an authorized release channel. Confirm the ZIP's SHA-256 before extraction; see [Downloads](downloads/index.md) for published assets and security limits.
+The portable ZIP is the supported form for the current release candidate while the Windows installer is unsigned and unvalidated end to end. It needs Windows 10/11 x64, but bundles a private Node.js runtime: you do **not** install Node.js system-wide. Download `PSO-Web-0.2.0-rc.3-win-x64-portable.zip` and its `SHA256SUMS`, `SHA256SUMS.sig` and `release-signing-key.public.pem` from the [release page](https://github.com/DevMboo/pso-web-releases/releases/tag/v0.2.0-rc.3). Confirm the ZIP's SHA-256 (`77eb495bd93a74c22f65c5af8692a535417f5939d95759dfbd9880d6ffca57d0`) before extraction; see [Downloads](downloads/index.md) for verification and security limits. The experimental installer `PSO-Web-0.2.0-rc.3-win-x64.exe` carries the same content but is not validated end to end.
 
 1. Extract to a writable folder such as `%LOCALAPPDATA%\PSO` or `C:\Tools\pso`. Avoid `Program Files`; no administrator rights are needed.
 2. Run `pso.cmd` from the extracted folder and check the installation:
@@ -1552,7 +1552,7 @@ All diagnostic codes are listed in the [diagnostics reference](reference/diagnos
 
 # Downloads
 
-> Current PSO Web distribution status, the available private portable preview, verification and Windows installation limits.
+> Download PSO Web V2 (0.2.0-rc.3) for Windows x64 - the recommended portable ZIP and the experimental installer - verify them, install, update and roll back; earlier releases are listed as historical.
 
 > Status: PARTIALLY implemented — read the limitations.
 
@@ -1561,43 +1561,89 @@ All diagnostic codes are listed in the [diagnostics reference](reference/diagnos
 **One ecosystem. Independent teams. Unified architecture.**
 
 > [!NOTE]
-> **The current installed distribution is `0.2.0-rc.3`.** This documentation describes its implemented framework. Its portable candidate exists on the development machine but has not been published in the private releases repository. Documentation deployment does not authorize a software release.
+> **The current release is PSO Web V2, `0.2.0-rc.3`** (release candidate, private prerelease). It is the release this documentation
+> describes: the official application structures, the reference Product CRUD, the infrastructure engine and the layered Java event
+> and Channels generators. The CLI reports version `0.2.0`; its Java libraries are `com.pso:*:0.2.0-rc.3` and are included.
 
-## Available private preview
-
-The latest published private download is the earlier **`0.1.0-alpha.2` portable ZIP**. It is for evaluation, not the current `0.2.0-rc.3` framework. The older `0.1.0-alpha.1` installer is encrypted for one validation recipient and should not be used as the general installation path.
+## Download PSO Web V2 (0.2.0-rc.3)
 
 | Release detail | Value |
 | --- | --- |
-| Published asset | `PSO-Web-0.1.0-alpha.2-win-x64-portable.zip` |
+| Release | [`v0.2.0-rc.3`](https://github.com/DevMboo/pso-web-releases/releases/tag/v0.2.0-rc.3) (prerelease) |
 | Platform | Windows 10/11 x64 |
-| ZIP size | 50.2 MB (50,196,310 bytes) |
+| Recommended asset | `PSO-Web-0.2.0-rc.3-win-x64-portable.zip`, 50.4 MB (50,408,660 bytes) |
+| Experimental asset | `PSO-Web-0.2.0-rc.3-win-x64.exe`, 31.4 MB (31,375,245 bytes) |
 | Node.js requirement | Bundled private runtime; no system Node.js installation |
+| Java | JDK 21 or newer for Spring services; the matching `com.pso` Maven repository is included (`pso java:install`) |
 | Access | GitHub sign-in and access to `DevMboo/pso-web-releases` |
-| Security | Unsigned developer alpha; no independent publisher authentication |
+| Security | Unsigned developer distribution: no Authenticode signature, development signing key, no independent publisher authentication |
 
-:::download-button url="https://github.com/DevMboo/pso-web-releases/releases/download/v0.1.0-alpha.2/PSO-Web-0.1.0-alpha.2-win-x64-portable.zip" label="Download PSO Web — Windows x64 portable (alpha.2)"
+:::download-button url="https://github.com/DevMboo/pso-web-releases/releases/download/v0.2.0-rc.3/PSO-Web-0.2.0-rc.3-win-x64-portable.zip" label="Download PSO Web V2 — Windows x64 portable (0.2.0-rc.3, recommended)"
 
-See the [private alpha.2 release page](https://github.com/DevMboo/pso-web-releases/releases/tag/v0.1.0-alpha.2) for `PORTABLE.md`, checksums, the detached signature, SBOMs and notices. The public website does not proxy private assets or contain GitHub credentials.
+The **portable ZIP is the recommended download**: the exact ZIP passed 21/21 portable validation checks in an isolated Windows folder
+without Node.js on PATH (extraction, launcher, doctor, integrity, repair, relocation, update signer rejection). It installs nothing:
+extract it and run `pso.cmd` ([Installation](getting-started/installation.md)).
+
+:::download-button url="https://github.com/DevMboo/pso-web-releases/releases/download/v0.2.0-rc.3/PSO-Web-0.2.0-rc.3-win-x64.exe" label="Download the experimental Windows x64 installer (0.2.0-rc.3)"
+
+The **installer is experimental**: it carries the same content, but its real Windows installation flow (wizard, PATH entry,
+uninstaller) has not been validated end to end, because Smart App Control on the validation machine refuses unsigned installers. It
+may block it on your machine too; it is not a supported installation method yet. Read `INSTALL.md` on the release page first.
+
+The [release page](https://github.com/DevMboo/pso-web-releases/releases/tag/v0.2.0-rc.3) also holds `PORTABLE.md`, `INSTALL.md`,
+the checksums, the detached signature, the public key, the release manifest, both SBOMs and the notices. The public website does not
+proxy private assets or contain GitHub credentials.
 
 ## Verify before use
 
-Download `SHA256SUMS`, `SHA256SUMS.sig` and `release-signing-key.public.pem` from the same release. For alpha.2, the ZIP must have SHA-256 `094b4cd555fd837d46688d45f82b9805b8c8c73667c6f63dc172f4f9c4c45dbe`:
+Download `SHA256SUMS`, `SHA256SUMS.sig` and `release-signing-key.public.pem` from the same release, then compare:
 
 ```powershell
-Get-FileHash .\PSO-Web-0.1.0-alpha.2-win-x64-portable.zip -Algorithm SHA256
+Get-FileHash .\PSO-Web-0.2.0-rc.3-win-x64-portable.zip -Algorithm SHA256
 Get-Content .\SHA256SUMS
 ```
 
-The Ed25519 signature proves integrity relative to the included key. Because that key travels with the release, it does **not** independently establish the publisher's identity. Confirm a trusted fingerprint through another channel before using it as an identity claim. Stop if a checksum or signature differs.
+| File | SHA-256 |
+| --- | --- |
+| `PSO-Web-0.2.0-rc.3-win-x64-portable.zip` | `77eb495bd93a74c22f65c5af8692a535417f5939d95759dfbd9880d6ffca57d0` |
+| `PSO-Web-0.2.0-rc.3-win-x64.exe` | `8c572191e145dc8263917ec161f04c234365304129e0ce379fb05fd709746fb1` |
 
-## Current release candidate and installation limits
+`SHA256SUMS` is signed with Ed25519 by the development key `7ebced006968027b3ca9939c1e245637ce93ba8bb6261a125a0fd31f957dcc89`
+(fingerprint of `release-signing-key.public.pem`). The signature proves integrity relative to that key. Because the key travels with
+the release, it does **not** independently establish the publisher's identity: confirm the fingerprint through another channel
+before using it as an identity claim. Stop if a checksum or the signature differs.
 
-The local `0.2.0-rc.3` candidate is a portable Windows x64 ZIP with a bundled Node.js runtime and matching Java artifacts. Its SHA-256 is listed in the signed `SHA256SUMS` released with it; this is verification information, **not a download link or publication notice**. Only obtain it through an authorized distribution channel with its matching release materials.
+## Install, update and roll back
 
-For a supplied portable ZIP, follow [Installation](getting-started/installation.md): verify its checksum, extract into a writable folder, run `pso.cmd` from that folder, and optionally add its `bin` directory to your user PATH. It does not install an application or change the system Node.js. Use `pso integrity check --full`, `pso update install --package <file.psopkg>` and `pso update rollback` for maintenance. Spring services additionally need JDK 21 or newer and the matching `com.pso` Java artifacts.
+- **New installation:** extract the ZIP into a writable folder (for example `C:\Tools\pso`), run `.\pso.cmd --version` and
+  `.\pso.cmd doctor`, and optionally add its `bin` directory to your user PATH. Then `pso java:install` for Spring services. See
+  [Installation](getting-started/installation.md).
+- **Update an existing portable installation** that trusts the same key: `pso update install --package <extracted-zip>\.pso-install\packages\0.2.0-rc.3.psopkg`,
+  then `pso integrity check --full` and `pso java:install`. The previous version is kept side by side.
+- **Roll back:** `pso update rollback` returns to the previous version. Workspaces live outside the installation and are not touched
+  by an update, a rollback or removal of the folder; migrate them separately ([migration](reference/migration.md)).
 
-The Windows installer remains **unsigned and unvalidated end to end**, so it is not a supported installation method. Do not disable or bypass Smart App Control, SmartScreen, Defender or organizational policy. See [Release integrity and signing](infrastructure/release-integrity-and-signing.md).
+Do not disable or bypass Smart App Control, SmartScreen, Defender or organizational policy. If your system blocks the files, ask
+your administrator or wait for a signed release. See [Release integrity and signing](infrastructure/release-integrity-and-signing.md).
+
+## Troubleshooting a download
+
+| Symptom | Cause | Fix |
+| --- | --- | --- |
+| the download button answers `404` | you are not signed in to GitHub, or your account has no access to the private `DevMboo/pso-web-releases` | sign in with an account that has access; the website never holds credentials |
+| the SHA-256 differs from the table above | an incomplete or altered download | delete the file and download it again from the release page; never run a file whose hash differs |
+| Windows blocks the installer ("An Application Control policy blocked this file") | Smart App Control or another policy refuses unsigned files | use the portable ZIP, or ask your administrator; do not switch the protection off |
+| `pso update install` refuses the package | the installation trusts another signing key | that is the protection working: extract the ZIP into a new folder instead |
+
+## Previous releases (historical)
+
+Earlier releases stay available, unchanged, for compatibility and rollback; they are not recommended for new work and describe the
+0.1 framework.
+
+| Release | Asset | Status |
+| --- | --- | --- |
+| [`v0.1.0-alpha.2`](https://github.com/DevMboo/pso-web-releases/releases/tag/v0.1.0-alpha.2) | `PSO-Web-0.1.0-alpha.2-win-x64-portable.zip` (SHA-256 `094b4cd555fd837d46688d45f82b9805b8c8c73667c6f63dc172f4f9c4c45dbe`) | 0.1 portable developer preview |
+| `v0.1.0-alpha.1` | 0.1 installer encrypted for one validation recipient | not a general installation path |
 
 ---
 
@@ -9670,7 +9716,7 @@ Generated services include Lombok with explicit annotation processing. See [Lomb
 
 ## Development workflow
 
-The artifacts are not published. Install them once into your local Maven repository with `pso java:install`; services then resolve `com.pso:*:0.1.0-SNAPSHOT` from `~/.m2` (see [Maven BOM and SNAPSHOTs](spring/maven-bom.md)).
+The artifacts are not published to Maven Central. Install them once into your local Maven repository with `pso java:install`: the installed rc.3 distribution copies its bundled `com.pso:*:0.2.0-rc.3` repository, a framework checkout builds `com.pso:*:0.1.0-SNAPSHOT` (see [Maven BOM and Java versions](spring/maven-bom.md)).
 
 ## Not implemented
 
@@ -14982,7 +15028,7 @@ A 0.1 workspace keeps working with the 0.2.0 CLI without any change: `pso dev`, 
 
 ## Upgrading the CLI first
 
-Obtain an authorized `0.2.0-rc.3` portable distribution, or update an installed distribution with `pso update install --package <authorized-newer.psopkg>`. The rc.3 Windows installer is unsigned and unvalidated end to end, so it is not an upgrade path. See [Installation](getting-started/installation.md) and [release integrity and Windows installation](infrastructure/release-integrity-and-signing.md). Workspaces live outside the installation and are not touched by an update, rollback (`pso update rollback`) or removal of the portable folder.
+Download the `0.2.0-rc.3` portable ZIP ([Downloads](downloads/index.md)), or update an installed distribution that trusts the same key with `pso update install --package <extracted-zip>\.pso-install\packages\0.2.0-rc.3.psopkg`. The rc.3 Windows installer is unsigned and unvalidated end to end, so it is not an upgrade path. See [Installation](getting-started/installation.md) and [release integrity and Windows installation](infrastructure/release-integrity-and-signing.md). Workspaces live outside the installation and are not touched by an update, rollback (`pso update rollback`) or removal of the portable folder.
 
 ## Preparing to migrate an application
 
@@ -15092,7 +15138,7 @@ A checksum published next to the file proves integrity only as far as that page 
 ## Installing on Windows
 
 - **Portable ZIP** (recommended while the installer is unsigned): extract to a folder you can write to, run `.\pso.cmd --version`. A private Node.js runtime is bundled; nothing on the machine is changed.
-- **Installer** (`PSO-Web-<version>-win-x64.exe`, Inno Setup): an experimental local candidate. It is unsigned, its real installation flow has not been validated end to end, and it is not a supported installation method for rc.3.
+- **Installer** (`PSO-Web-<version>-win-x64.exe`, Inno Setup): published with rc.3 as an **experimental** asset. It is unsigned, its real installation flow has not been validated end to end, and it is not a supported installation method for rc.3.
 
 Maintenance of an installation (both forms):
 
@@ -15115,7 +15161,7 @@ Upgrading from 0.1.x keeps every workspace untouched: workspaces live outside th
 
 ### Windows installer limitations
 
-The installer of `0.2.0-rc.3` is not Authenticode-signed or published as a supported installation method. A prior rc.1 unsigned build was refused by Smart App Control on the validation machine ("An Application Control policy blocked this file", Code Integrity event 3077), showing that acceptance of one unsigned file does not predict acceptance of another. PSO never asks you to switch Smart App Control, SmartScreen or Defender off. Use an **authorized portable ZIP** until the installer is signed and its installation flow validated. The rc.3 portable candidate is not yet published in the private releases repository.
+The installer of `0.2.0-rc.3` is published as an experimental asset; it is not Authenticode-signed and not a supported installation method. A prior rc.1 unsigned build was refused by Smart App Control on the validation machine ("An Application Control policy blocked this file", Code Integrity event 3077), showing that acceptance of one unsigned file does not predict acceptance of another. PSO never asks you to switch Smart App Control, SmartScreen or Defender off. Use the **portable ZIP** ([Downloads](downloads/index.md)) until the installer is signed and its installation flow validated. Both rc.3 files, their checksums and the Ed25519 signature of `SHA256SUMS` (development key `7ebced00…`) are on the private release `v0.2.0-rc.3`.
 
 ## The permanent PSO release signing identity
 
@@ -24920,8 +24966,11 @@ A foreign file placed in the root is left alone (observed in an earlier installe
 
 ## 3. The Windows installer
 
+> [!NOTE]
+> The current release, PSO Web V2 `0.2.0-rc.3`, publishes its installer as an **experimental** asset ([Downloads](downloads/index.md)): an unencrypted developer distribution that bundles its private Node.js, needs no signer fingerprint, and installs silently only with the explicit acknowledgement `/VERYSILENT /SUPPRESSMSGBOXES /ACCEPTUNSIGNEDALPHA=1 /DIR=<folder>` (its `INSTALL.md`). Its Windows installation flow is not validated end to end; the portable ZIP is recommended. The encrypted, recipient-pinned flow below (`/SIGNER=`, Node.js on PATH) is the one of the historical `0.1.0-alpha.1` installer, kept as the reference for private encrypted releases.
+
 ```bash
-pso dist installer --platform windows --package pso.psopkg --bootstrap pso-bootstrap.mjs --trust keys/release.public.pem --name PSO-Web-0.1.0-alpha.1-win-x64 --out inst
+pso dist installer --platform windows --package pso.psopkg --bootstrap pso-bootstrap.mjs --trust keys/release.public.pem --name PSO-Web-<version>-win-x64 --out inst
 ```
 
 The command writes `pso-setup.iss` and compiles it with Inno Setup 6 or 7 (`ISCC` environment variable or the default install locations). Without Inno Setup it reports `BLOCKED` and exits `2`. The output is the installer plus a manifest with its SHA-256.
@@ -27890,7 +27939,7 @@ Every documentation build writes these files from the **same sources** as the HT
 
 All of them carry the framework version (0.2.0). They contain no credentials, keys or environment-specific values: the build never reads `.env` files or key material.
 
-The installed `0.2.0-rc.3` distribution reports the CLI/API version `0.2.0`; use the accompanying release label when matching an installed binary to these files. The current contexts describe the [official application structures](architecture/overview.md), [generator destinations](architecture/generators.md), [infrastructure engine](infrastructure/overview.md) and [migration path](reference/migration.md). Regenerate `pso ai:init` files after changing the installed CLI so an older repository instruction file does not override these conventions.
+The current release, PSO Web V2 `0.2.0-rc.3` ([Downloads](downloads/index.md)), reports the CLI/API version `0.2.0`; use the release label when matching an installed binary to these files. The current contexts describe the [official application structures](architecture/overview.md), [generator destinations](architecture/generators.md), [infrastructure engine](infrastructure/overview.md) and [migration path](reference/migration.md). Regenerate `pso ai:init` files after changing the installed CLI so an older repository instruction file does not override these conventions.
 
 Generate your own copy of the site:
 
@@ -30040,7 +30089,7 @@ Only the current documentation version is published; `docs/versions.json` lists 
 ## An upgrade procedure
 
 1. **Commit** your current state so the upgrade is a reviewable diff.
-2. Update an authorized portable installation with a matching, trusted `.psopkg` (`pso update install --package <file.psopkg>`), or update and rebuild an authorized framework checkout. Run `pso java:install` after changing releases if you use Spring services ([installation](getting-started/installation.md)); the installed rc.3 CLI uses `com.pso:*:0.2.0-rc.3`, while this source checkout builds its own `0.1.0-SNAPSHOT` artifacts.
+2. Update a portable installation with the trusted package of the new release (for rc.3: `pso update install --package <extracted-zip>\.pso-install\packages\0.2.0-rc.3.psopkg`, from the ZIP on [Downloads](downloads/index.md)), or update and rebuild an authorized framework checkout. Run `pso java:install` after changing releases if you use Spring services ([installation](getting-started/installation.md)); the installed rc.3 CLI uses `com.pso:*:0.2.0-rc.3`, while this source checkout builds its own `0.1.0-SNAPSHOT` artifacts.
 3. `pso validate` and `pso config:validate`: new rules show up as diagnostics, not as run-time surprises.
 4. Preview changes to generated files with the generators' `--dry-run`, e.g. `pso docker:init --dry-run`. A differing file is reported as a conflict and never overwritten silently.
 5. Apply what you want by hand or with `--force` for files you never edited; review the diff.

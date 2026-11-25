@@ -5,7 +5,7 @@
   "files": [
     {
       "file": "ai/complete.md",
-      "sha256": "021dc33991dd52b7a75c315039f75b15fdd157e5c7abf1aa722f5e39da477d03",
+      "sha256": "00453658a21f9602c2192533b22b06bf4c3814afb48bcda7c75917c9757812c5",
       "scopes": [
         "core",
         "architecture",
@@ -78,7 +78,7 @@
     },
     {
       "file": "ai/devops.md",
-      "sha256": "c5162a045d4e807af4aa3e80dcfe1fb491ffd7706118609deed947f730ea7127",
+      "sha256": "08be4792f482eed06048aacb7d276b51ddadc378e42b35d7c721be5da93e3af3",
       "scopes": [
         "core",
         "devops"
@@ -86,7 +86,7 @@
     },
     {
       "file": "ai/docs-refs.md",
-      "sha256": "5b6d4a5d6ba541e09dcea9c08a48a34135e1981bc50eeebe154dafde8e5cf8c7",
+      "sha256": "490b950951187db890b29cb1f5f107435039670f44dbfe96f6afab316a14e7b4",
       "scopes": [
         "core",
         "docs-refs"
@@ -121,7 +121,7 @@
     },
     {
       "file": "ai/configure-docker.md",
-      "sha256": "168db0249fd573b40f7351a2ca28d973290f8eea8db43534e4ebbe282696b334",
+      "sha256": "f0ae23a00365b9f43d269ec3f24b0a501cab055e09d11246702ff2d793e2fea6",
       "scopes": [
         "core",
         "devops",
@@ -225,21 +225,21 @@
     },
     {
       "file": "ai/AGENTS.md",
-      "sha256": "e495505a77911dda49b8d14e66c80010447bc1ab3997d8dfe7e92df7e8dc61d8",
+      "sha256": "dd04ff8a3203ebc98caf4a7a74cd24735fac536b535eff8caa19f86c44f37be8",
       "scopes": [
         "complete"
       ]
     },
     {
       "file": "ai/CLAUDE.md",
-      "sha256": "1f6d4c53d5d7d7f67eea308c89acff0c31a1a07f5a95ca99e130c897e04f0ad4",
+      "sha256": "37f163638448d075dd1e6b377eac6ec70af321fa0e725d46b2214f9b85b82ea8",
       "scopes": [
         "complete"
       ]
     },
     {
       "file": "ai/copilot-instructions.md",
-      "sha256": "b7e5664ba618ed47549f46887ebc7ceede75eb963792a1b57b71c252a93a40f5",
+      "sha256": "cae84b279f244cdc48dc84f4bd5ed5700822669754157d12aed5345b22232f93",
       "scopes": [
         "complete"
       ]

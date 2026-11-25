@@ -11,7 +11,7 @@ Only the current documentation version is published; `docs/versions.json` lists 
 ## An upgrade procedure
 
 1. **Commit** your current state so the upgrade is a reviewable diff.
-2. Update an authorized portable installation with a matching, trusted `.psopkg` (`pso update install --package <file.psopkg>`), or update and rebuild an authorized framework checkout. Run `pso java:install` after changing releases if you use Spring services ([installation](getting-started/installation.md)); the installed rc.3 CLI uses `com.pso:*:0.2.0-rc.3`, while this source checkout builds its own `0.1.0-SNAPSHOT` artifacts.
+2. Update a portable installation with the trusted package of the new release (for rc.3: `pso update install --package <extracted-zip>\.pso-install\packages\0.2.0-rc.3.psopkg`, from the ZIP on [Downloads](downloads/index.md)), or update and rebuild an authorized framework checkout. Run `pso java:install` after changing releases if you use Spring services ([installation](getting-started/installation.md)); the installed rc.3 CLI uses `com.pso:*:0.2.0-rc.3`, while this source checkout builds its own `0.1.0-SNAPSHOT` artifacts.
 3. `pso validate` and `pso config:validate`: new rules show up as diagnostics, not as run-time surprises.
 4. Preview changes to generated files with the generators' `--dry-run`, e.g. `pso docker:init --dry-run`. A differing file is reported as a conflict and never overwritten silently.
 5. Apply what you want by hand or with `--force` for files you never edited; review the diff.

@@ -21,7 +21,7 @@ Version: 0.2.0. Features marked "not implemented" in a page are design notes, no
 
 ## Downloads
 
-- [Downloads](md/downloads/index.md): Current PSO Web distribution status, the available private portable preview, verification and Windows installation limits.
+- [Downloads](md/downloads/index.md): Download PSO Web V2 (0.2.0-rc.3) for Windows x64 - the recommended portable ZIP and the experimental installer - verify them, install, update and roll back; earlier releases are listed as historical.
 
 ## Tutorials
 

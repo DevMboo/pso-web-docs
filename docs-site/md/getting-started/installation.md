@@ -5,11 +5,11 @@
 > Status: PARTIALLY implemented — read the limitations.
 
 > [!NOTE]
-> The installed distribution on the validation machine is `0.2.0-rc.3`; its CLI reports version `0.2.0`. That candidate is not yet published in the private releases repository. [Downloads](downloads/index.md) identifies the older, published alpha.2 portable preview. Do not substitute its files for rc.3.
+> The current release is **PSO Web V2, `0.2.0-rc.3`**; its CLI reports version `0.2.0`. Download it from [Downloads](downloads/index.md) (the private release [`v0.2.0-rc.3`](https://github.com/DevMboo/pso-web-releases/releases/tag/v0.2.0-rc.3)). The 0.1 alpha releases listed there are historical: do not substitute their files for rc.3.
 
-## Option 1: an authorized portable Windows distribution
+## Option 1: the portable Windows distribution (recommended)
 
-The portable ZIP is the supported form for the current release candidate while the Windows installer is unsigned and unvalidated end to end. It needs Windows 10/11 x64, but bundles a private Node.js runtime: you do **not** install Node.js system-wide. Obtain the ZIP and its matching `SHA256SUMS`, detached signature and public key from an authorized release channel. Confirm the ZIP's SHA-256 before extraction; see [Downloads](downloads/index.md) for published assets and security limits.
+The portable ZIP is the supported form for the current release candidate while the Windows installer is unsigned and unvalidated end to end. It needs Windows 10/11 x64, but bundles a private Node.js runtime: you do **not** install Node.js system-wide. Download `PSO-Web-0.2.0-rc.3-win-x64-portable.zip` and its `SHA256SUMS`, `SHA256SUMS.sig` and `release-signing-key.public.pem` from the [release page](https://github.com/DevMboo/pso-web-releases/releases/tag/v0.2.0-rc.3). Confirm the ZIP's SHA-256 (`77eb495bd93a74c22f65c5af8692a535417f5939d95759dfbd9880d6ffca57d0`) before extraction; see [Downloads](downloads/index.md) for verification and security limits. The experimental installer `PSO-Web-0.2.0-rc.3-win-x64.exe` carries the same content but is not validated end to end.
 
 1. Extract to a writable folder such as `%LOCALAPPDATA%\PSO` or `C:\Tools\pso`. Avoid `Program Files`; no administrator rights are needed.
 2. Run `pso.cmd` from the extracted folder and check the installation:
