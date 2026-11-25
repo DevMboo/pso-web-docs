@@ -5,7 +5,7 @@
   "files": [
     {
       "file": "ai/complete.md",
-      "sha256": "d448c9de892cf643d58b3119e85718ab5bd0649bec9491d941fcc75025245c5a",
+      "sha256": "e2485a4420b376bd8d172724804f850b2637efb77962bf806cac6cfec4f1270c",
       "scopes": [
         "core",
         "architecture",
@@ -86,7 +86,7 @@
     },
     {
       "file": "ai/docs-refs.md",
-      "sha256": "281b80e088a4d5a9d65235212cbd1001c3165ec44cfc822685f3131460632e50",
+      "sha256": "f58e189aff44377c91a1a5f7b4f942e1b66dce3e1c76ebcf89b826c7826a22cf",
       "scopes": [
         "core",
         "docs-refs"
@@ -225,21 +225,21 @@
     },
     {
       "file": "ai/AGENTS.md",
-      "sha256": "b4690fa2bc845309bf99f1d446dfaa467dec6e28c4f0d4359b2c24761297b9f5",
+      "sha256": "3f2b04f4840acc702088140f930f328f03f01d98d669d089f24f74ddd29fd04e",
       "scopes": [
         "complete"
       ]
     },
     {
       "file": "ai/CLAUDE.md",
-      "sha256": "45b12deb6052120c03f055ee3fcaf234b06277dbbb863f18c730047ca7105634",
+      "sha256": "a9dc05ce8b233f070ad3c1f8d33c3e350b4f7ad68ada8815aab2f4dd05cc3e72",
       "scopes": [
         "complete"
       ]
     },
     {
       "file": "ai/copilot-instructions.md",
-      "sha256": "962f19c10be0f9c810b6352309bc45e367fd7dfc27d1af1d2a221ffd90274537",
+      "sha256": "b9a8b7a84102d85140dc951e748fc497f2ad3833f2bbcbad8066a27a2374654e",
       "scopes": [
         "complete"
       ]

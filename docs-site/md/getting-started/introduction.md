@@ -6,6 +6,10 @@
 
 > Structure declares. Modules compose. Contracts validate. The framework executes.
 
+## License
+
+PSO Web Framework is free and open-source software, licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0). It has no telemetry, license check or paid tier ([privacy policy](downloads/privacy-policy.md)).
+
 ## The problem it solves
 
 Every system made of a public gateway and a few services repeats the same decisions: where files go, how a gateway route reaches the service that implements it, who may call what, how tokens are checked twice, how the whole thing starts on a laptop, and how to find out that a change broke the wiring. Each team re-solves these, differently, and the answers drift apart as the code grows.

@@ -12,6 +12,10 @@
 
 > Structure declares. Modules compose. Contracts validate. The framework executes.
 
+## License
+
+PSO Web Framework is free and open-source software, licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0). It has no telemetry, license check or paid tier ([privacy policy](downloads/privacy-policy.md)).
+
 ## The problem it solves
 
 Every system made of a public gateway and a few services repeats the same decisions: where files go, how a gateway route reaches the service that implements it, who may call what, how tokens are checked twice, how the whole thing starts on a laptop, and how to find out that a change broke the wiring. Each team re-solves these, differently, and the answers drift apart as the code grows.
@@ -285,7 +289,7 @@ They are not a promise that your application is correct. They make one kind of m
 | Maven | **not required** | each service carries a project-local Maven Wrapper (Maven 3.9.9, SHA-256 pinned) that downloads Maven from Maven Central on first use |
 | Docker | optional | `pso docker:build`, the generated Compose stack, and running real brokers or PostgreSQL locally |
 
-Windows, macOS and Linux are supported by the CLI from an authorized checkout. The current release, PSO Web V2 `0.2.0-rc.3`, is distributed for Windows 10/11 x64 as a portable ZIP (recommended) and an experimental, unsigned installer that is not validated end to end ([Downloads](downloads/index.md)).
+Windows, macOS and Linux are supported by the CLI from a checkout of the source. The current release, PSO Web V2 `0.2.0-rc.3`, is distributed for Windows 10/11 x64 as a portable ZIP (recommended) and an experimental, unsigned installer that is not validated end to end ([Downloads](downloads/index.md)).
 
 > [!NOTE]
 > **Which Node version?** Node 24 or newer. The framework packages and the generated orchestrator declare `engines.node >=24`, `pso doctor` requires 24 (it prints `>=24`), and every test of this framework ran on Node 24.
@@ -352,7 +356,7 @@ ok      docker  Docker version 29.6.1, build 8900f1d  (optional)
 
 # Installation
 
-> Use the portable Windows distribution or an authorized framework checkout, install matching Java dependencies, verify files, update and roll back.
+> Use the portable Windows distribution or a checkout of the framework's source (Apache License 2.0), install matching Java dependencies, verify files, update and roll back.
 
 > Status: PARTIALLY implemented — read the limitations.
 
@@ -386,7 +390,7 @@ cd .\catalog
 .\mvnw.cmd test
 ```
 
-If your authorized distribution provides the Maven file repository separately, use `pso java:install --from <maven-repository-dir>`. The source-checkout workflow below uses its own Java version; do not mix its SNAPSHOT artifacts with a release candidate. See [Maven BOM and versions](spring/maven-bom.md).
+If your distribution provides the Maven file repository separately, use `pso java:install --from <maven-repository-dir>`. The source-checkout workflow below uses its own Java version; do not mix its SNAPSHOT artifacts with a release candidate. See [Maven BOM and versions](spring/maven-bom.md).
 
 ### Maintain and update
 
@@ -401,7 +405,7 @@ pso update rollback
 
 `integrity check` is read-only. Repair restores the installed version from its authenticated package. Update verifies a newer signed package and keeps the prior version for rollback; it does not fetch an unreleased candidate or change your workspaces. If an update changes the Java artifacts, run `pso java:install` for the newly active release. A package signed by another key is refused. See [Version migration](reference/migration.md) before adopting new project structure or infrastructure features.
 
-## Option 2: an authorized framework checkout
+## Option 2: a framework checkout
 
 For framework development, install Node.js 24 or newer and build the checkout. The `@pso/*` npm packages are not published; `npm link` points to the checkout, and moving it breaks the command:
 
@@ -1560,6 +1564,8 @@ All diagnostic codes are listed in the [diagnostics reference](reference/diagnos
 
 **One ecosystem. Independent teams. Unified architecture.**
 
+PSO Web Framework is free and open-source software, licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0). It has no telemetry, license check or paid tier ([privacy policy](downloads/privacy-policy.md)). The maintainer is [DevMboo](https://github.com/DevMboo).
+
 > [!NOTE]
 > **The current release is PSO Web V2, `0.2.0-rc.3`** (release candidate, private prerelease). It is the release this documentation
 > describes: the official application structures, the reference Product CRUD, the infrastructure engine and the layered Java event
@@ -1672,7 +1678,7 @@ Earlier releases stay available, unchanged, for compatibility and rollback; they
 | the bundled Node.js runtime `node.exe` | **not** re-signed: it keeps the OpenJS Foundation's own signature, which the build verifies |
 | scripts (`pso.cmd`, the Maven wrapper of generated projects) and JavaScript | cannot carry Authenticode signatures; covered by the package's signed per-file inventory (`pso integrity check --full`) |
 
-Only executables built from this project's own source code are signed. Upstream binaries are never signed with the project's certificate.
+Only executables built from this project's own source code (Apache License 2.0) are signed. Upstream binaries are never signed with the project's certificate.
 Every signed file carries the product name **PSO Web** and the release version (for example `0.2.0-rc.3`, numerically `0.2.0.0`) in its
 version information, the same values in every file of a release. Signatures use SHA-256 and an RFC 3161 timestamp.
 
@@ -25192,7 +25198,7 @@ Encryption controls who can *install* a release. It does not prevent an authoriz
 
 ## Protection and its limits
 
-The installed framework is a distribution assembled from an explicit, classified allowlist, not a copy of the development repository: no sources, no tests, no source maps, no internal reports. Its proprietary JavaScript is bundled and minified with internal identifiers mangled; the engines that hold the most algorithms receive additional string and control-flow transforms; the public SDK is left readable on purpose because developers build on it. The agent that runs on Linux servers is protected the same way.
+The installed framework is a distribution assembled from an explicit, classified allowlist, not a copy of the development repository: no sources, no tests, no source maps, no internal reports. Its JavaScript is bundled and minified with internal identifiers mangled; the engines that hold the most algorithms receive additional string and control-flow transforms; the public SDK is left readable on purpose because developers build on it. The agent that runs on Linux servers is protected the same way.
 
 This raises the effort of reading and re-creating the implementation. It does **not** make it impossible: the code runs on the recipient's machine, so a determined developer with debugging tools or AI-assisted deobfuscation can still recover its behaviour. No anti-debugging, no antivirus evasion and no destructive anti-tamper is used. Installed files are checked against a signed inventory (`pso integrity check`) and repaired from the authenticated, encrypted package; that detects accidental damage and casual edits, and it is not a security boundary against the device owner.
 
@@ -25212,7 +25218,7 @@ PASSED   reproducible tarballs - two independent packs have identical integrity
 PASSED   content policy - no tests, maps, env files or key material in any tarball
 PASSED   secret scan - 6 secret patterns, no findings
 PASSED   SBOM (CycloneDX) - 39 components, production tree from package-lock.json
-PASSED   licence inventory - licences: MIT, Apache-2.0, BSD-3-Clause, ISC; own packages UNLICENSED (no licence granted)
+PASSED   licence inventory - licences: MIT, Apache-2.0, BSD-3-Clause, ISC; own packages Apache-2.0
 NOT RUN  vulnerability audit - --skip-audit
 PASSED   checksums + provenance - SHA256SUMS, manifest.json, provenance.json (self-asserted, not an attested SLSA build)
 PASSED   signing - Ed25519 signature of SHA256SUMS and manifest.json (verify with signing-key.public.pem)
@@ -25230,7 +25236,7 @@ What this evidence does and does not give you:
 | provenance | **self-asserted** by the build machine; not an attested SLSA build (that needs a hosted builder that signs it) |
 | GPG signatures for Maven Central, Authenticode for Windows | not done: they need keys and certificates only you can provide |
 | vulnerability scanning | `npm audit` for the production tree; Maven dependencies are not scanned |
-| licence | the packages declare `UNLICENSED`; choosing a licence is a decision for the owner (see `docs/commercial/licensing-status.md` in the repository) |
+| licence | PSO Web Framework is licensed under Apache-2.0: every package declares it and ships `LICENSE` and `NOTICE`; third-party licenses are inventoried per release (`docs/commercial/licensing-status.md` in the repository) |
 
 
 ## Variations
@@ -27954,7 +27960,7 @@ From lowest to highest: framework defaults, workspace, service `pso.config.json`
 
 **PSO AI Context** is a set of generated instructions that tell an AI coding assistant how PSO works: the architecture, directory conventions, the module and route contracts, decorator semantics, the CLI commands that really exist, the security model and the rules for generating code.
 
-For the current `0.2.0-rc.3` distribution the official structures are **mandatory for all new code**: the modular TypeScript orchestrator (`src/.app/`, `src/modules/`, `src/shared/`) and the layered Java service (`application/`, `infrastructure/`, `shared/`; never `providers`, `modules` or `.app` in Java). Only an existing 0.1 project keeps its own layout, and the two are never mixed in one project. New projects include the functional Product CRUD by default; `--template empty` omits it. The [structure migration guide](architecture/structure-migration.md) explains how to inspect an older project without moving its files.
+PSO Web Framework is free and open-source software under the Apache License 2.0. For the current `0.2.0-rc.3` distribution the official structures are **mandatory for all new code**: the modular TypeScript orchestrator (`src/.app/`, `src/modules/`, `src/shared/`) and the layered Java service (`application/`, `infrastructure/`, `shared/`; never `providers`, `modules` or `.app` in Java). Only an existing 0.1 project keeps its own layout, and the two are never mixed in one project. New projects include the functional Product CRUD by default; `--template empty` omits it. The [structure migration guide](architecture/structure-migration.md) explains how to inspect an older project without moving its files.
 
 ## Why it exists
 
@@ -30239,7 +30245,7 @@ Only the current documentation version is published; `docs/versions.json` lists 
 ## An upgrade procedure
 
 1. **Commit** your current state so the upgrade is a reviewable diff.
-2. Update a portable installation with the trusted package of the new release (for rc.3: `pso update install --package <extracted-zip>\.pso-install\packages\0.2.0-rc.3.psopkg`, from the ZIP on [Downloads](downloads/index.md)), or update and rebuild an authorized framework checkout. Run `pso java:install` after changing releases if you use Spring services ([installation](getting-started/installation.md)); the installed rc.3 CLI uses `com.pso:*:0.2.0-rc.3`, while this source checkout builds its own `0.1.0-SNAPSHOT` artifacts.
+2. Update a portable installation with the trusted package of the new release (for rc.3: `pso update install --package <extracted-zip>\.pso-install\packages\0.2.0-rc.3.psopkg`, from the ZIP on [Downloads](downloads/index.md)), or update and rebuild a framework checkout. Run `pso java:install` after changing releases if you use Spring services ([installation](getting-started/installation.md)); the installed rc.3 CLI uses `com.pso:*:0.2.0-rc.3`, while this source checkout builds its own `0.1.0-SNAPSHOT` artifacts.
 3. `pso validate` and `pso config:validate`: new rules show up as diagnostics, not as run-time surprises.
 4. Preview changes to generated files with the generators' `--dry-run`, e.g. `pso docker:init --dry-run`. A differing file is reported as a conflict and never overwritten silently.
 5. Apply what you want by hand or with `--force` for files you never edited; review the diff.

@@ -231,7 +231,7 @@ Encryption controls who can *install* a release. It does not prevent an authoriz
 
 ## Protection and its limits
 
-The installed framework is a distribution assembled from an explicit, classified allowlist, not a copy of the development repository: no sources, no tests, no source maps, no internal reports. Its proprietary JavaScript is bundled and minified with internal identifiers mangled; the engines that hold the most algorithms receive additional string and control-flow transforms; the public SDK is left readable on purpose because developers build on it. The agent that runs on Linux servers is protected the same way.
+The installed framework is a distribution assembled from an explicit, classified allowlist, not a copy of the development repository: no sources, no tests, no source maps, no internal reports. Its JavaScript is bundled and minified with internal identifiers mangled; the engines that hold the most algorithms receive additional string and control-flow transforms; the public SDK is left readable on purpose because developers build on it. The agent that runs on Linux servers is protected the same way.
 
 This raises the effort of reading and re-creating the implementation. It does **not** make it impossible: the code runs on the recipient's machine, so a determined developer with debugging tools or AI-assisted deobfuscation can still recover its behaviour. No anti-debugging, no antivirus evasion and no destructive anti-tamper is used. Installed files are checked against a signed inventory (`pso integrity check`) and repaired from the authenticated, encrypted package; that detects accidental damage and casual edits, and it is not a security boundary against the device owner.
 
@@ -251,7 +251,7 @@ PASSED   reproducible tarballs - two independent packs have identical integrity
 PASSED   content policy - no tests, maps, env files or key material in any tarball
 PASSED   secret scan - 6 secret patterns, no findings
 PASSED   SBOM (CycloneDX) - 39 components, production tree from package-lock.json
-PASSED   licence inventory - licences: MIT, Apache-2.0, BSD-3-Clause, ISC; own packages UNLICENSED (no licence granted)
+PASSED   licence inventory - licences: MIT, Apache-2.0, BSD-3-Clause, ISC; own packages Apache-2.0
 NOT RUN  vulnerability audit - --skip-audit
 PASSED   checksums + provenance - SHA256SUMS, manifest.json, provenance.json (self-asserted, not an attested SLSA build)
 PASSED   signing - Ed25519 signature of SHA256SUMS and manifest.json (verify with signing-key.public.pem)
@@ -269,7 +269,7 @@ What this evidence does and does not give you:
 | provenance | **self-asserted** by the build machine; not an attested SLSA build (that needs a hosted builder that signs it) |
 | GPG signatures for Maven Central, Authenticode for Windows | not done: they need keys and certificates only you can provide |
 | vulnerability scanning | `npm audit` for the production tree; Maven dependencies are not scanned |
-| licence | the packages declare `UNLICENSED`; choosing a licence is a decision for the owner (see `docs/commercial/licensing-status.md` in the repository) |
+| licence | PSO Web Framework is licensed under Apache-2.0: every package declares it and ships `LICENSE` and `NOTICE`; third-party licenses are inventoried per release (`docs/commercial/licensing-status.md` in the repository) |
 
 
 ## Variations

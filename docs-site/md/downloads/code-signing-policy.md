@@ -17,7 +17,7 @@
 | the bundled Node.js runtime `node.exe` | **not** re-signed: it keeps the OpenJS Foundation's own signature, which the build verifies |
 | scripts (`pso.cmd`, the Maven wrapper of generated projects) and JavaScript | cannot carry Authenticode signatures; covered by the package's signed per-file inventory (`pso integrity check --full`) |
 
-Only executables built from this project's own source code are signed. Upstream binaries are never signed with the project's certificate.
+Only executables built from this project's own source code (Apache License 2.0) are signed. Upstream binaries are never signed with the project's certificate.
 Every signed file carries the product name **PSO Web** and the release version (for example `0.2.0-rc.3`, numerically `0.2.0.0`) in its
 version information, the same values in every file of a release. Signatures use SHA-256 and an RFC 3161 timestamp.
 

@@ -1,6 +1,6 @@
 # Installation
 
-> Use the portable Windows distribution or an authorized framework checkout, install matching Java dependencies, verify files, update and roll back.
+> Use the portable Windows distribution or a checkout of the framework's source (Apache License 2.0), install matching Java dependencies, verify files, update and roll back.
 
 > Status: PARTIALLY implemented — read the limitations.
 
@@ -34,7 +34,7 @@ cd .\catalog
 .\mvnw.cmd test
 ```
 
-If your authorized distribution provides the Maven file repository separately, use `pso java:install --from <maven-repository-dir>`. The source-checkout workflow below uses its own Java version; do not mix its SNAPSHOT artifacts with a release candidate. See [Maven BOM and versions](spring/maven-bom.md).
+If your distribution provides the Maven file repository separately, use `pso java:install --from <maven-repository-dir>`. The source-checkout workflow below uses its own Java version; do not mix its SNAPSHOT artifacts with a release candidate. See [Maven BOM and versions](spring/maven-bom.md).
 
 ### Maintain and update
 
@@ -49,7 +49,7 @@ pso update rollback
 
 `integrity check` is read-only. Repair restores the installed version from its authenticated package. Update verifies a newer signed package and keeps the prior version for rollback; it does not fetch an unreleased candidate or change your workspaces. If an update changes the Java artifacts, run `pso java:install` for the newly active release. A package signed by another key is refused. See [Version migration](reference/migration.md) before adopting new project structure or infrastructure features.
 
-## Option 2: an authorized framework checkout
+## Option 2: a framework checkout
 
 For framework development, install Node.js 24 or newer and build the checkout. The `@pso/*` npm packages are not published; `npm link` points to the checkout, and moving it breaks the command:
 
