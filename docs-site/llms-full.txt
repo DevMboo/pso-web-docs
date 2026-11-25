@@ -14,7 +14,7 @@
 
 ## License
 
-PSO Web Framework is free and open-source software, licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0). It has no telemetry, license check or paid tier ([privacy policy](downloads/privacy-policy.md)).
+PSO Web Framework is free and open-source software, licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0). It has no telemetry, license check or paid tier ([privacy policy](downloads/privacy-policy.md)). The source code is public at [github.com/DevMboo/pso-web-framework](https://github.com/DevMboo/pso-web-framework).
 
 ## The problem it solves
 
@@ -1564,7 +1564,7 @@ All diagnostic codes are listed in the [diagnostics reference](reference/diagnos
 
 **One ecosystem. Independent teams. Unified architecture.**
 
-PSO Web Framework is free and open-source software, licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0). It has no telemetry, license check or paid tier ([privacy policy](downloads/privacy-policy.md)). The maintainer is [DevMboo](https://github.com/DevMboo).
+PSO Web Framework is free and open-source software, licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0). It has no telemetry, license check or paid tier ([privacy policy](downloads/privacy-policy.md)). The maintainer is [DevMboo](https://github.com/DevMboo). The source code is public at [github.com/DevMboo/pso-web-framework](https://github.com/DevMboo/pso-web-framework).
 
 > [!NOTE]
 > **The current release is PSO Web V2, `0.2.0-rc.3`** (release candidate, private prerelease). It is the release this documentation
@@ -1684,7 +1684,7 @@ version information, the same values in every file of a release. Signatures use 
 
 ## How a release is built and approved
 
-1. A release is built by GitHub Actions on GitHub-hosted runners from a tagged commit of the public source repository. Build scripts and
+1. A release is built by GitHub Actions on GitHub-hosted runners from a tagged commit of the public source repository ([github.com/DevMboo/pso-web-framework](https://github.com/DevMboo/pso-web-framework)). Build scripts and
    CI configuration are part of that repository. No artifact built on a developer's machine is submitted for signing.
 2. The build submits each artifact to the signing service by its GitHub artifact identifier, so the service can verify that it was built
    by that workflow from that commit.
