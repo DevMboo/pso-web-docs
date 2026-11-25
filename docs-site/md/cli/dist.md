@@ -7,12 +7,12 @@ Build, sign, encrypt, verify and extract signed .psopkg distribution packages fr
 ## Usage
 
 ```text
-pso dist keygen --kind <signing|recipient> --out <dir> [--name <name>] | build [--config <file>] [--out <stage>] | pack --stage <dir> --sign-key <file> [--config <file>] [--out <file.psopkg>] [--encrypt --recipient <public.pem[,more]>] | verify <file> --trust <public.pem[,more]> [--key <recipient-private.pem>] | inspect <file> --trust <public.pem> | extract <file> --to <dir> --trust <public.pem> [--key <recipient-private.pem>] [--overwrite] | installer --platform windows --package <file.psopkg> --bootstrap <pso-bootstrap.mjs> --trust <release.public.pem> [--name <file name>] [--out <dir>] [--publisher <certificate common name> | --dev-distribution] [--runtime <node.exe> --runtime-license <file>] [--json]
+pso dist keygen --kind <signing|recipient> --out <dir> [--name <name>] | build [--config <file>] [--out <stage>] | pack --stage <dir> --sign-key <file> [--config <file>] [--out <file.psopkg>] [--encrypt --recipient <public.pem[,more]>] | verify <file> --trust <public.pem[,more]> [--key <recipient-private.pem>] | inspect <file> --trust <public.pem> | extract <file> --to <dir> --trust <public.pem> [--key <recipient-private.pem>] [--overwrite] | installer --platform windows --package <file.psopkg> --bootstrap <pso-bootstrap.mjs> --trust <release.public.pem> [--name <file name>] [--out <dir>] [--publisher <certificate common name> [--sign-command <command with $f> | --signed-uninstaller-dir <dir>] [--app-publisher <name>] | --dev-distribution] [--runtime <node.exe> --runtime-license <file>] [--json]
 ```
 
 ## Flags
 
-`--kind`, `--out`, `--name`, `--config`, `--stage`, `--sign-key`, `--encrypt`, `--recipient`, `--trust`, `--key`, `--to`, `--overwrite`, `--platform`, `--package`, `--bootstrap`, `--publisher`, `--dev-distribution`, `--runtime`, `--runtime-license`, `--json`.
+`--kind`, `--out`, `--name`, `--config`, `--stage`, `--sign-key`, `--encrypt`, `--recipient`, `--trust`, `--key`, `--to`, `--overwrite`, `--platform`, `--package`, `--bootstrap`, `--publisher`, `--sign-command`, `--signed-uninstaller-dir`, `--app-publisher`, `--dev-distribution`, `--runtime`, `--runtime-license`, `--json`.
 
 ## Examples
 

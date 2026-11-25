@@ -1613,6 +1613,12 @@ Get-Content .\SHA256SUMS
 the release, it does **not** independently establish the publisher's identity: confirm the fingerprint through another channel
 before using it as an identity claim. Stop if a checksum or the signature differs.
 
+## Code signing policy
+
+No PSO Web release is Authenticode-signed yet. The [code signing policy](downloads/code-signing-policy.md) describes how signed releases
+will be built, approved and verified, and who is responsible for them; the [privacy policy](downloads/privacy-policy.md) states what PSO Web
+transfers over the network (nothing unless you ask for it).
+
 ## Install, update and roll back
 
 - **New installation:** extract the ZIP into a writable folder (for example `C:\Tools\pso`), run `.\pso.cmd --version` and
@@ -1644,6 +1650,131 @@ Earlier releases stay available, unchanged, for compatibility and rollback; they
 | --- | --- | --- |
 | [`v0.1.0-alpha.2`](https://github.com/DevMboo/pso-web-releases/releases/tag/v0.1.0-alpha.2) | `PSO-Web-0.1.0-alpha.2-win-x64-portable.zip` (SHA-256 `094b4cd555fd837d46688d45f82b9805b8c8c73667c6f63dc172f4f9c4c45dbe`) | 0.1 portable developer preview |
 | `v0.1.0-alpha.1` | 0.1 installer encrypted for one validation recipient | not a general installation path |
+
+---
+
+# Code signing policy
+
+> How PSO Web release executables are to be Authenticode-signed - current status (not signed yet), what is and is not signed, verifiable builds, manual approval of every signing request, team roles and the privacy policy.
+
+> [!IMPORTANT]
+> **Status: no PSO Web release is Authenticode-signed yet.** The project is preparing an application to the
+> [SignPath Foundation](https://signpath.org) free code-signing program for open-source projects. It has **not** been accepted, no
+> certificate has been issued, and nothing is signed through SignPath. `0.2.0-rc.3` is unsigned; Windows Smart App Control can block its
+> installer. This page describes the policy that signed releases will follow, and it will name the signing service once one is active.
+
+## What will be signed
+
+| File | Signing |
+|---|---|
+| the installer `PSO-Web-<version>-win-x64.exe` | signed by the project's code-signing certificate |
+| its uninstaller `unins000.exe`, which is also the temporary copy of Setup that runs from TEMP | signed by the same certificate, before it is embedded in the installer |
+| the bundled Node.js runtime `node.exe` | **not** re-signed: it keeps the OpenJS Foundation's own signature, which the build verifies |
+| scripts (`pso.cmd`, the Maven wrapper of generated projects) and JavaScript | cannot carry Authenticode signatures; covered by the package's signed per-file inventory (`pso integrity check --full`) |
+
+Only executables built from this project's own source code are signed. Upstream binaries are never signed with the project's certificate.
+Every signed file carries the product name **PSO Web** and the release version (for example `0.2.0-rc.3`, numerically `0.2.0.0`) in its
+version information, the same values in every file of a release. Signatures use SHA-256 and an RFC 3161 timestamp.
+
+## How a release is built and approved
+
+1. A release is built by GitHub Actions on GitHub-hosted runners from a tagged commit of the public source repository. Build scripts and
+   CI configuration are part of that repository. No artifact built on a developer's machine is submitted for signing.
+2. The build submits each artifact to the signing service by its GitHub artifact identifier, so the service can verify that it was built
+   by that workflow from that commit.
+3. **Every signing request is approved manually** by a signing approver, twice per release (uninstaller, then installer). The GitHub
+   environment of the release job also requires an approver before the job runs.
+4. The build then checks that the signed installer is exactly the submitted build plus its signature, and that Windows trusts the
+   signature. Only after that are checksums and manifests written.
+5. Publishing a release is a separate, manual step.
+
+## Team roles
+
+| Role | Responsibility | Members |
+|---|---|---|
+| Committers (authors) | may change the source code without an additional review | [DevMboo](https://github.com/DevMboo) |
+| Reviewers | review every change proposed by someone who is not a committer (pull requests) before it is merged | [DevMboo](https://github.com/DevMboo) |
+| Approvers | decide whether a release may be signed, and approve each signing request | [DevMboo](https://github.com/DevMboo) |
+
+All members use multi-factor authentication for the source repository and for the signing service. The team is responsible for the
+source code repository, the build scripts and every released artifact.
+
+## Privacy
+
+See the [privacy policy](downloads/privacy-policy.md): PSO Web transfers no information to other networked systems unless specifically
+requested by the user or the person installing or operating it.
+
+## What can go wrong
+
+- **A file signed by this project behaves maliciously or is misused:** report it with proof to the project (an issue in the source
+  repository) so the team can investigate; the signing service can revoke the certificate.
+- **A signed file does not match the source:** every signed release is reproducible from its tag by the published workflow; report any
+  difference.
+- **Windows still warns about a signed release:** a new certificate can need time to build reputation with Microsoft SmartScreen and
+  Smart App Control. Never switch Windows protection off; use the portable ZIP or wait.
+
+---
+
+# Privacy policy
+
+> What PSO Web transfers over the network and when - nothing unless you ask for it - what it changes on your machine, and the third-party services your own configuration can involve.
+
+PSO Web consists of the `pso` command-line tool, the orchestrator and Spring Boot runtime libraries it generates projects with, Studio,
+the deployment agent, the Windows installer and the portable distribution.
+
+> This program will not transfer any information to other networked systems unless specifically requested by the user or the person
+> installing or operating it.
+
+## No telemetry
+
+PSO Web contains no telemetry, analytics, crash reporting, usage statistics, advertising or license check. It does not contact a PSO server:
+there is none. The installer and the portable distribution make no network connection.
+
+## Connections you ask for
+
+Every connection below happens only because you run the command or configure the destination yourself:
+
+| What you do | Where the connection goes |
+|---|---|
+| `pso update check` / `pso update install --catalog <url>` | the catalog or package URL you give; without one the command refuses to run |
+| building generated projects (`npm`, `./mvnw`, `pso docker:up`) | the package registries and container registries your build uses (by default the npm registry, Maven Central, Docker Hub and Quay for Keycloak) |
+| running your applications (`pso dev`, `pso docker:up`) | your own services, databases, brokers and identity provider, as declared in your workspace |
+| OpenTelemetry export | only the collector endpoint you configure |
+| frontend applications built with PSO | the API endpoints you declare |
+| the deployment agent, server connections and agents (`pso connection:add`, `pso agent:enroll` and the related commands) and deployment health checks (`--health-url`) | the servers you add and enroll, and the URLs you give |
+| the Java dependency scan of the deployment agent | if you install [OSV-Scanner](https://google.github.io/osv-scanner/) on the build server, that tool sends the names and versions of the scanned Java dependencies to the OSV vulnerability database (osv.dev, operated by Google); without the tool installed nothing is sent and the scan is reported as not run |
+| Studio | binds to loopback on your machine; it is not reachable from other computers unless you start it with `--remote` |
+
+The privacy policies of those registries, identity providers, collectors and of OSV apply to what they receive.
+
+## Changes to your machine
+
+| Change | When, and how it is undone |
+|---|---|
+| a folder with the PSO installation | installer or portable ZIP; removed by the uninstaller or by deleting the folder |
+| your **user** PATH entry for PSO | only if you keep the installer option *Add PSO to my PATH*; restored exactly by the uninstaller |
+| the per-user uninstall entry (*Settings → Apps*) | installer only; removed by the uninstaller |
+| a marked block in the system `hosts` file | only when you run `pso infra:apply` for a local environment that needs it, after `pso infra:plan` shows it; it needs administrator rights, which PSO never requests itself; a backup is kept |
+
+PSO never disables or changes Windows security settings, never installs a trusted root certificate, and never elevates itself.
+
+## Data in your projects
+
+Secrets, keys and certificates that PSO generates for local development stay in your workspace (`.infra/`, git-ignored) or in your
+installation; they are never transferred. Logs and Studio mask tokens, credentials and known secret values.
+
+## This website
+
+The documentation site is a static site hosted by GitHub Pages; it loads no third-party scripts, fonts or analytics. GitHub's own privacy
+statement applies to the server logs of GitHub Pages.
+
+## What can go wrong
+
+- A dependency or container download fails because a registry is unreachable: PSO does not retry through any other service.
+- A corporate proxy or firewall may log the registry and update connections you start; that logging is outside PSO.
+- If you configure an OpenTelemetry collector or a remote identity provider, the data you send there is governed by that operator.
+
+Questions about this policy: open an issue in the project's repository.
 
 ---
 
@@ -15203,12 +15334,29 @@ The development key used for release candidates (`~/.pso-psd/keys/release.privat
 
 ### Windows code signing
 
-Needs a code-signing certificate from a public certificate authority (bought by the release owner; PSO does not provide one) and `node scripts/psd/sign-installer.mjs` (signtool with the certificate in a hardware token, a PFX, or a cloud signing service). Sign the existing installer artifact; do not rebuild it to sign it.
+A production release is Authenticode-signed during its build; there is no step that signs an installer afterwards, because the
+uninstaller is embedded in the installer and both must be signed before any checksum is computed.
+
+| What | How it is handled |
+|---|---|
+| the installer `PSO-Web-<version>-win-x64.exe` and its uninstaller `unins000.exe` | signed by the PSO publisher while Inno Setup compiles, together with the temporary copies Setup runs from TEMP (Windows SDK SignTool, SHA-256, RFC 3161 timestamp), each signature verified as Windows verifies it. Signing only the finished file would leave those copies unsigned, and Smart App Control blocks them |
+| the bundled `node.exe` | keeps the OpenJS Foundation's signature, which is verified; PSO never re-signs a third-party file |
+| `pso.cmd`, generated `mvnw.cmd` | scripts cannot carry Authenticode signatures: they are covered by the package's per-file integrity (`pso integrity check --full`) |
+| `.psopkg`, `SHA256SUMS` | unchanged Ed25519 signatures; `SHA256SUMS` is computed after signing and records the signed installer |
+
+The certificate is a publicly trusted code-signing certificate bought and held by the release owner (PSO provides none). Its key lives in
+hardware: a token, an HSM or a cloud signing service such as Azure Artifact Signing. The build reads the signing identity from the environment
+and never stores keys, passwords or tokens in the repository. A **release gate** stops the build when a required executable is unsigned,
+untrusted, untimestamped or signed by another publisher. An unsigned build exists only as an explicitly labelled development build.
+
+**Status:** the signing pipeline and the release gate are implemented and tested without a certificate. No certificate has been
+provisioned yet, so no PSO release is Authenticode-signed: `0.2.0-rc.3` is unsigned, and Smart App Control can block its installer.
+Acceptance of a signed release under Smart App Control is validated on an isolated Windows 11 machine before it is published.
 
 ## Before an official release
 
 1. The permanent release identity (above), authorized by the release owner.
-2. A trusted code-signing certificate and a signed installer.
+2. A trusted code-signing certificate, a production build that passes the Authenticode release gate, and its validation under Smart App Control on an isolated Windows 11 machine.
 3. Explicit approval to publish.
 
 ## What goes wrong
@@ -17537,12 +17685,12 @@ Build, sign, encrypt, verify and extract signed .psopkg distribution packages fr
 ## Usage
 
 ```text
-pso dist keygen --kind <signing|recipient> --out <dir> [--name <name>] | build [--config <file>] [--out <stage>] | pack --stage <dir> --sign-key <file> [--config <file>] [--out <file.psopkg>] [--encrypt --recipient <public.pem[,more]>] | verify <file> --trust <public.pem[,more]> [--key <recipient-private.pem>] | inspect <file> --trust <public.pem> | extract <file> --to <dir> --trust <public.pem> [--key <recipient-private.pem>] [--overwrite] | installer --platform windows --package <file.psopkg> --bootstrap <pso-bootstrap.mjs> --trust <release.public.pem> [--name <file name>] [--out <dir>] [--publisher <certificate common name> | --dev-distribution] [--runtime <node.exe> --runtime-license <file>] [--json]
+pso dist keygen --kind <signing|recipient> --out <dir> [--name <name>] | build [--config <file>] [--out <stage>] | pack --stage <dir> --sign-key <file> [--config <file>] [--out <file.psopkg>] [--encrypt --recipient <public.pem[,more]>] | verify <file> --trust <public.pem[,more]> [--key <recipient-private.pem>] | inspect <file> --trust <public.pem> | extract <file> --to <dir> --trust <public.pem> [--key <recipient-private.pem>] [--overwrite] | installer --platform windows --package <file.psopkg> --bootstrap <pso-bootstrap.mjs> --trust <release.public.pem> [--name <file name>] [--out <dir>] [--publisher <certificate common name> [--sign-command <command with $f> | --signed-uninstaller-dir <dir>] [--app-publisher <name>] | --dev-distribution] [--runtime <node.exe> --runtime-license <file>] [--json]
 ```
 
 ## Flags
 
-`--kind`, `--out`, `--name`, `--config`, `--stage`, `--sign-key`, `--encrypt`, `--recipient`, `--trust`, `--key`, `--to`, `--overwrite`, `--platform`, `--package`, `--bootstrap`, `--publisher`, `--dev-distribution`, `--runtime`, `--runtime-license`, `--json`.
+`--kind`, `--out`, `--name`, `--config`, `--stage`, `--sign-key`, `--encrypt`, `--recipient`, `--trust`, `--key`, `--to`, `--overwrite`, `--platform`, `--package`, `--bootstrap`, `--publisher`, `--sign-command`, `--signed-uninstaller-dir`, `--app-publisher`, `--dev-distribution`, `--runtime`, `--runtime-license`, `--json`.
 
 ## Examples
 
@@ -24973,6 +25121,8 @@ A foreign file placed in the root is left alone (observed in an earlier installe
 pso dist installer --platform windows --package pso.psopkg --bootstrap pso-bootstrap.mjs --trust keys/release.public.pem --name PSO-Web-<version>-win-x64 --out inst
 ```
 
+With `--publisher "<certificate common name>" --sign-command "<command containing $f>"` the installer is Authenticode-signed while it is built: Inno Setup runs the command on the uninstaller during compilation and on the finished installer (`SignTool=`, `SignedUninstaller=yes`) and refuses a file that comes back unsigned. The release pipeline passes `scripts/psd/codesign.mjs sign` (SHA-256, RFC 3161 timestamp) and then enforces its release gate ([release integrity](infrastructure/release-integrity-and-signing.md#windows-code-signing)). `--sign-command` is refused together with `--dev-distribution`.
+
 The command writes `pso-setup.iss` and compiles it with Inno Setup 6 or 7 (`ISCC` environment variable or the default install locations). Without Inno Setup it reports `BLOCKED` and exits `2`. The output is the installer plus a manifest with its SHA-256.
 
 The installer carries exactly three things, all extracted on demand to a temporary folder and none copied by Inno Setup itself:
@@ -24995,7 +25145,7 @@ $ ... the signer is not the one you pinned
 (non-zero exit; setup.log: SIGNER_NOT_TRUSTED ... Nothing was installed.)
 ```
 
-The result is **not Authenticode-signed**: that needs a code-signing certificate that PSO does not have. Integrity and authenticity come from the SHA-256 and the Ed25519 signature published with the release, checked against a fingerprint you received through a different channel.
+Without `--sign-command` the result is **not Authenticode-signed**: signing needs a publicly trusted code-signing certificate, which no PSO release has yet. Integrity and authenticity come from the SHA-256 and the Ed25519 signature published with the release, checked against a fingerprint you received through a different channel.
 
 ### What was verified, and what was not
 

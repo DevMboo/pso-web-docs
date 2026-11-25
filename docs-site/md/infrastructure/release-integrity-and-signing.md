@@ -85,12 +85,29 @@ The development key used for release candidates (`~/.pso-psd/keys/release.privat
 
 ### Windows code signing
 
-Needs a code-signing certificate from a public certificate authority (bought by the release owner; PSO does not provide one) and `node scripts/psd/sign-installer.mjs` (signtool with the certificate in a hardware token, a PFX, or a cloud signing service). Sign the existing installer artifact; do not rebuild it to sign it.
+A production release is Authenticode-signed during its build; there is no step that signs an installer afterwards, because the
+uninstaller is embedded in the installer and both must be signed before any checksum is computed.
+
+| What | How it is handled |
+|---|---|
+| the installer `PSO-Web-<version>-win-x64.exe` and its uninstaller `unins000.exe` | signed by the PSO publisher while Inno Setup compiles, together with the temporary copies Setup runs from TEMP (Windows SDK SignTool, SHA-256, RFC 3161 timestamp), each signature verified as Windows verifies it. Signing only the finished file would leave those copies unsigned, and Smart App Control blocks them |
+| the bundled `node.exe` | keeps the OpenJS Foundation's signature, which is verified; PSO never re-signs a third-party file |
+| `pso.cmd`, generated `mvnw.cmd` | scripts cannot carry Authenticode signatures: they are covered by the package's per-file integrity (`pso integrity check --full`) |
+| `.psopkg`, `SHA256SUMS` | unchanged Ed25519 signatures; `SHA256SUMS` is computed after signing and records the signed installer |
+
+The certificate is a publicly trusted code-signing certificate bought and held by the release owner (PSO provides none). Its key lives in
+hardware: a token, an HSM or a cloud signing service such as Azure Artifact Signing. The build reads the signing identity from the environment
+and never stores keys, passwords or tokens in the repository. A **release gate** stops the build when a required executable is unsigned,
+untrusted, untimestamped or signed by another publisher. An unsigned build exists only as an explicitly labelled development build.
+
+**Status:** the signing pipeline and the release gate are implemented and tested without a certificate. No certificate has been
+provisioned yet, so no PSO release is Authenticode-signed: `0.2.0-rc.3` is unsigned, and Smart App Control can block its installer.
+Acceptance of a signed release under Smart App Control is validated on an isolated Windows 11 machine before it is published.
 
 ## Before an official release
 
 1. The permanent release identity (above), authorized by the release owner.
-2. A trusted code-signing certificate and a signed installer.
+2. A trusted code-signing certificate, a production build that passes the Authenticode release gate, and its validation under Smart App Control on an isolated Windows 11 machine.
 3. Explicit approval to publish.
 
 ## What goes wrong

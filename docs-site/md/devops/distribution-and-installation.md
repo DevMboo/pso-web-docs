@@ -160,6 +160,8 @@ A foreign file placed in the root is left alone (observed in an earlier installe
 pso dist installer --platform windows --package pso.psopkg --bootstrap pso-bootstrap.mjs --trust keys/release.public.pem --name PSO-Web-<version>-win-x64 --out inst
 ```
 
+With `--publisher "<certificate common name>" --sign-command "<command containing $f>"` the installer is Authenticode-signed while it is built: Inno Setup runs the command on the uninstaller during compilation and on the finished installer (`SignTool=`, `SignedUninstaller=yes`) and refuses a file that comes back unsigned. The release pipeline passes `scripts/psd/codesign.mjs sign` (SHA-256, RFC 3161 timestamp) and then enforces its release gate ([release integrity](infrastructure/release-integrity-and-signing.md#windows-code-signing)). `--sign-command` is refused together with `--dev-distribution`.
+
 The command writes `pso-setup.iss` and compiles it with Inno Setup 6 or 7 (`ISCC` environment variable or the default install locations). Without Inno Setup it reports `BLOCKED` and exits `2`. The output is the installer plus a manifest with its SHA-256.
 
 The installer carries exactly three things, all extracted on demand to a temporary folder and none copied by Inno Setup itself:
@@ -182,7 +184,7 @@ $ ... the signer is not the one you pinned
 (non-zero exit; setup.log: SIGNER_NOT_TRUSTED ... Nothing was installed.)
 ```
 
-The result is **not Authenticode-signed**: that needs a code-signing certificate that PSO does not have. Integrity and authenticity come from the SHA-256 and the Ed25519 signature published with the release, checked against a fingerprint you received through a different channel.
+Without `--sign-command` the result is **not Authenticode-signed**: signing needs a publicly trusted code-signing certificate, which no PSO release has yet. Integrity and authenticity come from the SHA-256 and the Ed25519 signature published with the release, checked against a fingerprint you received through a different channel.
 
 ### What was verified, and what was not
 

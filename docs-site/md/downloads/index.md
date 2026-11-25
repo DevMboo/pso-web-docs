@@ -61,6 +61,12 @@ Get-Content .\SHA256SUMS
 the release, it does **not** independently establish the publisher's identity: confirm the fingerprint through another channel
 before using it as an identity claim. Stop if a checksum or the signature differs.
 
+## Code signing policy
+
+No PSO Web release is Authenticode-signed yet. The [code signing policy](downloads/code-signing-policy.md) describes how signed releases
+will be built, approved and verified, and who is responsible for them; the [privacy policy](downloads/privacy-policy.md) states what PSO Web
+transfers over the network (nothing unless you ask for it).
+
 ## Install, update and roll back
 
 - **New installation:** extract the ZIP into a writable folder (for example `C:\Tools\pso`), run `.\pso.cmd --version` and

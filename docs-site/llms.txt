@@ -22,6 +22,8 @@ Version: 0.2.0. Features marked "not implemented" in a page are design notes, no
 ## Downloads
 
 - [Downloads](md/downloads/index.md): Download PSO Web V2 (0.2.0-rc.3) for Windows x64 - the recommended portable ZIP and the experimental installer - verify them, install, update and roll back; earlier releases are listed as historical.
+- [Code signing policy](md/downloads/code-signing-policy.md): How PSO Web release executables are to be Authenticode-signed - current status (not signed yet), what is and is not signed, verifiable builds, manual approval of every signing request, team roles and the privacy policy.
+- [Privacy policy](md/downloads/privacy-policy.md): What PSO Web transfers over the network and when - nothing unless you ask for it - what it changes on your machine, and the third-party services your own configuration can involve.
 
 ## Tutorials
 
