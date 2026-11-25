@@ -60,15 +60,10 @@ So when you switch Dispatch on the documented way (`pso.dispatch.enabled: true` 
 | Not a broker | it proves nothing about delivery, ordering, redelivery after a crash or durability |
 | Real broker tests | an integration test that must use the broker selects it itself: `@SpringBootTest(properties = "pso.dispatch.provider=redis")`, with the broker URL from the environment |
 
-> [!WARNING]
-> **Known limitation in 0.2.0-rc.2.** In a service with the official layered structure, `pso make:dispatch-event`, `make:dispatch-handler`,
-> `make:event` and `make:listener` still write their classes to the 0.1 package `events/`, and `pso validate` then refuses the service
-> (`PSO_MISPLACED_RESOURCE`, and `PSO_STRUCTURE_MIXED` from `pso structure:inspect`). Until the generators are fixed, move the generated
-> classes to `application/event/` and change their `package` declaration (`pso structure:inspect --service <svc>` lists each move), then
-> run `pso validate`. The paths below are what the generators write; 0.1 services are not affected.
+The Dispatch classes of a layered service live in `application/event/` (`events/` in the 0.1 layout); a test of them uses the same package.
 
-```java title="src/test/java/com/pso/orders/events/OrdersPlacedBrokerTests.java (an integration test against the real broker)"
-package com.pso.orders.events;
+```java title="src/test/java/com/pso/orders/application/event/OrdersPlacedBrokerTests.java (an integration test against the real broker)"
+package com.pso.orders.application.event;
 
 import com.pso.dispatch.PsoDispatch;
 import org.junit.jupiter.api.Test;

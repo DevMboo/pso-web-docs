@@ -5,7 +5,7 @@
 > Status: PARTIALLY implemented — read the limitations.
 
 > [!NOTE]
-> The installed distribution on the validation machine is `0.2.0-rc.2`; its CLI reports version `0.2.0`. That candidate is not yet published in the private releases repository. [Downloads](downloads/index.md) identifies the older, published alpha.2 portable preview. Do not substitute its files for rc.2.
+> The installed distribution on the validation machine is `0.2.0-rc.3`; its CLI reports version `0.2.0`. That candidate is not yet published in the private releases repository. [Downloads](downloads/index.md) identifies the older, published alpha.2 portable preview. Do not substitute its files for rc.3.
 
 ## Option 1: an authorized portable Windows distribution
 
@@ -26,7 +26,7 @@ The ZIP writes no registry entries and does not alter a system Node.js installat
 
 ### Matching Java artifacts
 
-For generated Spring services, use JDK 21 or newer and run `pso java:install`. The installed rc.2 distribution contains its matching Maven file repository and generates services that request `com.pso:*:0.2.0-rc.2`; `java:install` copies those artifacts into your local Maven repository. It does not publish them to Maven Central. Then build a generated service with its Maven Wrapper:
+For generated Spring services, use JDK 21 or newer and run `pso java:install`. The installed rc.3 distribution contains its matching Maven file repository and generates services that request `com.pso:*:0.2.0-rc.3`; `java:install` copies those artifacts into your local Maven repository. It does not publish them to Maven Central. Then build a generated service with its Maven Wrapper:
 
 ```powershell
 pso java:install
@@ -62,7 +62,7 @@ npm link
 pso doctor
 ```
 
-Alternatively run `node path/to/pso-web-framework/packages/cli/bin/pso.js` without linking. A checkout also has `pso-java/`; there `pso java:install` builds and installs its `0.1.0-SNAPSHOT` artifacts, which are distinct from the installed rc.2 artifacts. Rebuild the checkout after source changes, and remove the global link with `npm unlink -g @pso/cli` when finished. [Installed versus development CLI](devops/installed-and-development-cli.md) explains how to identify which `pso` is running.
+Alternatively run `node path/to/pso-web-framework/packages/cli/bin/pso.js` without linking. A checkout also has `pso-java/`; there `pso java:install` builds and installs its `0.1.0-SNAPSHOT` artifacts, which are distinct from the installed rc.3 artifacts. Rebuild the checkout after source changes, and remove the global link with `npm unlink -g @pso/cli` when finished. [Installed versus development CLI](devops/installed-and-development-cli.md) explains how to identify which `pso` is running.
 
 ## Start a workspace
 
@@ -83,5 +83,5 @@ New projects use the [layered Java service](architecture/java-microservice.md) a
 | Windows blocks the extracted `pso.cmd` or a file of the ZIP (application control, Smart App Control) | the files are not publisher-signed | use only an authorized copy with a matching `SHA256SUMS`; never disable or bypass the protection |
 | `Get-Command pso -All` lists a development link first | an `npm link` of a checkout shadows the installed command | remove it (`npm unlink -g @pso/cli`) or call the installed `pso.cmd` by its full path |
 | `Non-resolvable import POM: com.pso:pso-bom` in a generated service | the matching Java artifacts are not in the local Maven repository | `pso java:install` with the installed distribution |
-| `does not carry com.pso:*:0.2.0-rc.2` from `pso java:install --from` | the repository is from another release | use the Maven repository of the same distribution |
+| `does not carry com.pso:*:0.2.0-rc.3` from `pso java:install --from` | the repository is from another release | use the Maven repository of the same distribution |
 | `integrity check` reports changed files | a file of the installation was modified or damaged | `pso repair --full`, or `pso update rollback` after a failed update |

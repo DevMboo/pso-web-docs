@@ -94,24 +94,20 @@ pso make:dispatch-handler orders.placed --service billing
 pso dispatch:validate
 ```
 
-> [!WARNING]
-> **Known limitation in 0.2.0-rc.2.** In a service with the official layered structure, `pso make:dispatch-event`, `make:dispatch-handler`,
-> `make:event` and `make:listener` still write their classes to the 0.1 package `events/`, and `pso validate` then refuses the service
-> (`PSO_MISPLACED_RESOURCE`, and `PSO_STRUCTURE_MIXED` from `pso structure:inspect`). Until the generators are fixed, move the generated
-> classes to `application/event/` and change their `package` declaration (`pso structure:inspect --service <svc>` lists each move), then
-> run `pso validate`. The paths below are what the generators write; 0.1 services are not affected.
+In a layered service the payload record and the handler are written to `application/event/` (package `<base>.application.event`);
+in a service with the 0.1 layout they go to `events/`.
 
 The publisher gets the declaration and the payload record; a consumer declares the same event with `--consume-only` (`"publish": false`) and gets a handler:
 
-```java title="orders: src/main/java/com/pso/orders/events/OrdersPlacedEvent.java (generated)"
-package com.pso.orders.events;
+```java title="orders: src/main/java/com/pso/orders/application/event/OrdersPlacedEvent.java (generated)"
+package com.pso.orders.application.event;
 
 public record OrdersPlacedEvent(String orderId, String customerId, double total) {
 }
 ```
 
-```java title="billing: src/main/java/com/pso/billing/events/OrdersPlacedHandler.java (generated)"
-package com.pso.billing.events;
+```java title="billing: src/main/java/com/pso/billing/application/event/OrdersPlacedHandler.java (generated)"
+package com.pso.billing.application.event;
 
 import com.pso.dispatch.ConsumeContext;
 import com.pso.dispatch.PsoEventHandler;
@@ -128,10 +124,10 @@ public class OrdersPlacedHandler {
 ```
 
 ```java title="orders: publishing (your code)"
-package com.pso.orders.application;
+package com.pso.orders.application.service;
 
 import com.pso.dispatch.PsoDispatch;
-import com.pso.orders.events.OrdersPlacedEvent;
+import com.pso.orders.application.event.OrdersPlacedEvent;
 import org.springframework.stereotype.Service;
 
 @Service

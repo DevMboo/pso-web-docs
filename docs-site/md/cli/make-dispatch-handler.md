@@ -24,7 +24,7 @@ pso make:dispatch-handler orders.placed --service gateway --group gateway-notifi
 ## What it changes
 
 - Generates a consumer of an event the project already declares.
-- Spring Boot: `events/OrdersPlacedHandler.java`, a component with a `@PsoEventHandler("orders.placed")` method.
+- Spring Boot: `application/event/OrdersPlacedHandler.java` (`events/` in a 0.1 service), a component with a `@PsoEventHandler("orders.placed")` method.
 - Orchestrator: a `@DispatchConsumer` class in `src/dispatch/<module>/`, listed in `consumers` of `EVENTS.pso.ts` (a consumer that is not listed never runs).
 
 ## Verify the result

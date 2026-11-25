@@ -8,7 +8,7 @@ reference Product CRUD, PostgreSQL and Flyway; `--template empty` creates the sa
 
 ```tree title="A new service (pso create service catalog)"
 catalog/
-  pom.xml  # generated: Spring Boot 3.5, the PSO BOM 0.2.0-rc.2 and starters
+  pom.xml  # generated: Spring Boot 3.5, the PSO BOM 0.2.0-rc.3 and starters
   mvnw  # generated: Maven Wrapper, with mvnw.cmd and .mvn/wrapper/maven-wrapper.properties
   src/
     main/
@@ -61,8 +61,7 @@ other services through `PsoHttpClient` (`infrastructure/client/`); its layers ar
 | event | `<package>/application/event/` | `*Event.java` |
 | listener | `<package>/application/event/` | `*Listener.java` |
 
-Known limitation of 0.2.0-rc.2: `make:event`, `make:listener`, `make:dispatch-event` and `make:dispatch-handler` still write to the 0.1
-package `events/`; move those classes to `application/event/` (and fix their `package` line) before `pso validate`.
+`make:event`, `make:listener`, `make:dispatch-event` and `make:dispatch-handler` write their classes to `application/event/`.
 
 Plain helper classes without one of these suffixes are allowed in any package of the service and are ignored by discovery. A class with
 a known suffix in the wrong package is `PSO_MISPLACED_RESOURCE`; a badly named one is `PSO_BAD_NAME`.

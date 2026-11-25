@@ -23,7 +23,7 @@ pso make:event order-placed --service orders
 
 ## What it changes
 
-- Writes `events/OrderPlacedEvent.java`: a record for a LOCAL Spring application event, published with `ApplicationEventPublisher` and delivered to `@EventListener` methods of the same process.
+- Writes `application/event/OrderPlacedEvent.java` (`events/` in a 0.1 service): a record for a LOCAL Spring application event, published with `ApplicationEventPublisher` and delivered to `@EventListener` methods of the same process.
 - It never leaves the service and is not stored. An event that other services receive is a PSO Dispatch event: `pso make:dispatch-event`.
 
 ## Failure cases

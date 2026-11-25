@@ -23,7 +23,7 @@ pso make:listener order-placed --service orders
 
 ## What it changes
 
-- Writes `events/OrderPlacedListener.java`: a component with an `@EventListener` method for the LOCAL application event of the same name (typed with `OrderPlacedEvent` when `pso make:event order-placed` created it).
+- Writes `application/event/OrderPlacedListener.java` (`events/` in a 0.1 service): a component with an `@EventListener` method for the LOCAL application event of the same name (typed with `OrderPlacedEvent` when `pso make:event order-placed` created it).
 - It is not a Dispatch consumer: events of other services are handled by a `@PsoEventHandler` method, generated with `pso make:dispatch-handler`.
 
 ## Failure cases

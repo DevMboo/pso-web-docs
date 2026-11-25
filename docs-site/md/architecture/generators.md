@@ -33,6 +33,7 @@ In the modular structure a provider, a service or a hook belongs to a module: `-
 | `pso make:entity <name>`, `make:repository <name>` | `infrastructure/entity`, `infrastructure/persistence` (a repository needs its entity) |
 | `pso make:config`, `make:filter`, `make:client <service>` | `infrastructure/config`, `infrastructure/filter`, `infrastructure/client` |
 | `pso make:exception <name>` | `shared/exception` |
+| `pso make:event <name>`, `make:listener <name>`, `make:dispatch-event <event.name>`, `make:dispatch-handler <event.name>` | `application/event` (the Dispatch declaration itself goes to `src/main/resources/dispatch/<service>.events.json`) |
 | `pso make:migration <name> --service <svc>` | `src/main/resources/db/migration/V<next>__<name>.sql` |
 
 `make:port` and `make:adapter` belong to the 0.1 hexagonal layout and are refused in a layered service.
@@ -61,10 +62,6 @@ length=MIN-MAX precision=P scale=S default=true|false sort filter`. Without `--f
 - No generator edits framework-managed infrastructure (`.infra/`) or a project's configuration files beyond the registrations listed above.
 
 ## Limits
-
-- In a layered service the event generators (`make:dispatch-event`, `make:dispatch-handler`, `make:event`, `make:listener`) still
-  write to the 0.1 package `events/`, which `pso validate` refuses: move those classes to `application/event/` and fix their package
-  (`pso structure:inspect` lists the moves). This is a known limitation of 0.2.0-rc.2.
 
 - `make:entity` writes the entity only: its table comes from a migration you add (`pso make:migration`), because Hibernate only
   validates the schema. In a service without a database `make:entity` and `make:repository` are refused with the command that adds one

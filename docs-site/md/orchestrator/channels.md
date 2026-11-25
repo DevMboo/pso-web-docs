@@ -99,6 +99,9 @@ pso make:notifier candidate --service recruitment-service --channel "candidate.{
   --event candidate.updated --fields "candidateId:string,status:string" --durable
 ```
 
+In a layered service `make:notifier` writes the payload record to `application/event/CandidateEvent.java` and the publishing service
+to `application/service/CandidateNotifier.java`; a 0.1 service gets `events/` and `application/`.
+
 ```java
 @Service
 public class RecruitmentNotificationService {

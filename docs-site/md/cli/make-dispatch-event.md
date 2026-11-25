@@ -36,7 +36,7 @@ pso make:dispatch-event orders.placed --service gateway --consume-only --fields 
 ## What it changes
 
 - Declares a DISTRIBUTED event: one that travels through the configured broker (Redis Streams, RabbitMQ, Kafka) to every service that declares it.
-- Spring Boot: adds the event with its schema to `src/main/resources/dispatch/<service>.events.json` and writes the payload record `events/OrdersPlacedEvent.java`.
+- Spring Boot: adds the event with its schema to `src/main/resources/dispatch/<service>.events.json` and writes the payload record `application/event/OrdersPlacedEvent.java` (`events/` in a 0.1 service).
 - Orchestrator: adds the event to `src/dispatch/<module>/EVENTS.pso.ts` (created when missing) and writes its schema under `schemas/`.
 - `--consume-only` declares an event another service publishes (`publish: false`).
 
@@ -46,7 +46,7 @@ This sample shows the shape of the result. Names, ports, digests and timings may
 
 ```text evidence="illustrative"
 updated    src/main/resources/dispatch/orders.events.json
-created    src/main/java/com/pso/orders/events/OrdersPlacedEvent.java
+created    src/main/java/com/pso/orders/application/event/OrdersPlacedEvent.java
 ```
 
 ## Verify the result

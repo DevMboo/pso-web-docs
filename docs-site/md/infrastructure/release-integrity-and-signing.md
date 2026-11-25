@@ -20,7 +20,7 @@ A checksum published next to the file proves integrity only as far as that page 
 ## Installing on Windows
 
 - **Portable ZIP** (recommended while the installer is unsigned): extract to a folder you can write to, run `.\pso.cmd --version`. A private Node.js runtime is bundled; nothing on the machine is changed.
-- **Installer** (`PSO-Web-<version>-win-x64.exe`, Inno Setup): an experimental local candidate. It is unsigned, its real installation flow has not been validated end to end, and it is not a supported installation method for rc.2.
+- **Installer** (`PSO-Web-<version>-win-x64.exe`, Inno Setup): an experimental local candidate. It is unsigned, its real installation flow has not been validated end to end, and it is not a supported installation method for rc.3.
 
 Maintenance of an installation (both forms):
 
@@ -43,7 +43,7 @@ Upgrading from 0.1.x keeps every workspace untouched: workspaces live outside th
 
 ### Windows installer limitations
 
-The installer of `0.2.0-rc.2` is not Authenticode-signed or published as a supported installation method. A prior rc.1 unsigned build was refused by Smart App Control on the validation machine ("An Application Control policy blocked this file", Code Integrity event 3077), showing that acceptance of one unsigned file does not predict acceptance of another. PSO never asks you to switch Smart App Control, SmartScreen or Defender off. Use an **authorized portable ZIP** until the installer is signed and its installation flow validated. The rc.2 portable candidate is not yet published in the private releases repository.
+The installer of `0.2.0-rc.3` is not Authenticode-signed or published as a supported installation method. A prior rc.1 unsigned build was refused by Smart App Control on the validation machine ("An Application Control policy blocked this file", Code Integrity event 3077), showing that acceptance of one unsigned file does not predict acceptance of another. PSO never asks you to switch Smart App Control, SmartScreen or Defender off. Use an **authorized portable ZIP** until the installer is signed and its installation flow validated. The rc.3 portable candidate is not yet published in the private releases repository.
 
 ## The permanent PSO release signing identity
 

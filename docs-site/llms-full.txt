@@ -357,7 +357,7 @@ ok      docker  Docker version 29.6.1, build 8900f1d  (optional)
 > Status: PARTIALLY implemented — read the limitations.
 
 > [!NOTE]
-> The installed distribution on the validation machine is `0.2.0-rc.2`; its CLI reports version `0.2.0`. That candidate is not yet published in the private releases repository. [Downloads](downloads/index.md) identifies the older, published alpha.2 portable preview. Do not substitute its files for rc.2.
+> The installed distribution on the validation machine is `0.2.0-rc.3`; its CLI reports version `0.2.0`. That candidate is not yet published in the private releases repository. [Downloads](downloads/index.md) identifies the older, published alpha.2 portable preview. Do not substitute its files for rc.3.
 
 ## Option 1: an authorized portable Windows distribution
 
@@ -378,7 +378,7 @@ The ZIP writes no registry entries and does not alter a system Node.js installat
 
 ### Matching Java artifacts
 
-For generated Spring services, use JDK 21 or newer and run `pso java:install`. The installed rc.2 distribution contains its matching Maven file repository and generates services that request `com.pso:*:0.2.0-rc.2`; `java:install` copies those artifacts into your local Maven repository. It does not publish them to Maven Central. Then build a generated service with its Maven Wrapper:
+For generated Spring services, use JDK 21 or newer and run `pso java:install`. The installed rc.3 distribution contains its matching Maven file repository and generates services that request `com.pso:*:0.2.0-rc.3`; `java:install` copies those artifacts into your local Maven repository. It does not publish them to Maven Central. Then build a generated service with its Maven Wrapper:
 
 ```powershell
 pso java:install
@@ -414,7 +414,7 @@ npm link
 pso doctor
 ```
 
-Alternatively run `node path/to/pso-web-framework/packages/cli/bin/pso.js` without linking. A checkout also has `pso-java/`; there `pso java:install` builds and installs its `0.1.0-SNAPSHOT` artifacts, which are distinct from the installed rc.2 artifacts. Rebuild the checkout after source changes, and remove the global link with `npm unlink -g @pso/cli` when finished. [Installed versus development CLI](devops/installed-and-development-cli.md) explains how to identify which `pso` is running.
+Alternatively run `node path/to/pso-web-framework/packages/cli/bin/pso.js` without linking. A checkout also has `pso-java/`; there `pso java:install` builds and installs its `0.1.0-SNAPSHOT` artifacts, which are distinct from the installed rc.3 artifacts. Rebuild the checkout after source changes, and remove the global link with `npm unlink -g @pso/cli` when finished. [Installed versus development CLI](devops/installed-and-development-cli.md) explains how to identify which `pso` is running.
 
 ## Start a workspace
 
@@ -435,7 +435,7 @@ New projects use the [layered Java service](architecture/java-microservice.md) a
 | Windows blocks the extracted `pso.cmd` or a file of the ZIP (application control, Smart App Control) | the files are not publisher-signed | use only an authorized copy with a matching `SHA256SUMS`; never disable or bypass the protection |
 | `Get-Command pso -All` lists a development link first | an `npm link` of a checkout shadows the installed command | remove it (`npm unlink -g @pso/cli`) or call the installed `pso.cmd` by its full path |
 | `Non-resolvable import POM: com.pso:pso-bom` in a generated service | the matching Java artifacts are not in the local Maven repository | `pso java:install` with the installed distribution |
-| `does not carry com.pso:*:0.2.0-rc.2` from `pso java:install --from` | the repository is from another release | use the Maven repository of the same distribution |
+| `does not carry com.pso:*:0.2.0-rc.3` from `pso java:install --from` | the repository is from another release | use the Maven repository of the same distribution |
 | `integrity check` reports changed files | a file of the installation was modified or damaged | `pso repair --full`, or `pso update rollback` after a failed update |
 
 ---
@@ -1561,11 +1561,11 @@ All diagnostic codes are listed in the [diagnostics reference](reference/diagnos
 **One ecosystem. Independent teams. Unified architecture.**
 
 > [!NOTE]
-> **The current installed distribution is `0.2.0-rc.2`.** This documentation describes its implemented framework. Its portable candidate exists on the development machine but has not been published in the private releases repository. Documentation deployment does not authorize a software release.
+> **The current installed distribution is `0.2.0-rc.3`.** This documentation describes its implemented framework. Its portable candidate exists on the development machine but has not been published in the private releases repository. Documentation deployment does not authorize a software release.
 
 ## Available private preview
 
-The latest published private download is the earlier **`0.1.0-alpha.2` portable ZIP**. It is for evaluation, not the current `0.2.0-rc.2` framework. The older `0.1.0-alpha.1` installer is encrypted for one validation recipient and should not be used as the general installation path.
+The latest published private download is the earlier **`0.1.0-alpha.2` portable ZIP**. It is for evaluation, not the current `0.2.0-rc.3` framework. The older `0.1.0-alpha.1` installer is encrypted for one validation recipient and should not be used as the general installation path.
 
 | Release detail | Value |
 | --- | --- |
@@ -1593,7 +1593,7 @@ The Ed25519 signature proves integrity relative to the included key. Because tha
 
 ## Current release candidate and installation limits
 
-The local `0.2.0-rc.2` candidate is a portable Windows x64 ZIP with a bundled Node.js runtime and matching Java artifacts. Its recorded ZIP SHA-256 is `8210ec436748354c424e760d54dbbe1b9dac80347aa9b6a5b30e2fe40ac0c62c`; this is verification information, **not a download link or publication notice**. Only obtain it through an authorized distribution channel with its matching release materials.
+The local `0.2.0-rc.3` candidate is a portable Windows x64 ZIP with a bundled Node.js runtime and matching Java artifacts. Its SHA-256 is listed in the signed `SHA256SUMS` released with it; this is verification information, **not a download link or publication notice**. Only obtain it through an authorized distribution channel with its matching release materials.
 
 For a supplied portable ZIP, follow [Installation](getting-started/installation.md): verify its checksum, extract into a writable folder, run `pso.cmd` from that folder, and optionally add its `bin` directory to your user PATH. It does not install an application or change the system Node.js. Use `pso integrity check --full`, `pso update install --package <file.psopkg>` and `pso update rollback` for maintenance. Spring services additionally need JDK 21 or newer and the matching `com.pso` Java artifacts.
 
@@ -4239,6 +4239,7 @@ In the modular structure a provider, a service or a hook belongs to a module: `-
 | `pso make:entity <name>`, `make:repository <name>` | `infrastructure/entity`, `infrastructure/persistence` (a repository needs its entity) |
 | `pso make:config`, `make:filter`, `make:client <service>` | `infrastructure/config`, `infrastructure/filter`, `infrastructure/client` |
 | `pso make:exception <name>` | `shared/exception` |
+| `pso make:event <name>`, `make:listener <name>`, `make:dispatch-event <event.name>`, `make:dispatch-handler <event.name>` | `application/event` (the Dispatch declaration itself goes to `src/main/resources/dispatch/<service>.events.json`) |
 | `pso make:migration <name> --service <svc>` | `src/main/resources/db/migration/V<next>__<name>.sql` |
 
 `make:port` and `make:adapter` belong to the 0.1 hexagonal layout and are refused in a layered service.
@@ -4267,10 +4268,6 @@ length=MIN-MAX precision=P scale=S default=true|false sort filter`. Without `--f
 - No generator edits framework-managed infrastructure (`.infra/`) or a project's configuration files beyond the registrations listed above.
 
 ## Limits
-
-- In a layered service the event generators (`make:dispatch-event`, `make:dispatch-handler`, `make:event`, `make:listener`) still
-  write to the 0.1 package `events/`, which `pso validate` refuses: move those classes to `application/event/` and fix their package
-  (`pso structure:inspect` lists the moves). This is a known limitation of 0.2.0-rc.2.
 
 - `make:entity` writes the entity only: its table comes from a migration you add (`pso make:migration`), because Hibernate only
   validates the schema. In a service without a database `make:entity` and `make:repository` are refused with the command that adds one
@@ -7872,6 +7869,9 @@ pso make:notifier candidate --service recruitment-service --channel "candidate.{
   --event candidate.updated --fields "candidateId:string,status:string" --durable
 ```
 
+In a layered service `make:notifier` writes the payload record to `application/event/CandidateEvent.java` and the publishing service
+to `application/service/CandidateNotifier.java`; a 0.1 service gets `events/` and `application/`.
+
 ```java
 @Service
 public class RecruitmentNotificationService {
@@ -8771,7 +8771,7 @@ reference Product CRUD, PostgreSQL and Flyway; `--template empty` creates the sa
 
 ```tree title="A new service (pso create service catalog)"
 catalog/
-  pom.xml  # generated: Spring Boot 3.5, the PSO BOM 0.2.0-rc.2 and starters
+  pom.xml  # generated: Spring Boot 3.5, the PSO BOM 0.2.0-rc.3 and starters
   mvnw  # generated: Maven Wrapper, with mvnw.cmd and .mvn/wrapper/maven-wrapper.properties
   src/
     main/
@@ -8824,8 +8824,7 @@ other services through `PsoHttpClient` (`infrastructure/client/`); its layers ar
 | event | `<package>/application/event/` | `*Event.java` |
 | listener | `<package>/application/event/` | `*Listener.java` |
 
-Known limitation of 0.2.0-rc.2: `make:event`, `make:listener`, `make:dispatch-event` and `make:dispatch-handler` still write to the 0.1
-package `events/`; move those classes to `application/event/` (and fix their `package` line) before `pso validate`.
+`make:event`, `make:listener`, `make:dispatch-event` and `make:dispatch-handler` write their classes to `application/event/`.
 
 Plain helper classes without one of these suffixes are allowed in any package of the service and are ignored by discovery. A class with
 a known suffix in the wrong package is `PSO_MISPLACED_RESOURCE`; a badly named one is `PSO_BAD_NAME`.
@@ -9243,7 +9242,7 @@ DROP TABLE outbox_event;
 
 ## Supported
 
-For the installed `0.2.0-rc.2` distribution, generated services request `com.pso:*:0.2.0-rc.2` through the BOM; its portable package carries matching Maven artifacts for `pso java:install`. A CLI run from this framework checkout instead reads `pso-java/pom.xml` and uses `0.1.0-SNAPSHOT`. See [Maven BOM and Java versions](spring/maven-bom.md). The `0.1.0` release run below is an illustrative older fixed-version example, not the installed rc.2 artifact set.
+For the installed `0.2.0-rc.3` distribution, generated services request `com.pso:*:0.2.0-rc.3` through the BOM; its portable package carries matching Maven artifacts for `pso java:install`. A CLI run from this framework checkout instead reads `pso-java/pom.xml` and uses `0.1.0-SNAPSHOT`. See [Maven BOM and Java versions](spring/maven-bom.md). The `0.1.0` release run below is an illustrative older fixed-version example, not the installed rc.3 artifact set.
 
 - **Maven Wrapper.** Every service has `mvnw`, `mvnw.cmd` and `.mvn/wrapper/maven-wrapper.properties` pinned to Maven 3.9.9 with `distributionSha256Sum`. Builds do not depend on a global Maven.
 - **One BOM.** Generated POMs import `com.pso:pso-bom`, so every PSO starter shares one version (`pso.version`) and Spring Boot's versions stay managed by the parent. See [Maven BOM and SNAPSHOTs](spring/maven-bom.md).
@@ -9512,11 +9511,11 @@ The artifacts are not published. Install them once into your local Maven reposit
 
 > How the distributed and source-checkout CLIs select matching PSO Java artifacts, and how Maven builds resolve them.
 
-Generated services import one bill of materials and then declare starters without individual versions. The **installed `0.2.0-rc.2` CLI** sets `pso.version` to `0.2.0-rc.2`; the **framework checkout** reads the current `pso-java/pom.xml`, which is `0.1.0-SNAPSHOT` in this checkout. The CLI selects a matching Java version instead of adopting whichever artifacts happen to be on the machine:
+Generated services import one bill of materials and then declare starters without individual versions. The **installed `0.2.0-rc.3` CLI** sets `pso.version` to `0.2.0-rc.3`; the **framework checkout** reads the current `pso-java/pom.xml`, which is `0.1.0-SNAPSHOT` in this checkout. The CLI selects a matching Java version instead of adopting whichever artifacts happen to be on the machine:
 
 ```xml
 <properties>
-  <pso.version>0.2.0-rc.2</pso.version>
+  <pso.version>0.2.0-rc.3</pso.version>
 </properties>
 <dependencyManagement>
   <dependencies>
@@ -9536,11 +9535,11 @@ The `pso.version` property is the only place a PSO version appears. Spring Boot 
 ## Install the matching artifacts
 
 ```bash
-pso java:install        # installed rc.2: copies its bundled com.pso:*:0.2.0-rc.2 repository into ~/.m2
+pso java:install        # installed rc.3: copies its bundled com.pso:*:0.2.0-rc.3 repository into ~/.m2
 pso create service catalog
 ```
 
-No JAR is copied by hand. The rc.2 portable distribution includes a Maven file repository next to the CLI. If your authorized package ships it separately, run `pso java:install --from <maven-repository-dir>`. `pso create service` reports when matching artifacts are missing. In a **framework checkout**, `pso java:install` builds `pso-java/` and installs `0.1.0-SNAPSHOT`; after changing the starters there, run it again. Do not substitute the checkout's SNAPSHOT for a distributed rc.2 service.
+No JAR is copied by hand. The rc.3 portable distribution includes a Maven file repository next to the CLI. If your authorized package ships it separately, run `pso java:install --from <maven-repository-dir>`. `pso create service` reports when matching artifacts are missing. In a **framework checkout**, `pso java:install` builds `pso-java/` and installs `0.1.0-SNAPSHOT`; after changing the starters there, run it again. Do not substitute the checkout's SNAPSHOT for a distributed rc.3 service.
 
 The group id `com.pso` is **not** an owned Maven Central namespace: the artifacts are never published from this repository. Choose and register a namespace before publishing.
 
@@ -10434,15 +10433,10 @@ So when you switch Dispatch on the documented way (`pso.dispatch.enabled: true` 
 | Not a broker | it proves nothing about delivery, ordering, redelivery after a crash or durability |
 | Real broker tests | an integration test that must use the broker selects it itself: `@SpringBootTest(properties = "pso.dispatch.provider=redis")`, with the broker URL from the environment |
 
-> [!WARNING]
-> **Known limitation in 0.2.0-rc.2.** In a service with the official layered structure, `pso make:dispatch-event`, `make:dispatch-handler`,
-> `make:event` and `make:listener` still write their classes to the 0.1 package `events/`, and `pso validate` then refuses the service
-> (`PSO_MISPLACED_RESOURCE`, and `PSO_STRUCTURE_MIXED` from `pso structure:inspect`). Until the generators are fixed, move the generated
-> classes to `application/event/` and change their `package` declaration (`pso structure:inspect --service <svc>` lists each move), then
-> run `pso validate`. The paths below are what the generators write; 0.1 services are not affected.
+The Dispatch classes of a layered service live in `application/event/` (`events/` in the 0.1 layout); a test of them uses the same package.
 
-```java title="src/test/java/com/pso/orders/events/OrdersPlacedBrokerTests.java (an integration test against the real broker)"
-package com.pso.orders.events;
+```java title="src/test/java/com/pso/orders/application/event/OrdersPlacedBrokerTests.java (an integration test against the real broker)"
+package com.pso.orders.application.event;
 
 import com.pso.dispatch.PsoDispatch;
 import org.junit.jupiter.api.Test;
@@ -12299,24 +12293,20 @@ pso make:dispatch-handler orders.placed --service billing
 pso dispatch:validate
 ```
 
-> [!WARNING]
-> **Known limitation in 0.2.0-rc.2.** In a service with the official layered structure, `pso make:dispatch-event`, `make:dispatch-handler`,
-> `make:event` and `make:listener` still write their classes to the 0.1 package `events/`, and `pso validate` then refuses the service
-> (`PSO_MISPLACED_RESOURCE`, and `PSO_STRUCTURE_MIXED` from `pso structure:inspect`). Until the generators are fixed, move the generated
-> classes to `application/event/` and change their `package` declaration (`pso structure:inspect --service <svc>` lists each move), then
-> run `pso validate`. The paths below are what the generators write; 0.1 services are not affected.
+In a layered service the payload record and the handler are written to `application/event/` (package `<base>.application.event`);
+in a service with the 0.1 layout they go to `events/`.
 
 The publisher gets the declaration and the payload record; a consumer declares the same event with `--consume-only` (`"publish": false`) and gets a handler:
 
-```java title="orders: src/main/java/com/pso/orders/events/OrdersPlacedEvent.java (generated)"
-package com.pso.orders.events;
+```java title="orders: src/main/java/com/pso/orders/application/event/OrdersPlacedEvent.java (generated)"
+package com.pso.orders.application.event;
 
 public record OrdersPlacedEvent(String orderId, String customerId, double total) {
 }
 ```
 
-```java title="billing: src/main/java/com/pso/billing/events/OrdersPlacedHandler.java (generated)"
-package com.pso.billing.events;
+```java title="billing: src/main/java/com/pso/billing/application/event/OrdersPlacedHandler.java (generated)"
+package com.pso.billing.application.event;
 
 import com.pso.dispatch.ConsumeContext;
 import com.pso.dispatch.PsoEventHandler;
@@ -12333,10 +12323,10 @@ public class OrdersPlacedHandler {
 ```
 
 ```java title="orders: publishing (your code)"
-package com.pso.orders.application;
+package com.pso.orders.application.service;
 
 import com.pso.dispatch.PsoDispatch;
-import com.pso.orders.events.OrdersPlacedEvent;
+import com.pso.orders.application.event.OrdersPlacedEvent;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14784,7 +14774,7 @@ A 0.1 workspace keeps working with the 0.2.0 CLI without any change: `pso dev`, 
 
 ## Upgrading the CLI first
 
-Obtain an authorized `0.2.0-rc.2` portable distribution, or update an installed distribution with `pso update install --package <authorized-newer.psopkg>`. The rc.2 Windows installer is unsigned and unvalidated end to end, so it is not an upgrade path. See [Installation](getting-started/installation.md) and [release integrity and Windows installation](infrastructure/release-integrity-and-signing.md). Workspaces live outside the installation and are not touched by an update, rollback (`pso update rollback`) or removal of the portable folder.
+Obtain an authorized `0.2.0-rc.3` portable distribution, or update an installed distribution with `pso update install --package <authorized-newer.psopkg>`. The rc.3 Windows installer is unsigned and unvalidated end to end, so it is not an upgrade path. See [Installation](getting-started/installation.md) and [release integrity and Windows installation](infrastructure/release-integrity-and-signing.md). Workspaces live outside the installation and are not touched by an update, rollback (`pso update rollback`) or removal of the portable folder.
 
 ## Preparing to migrate an application
 
@@ -14894,7 +14884,7 @@ A checksum published next to the file proves integrity only as far as that page 
 ## Installing on Windows
 
 - **Portable ZIP** (recommended while the installer is unsigned): extract to a folder you can write to, run `.\pso.cmd --version`. A private Node.js runtime is bundled; nothing on the machine is changed.
-- **Installer** (`PSO-Web-<version>-win-x64.exe`, Inno Setup): an experimental local candidate. It is unsigned, its real installation flow has not been validated end to end, and it is not a supported installation method for rc.2.
+- **Installer** (`PSO-Web-<version>-win-x64.exe`, Inno Setup): an experimental local candidate. It is unsigned, its real installation flow has not been validated end to end, and it is not a supported installation method for rc.3.
 
 Maintenance of an installation (both forms):
 
@@ -14917,7 +14907,7 @@ Upgrading from 0.1.x keeps every workspace untouched: workspaces live outside th
 
 ### Windows installer limitations
 
-The installer of `0.2.0-rc.2` is not Authenticode-signed or published as a supported installation method. A prior rc.1 unsigned build was refused by Smart App Control on the validation machine ("An Application Control policy blocked this file", Code Integrity event 3077), showing that acceptance of one unsigned file does not predict acceptance of another. PSO never asks you to switch Smart App Control, SmartScreen or Defender off. Use an **authorized portable ZIP** until the installer is signed and its installation flow validated. The rc.2 portable candidate is not yet published in the private releases repository.
+The installer of `0.2.0-rc.3` is not Authenticode-signed or published as a supported installation method. A prior rc.1 unsigned build was refused by Smart App Control on the validation machine ("An Application Control policy blocked this file", Code Integrity event 3077), showing that acceptance of one unsigned file does not predict acceptance of another. PSO never asks you to switch Smart App Control, SmartScreen or Defender off. Use an **authorized portable ZIP** until the installer is signed and its installation flow validated. The rc.3 portable candidate is not yet published in the private releases repository.
 
 ## The permanent PSO release signing identity
 
@@ -20309,7 +20299,7 @@ pso make:dispatch-event orders.placed --service gateway --consume-only --fields 
 ## What it changes
 
 - Declares a DISTRIBUTED event: one that travels through the configured broker (Redis Streams, RabbitMQ, Kafka) to every service that declares it.
-- Spring Boot: adds the event with its schema to `src/main/resources/dispatch/<service>.events.json` and writes the payload record `events/OrdersPlacedEvent.java`.
+- Spring Boot: adds the event with its schema to `src/main/resources/dispatch/<service>.events.json` and writes the payload record `application/event/OrdersPlacedEvent.java` (`events/` in a 0.1 service).
 - Orchestrator: adds the event to `src/dispatch/<module>/EVENTS.pso.ts` (created when missing) and writes its schema under `schemas/`.
 - `--consume-only` declares an event another service publishes (`publish: false`).
 
@@ -20319,7 +20309,7 @@ This sample shows the shape of the result. Names, ports, digests and timings may
 
 ```text evidence="illustrative"
 updated    src/main/resources/dispatch/orders.events.json
-created    src/main/java/com/pso/orders/events/OrdersPlacedEvent.java
+created    src/main/java/com/pso/orders/application/event/OrdersPlacedEvent.java
 ```
 
 ## Verify the result
@@ -20370,7 +20360,7 @@ pso make:dispatch-handler orders.placed --service gateway --group gateway-notifi
 ## What it changes
 
 - Generates a consumer of an event the project already declares.
-- Spring Boot: `events/OrdersPlacedHandler.java`, a component with a `@PsoEventHandler("orders.placed")` method.
+- Spring Boot: `application/event/OrdersPlacedHandler.java` (`events/` in a 0.1 service), a component with a `@PsoEventHandler("orders.placed")` method.
 - Orchestrator: a `@DispatchConsumer` class in `src/dispatch/<module>/`, listed in `consumers` of `EVENTS.pso.ts` (a consumer that is not listed never runs).
 
 ## Verify the result
@@ -20497,7 +20487,7 @@ pso make:event order-placed --service orders
 
 ## What it changes
 
-- Writes `events/OrderPlacedEvent.java`: a record for a LOCAL Spring application event, published with `ApplicationEventPublisher` and delivered to `@EventListener` methods of the same process.
+- Writes `application/event/OrderPlacedEvent.java` (`events/` in a 0.1 service): a record for a LOCAL Spring application event, published with `ApplicationEventPublisher` and delivered to `@EventListener` methods of the same process.
 - It never leaves the service and is not stored. An event that other services receive is a PSO Dispatch event: `pso make:dispatch-event`.
 
 ## Failure cases
@@ -20796,7 +20786,7 @@ pso make:listener order-placed --service orders
 
 ## What it changes
 
-- Writes `events/OrderPlacedListener.java`: a component with an `@EventListener` method for the LOCAL application event of the same name (typed with `OrderPlacedEvent` when `pso make:event order-placed` created it).
+- Writes `application/event/OrderPlacedListener.java` (`events/` in a 0.1 service): a component with an `@EventListener` method for the LOCAL application event of the same name (typed with `OrderPlacedEvent` when `pso make:event order-placed` created it).
 - It is not a Dispatch consumer: events of other services are handled by a `@PsoEventHandler` method, generated with `pso make:dispatch-handler`.
 
 ## Failure cases
@@ -21005,7 +20995,7 @@ pso make:notifier candidate --service recruitment-service --channel "candidate.{
 
 ## What it changes
 
-- Writes the event record (events/) and a service that publishes it with `PsoChannelPublisher`; `--durable` selects the transactional outbox.
+- Writes the event record (`application/event/`) and a service that publishes it with `PsoChannelPublisher` (`application/service/`); in a 0.1 service they go to `events/` and `application/`. `--durable` selects the transactional outbox.
 
 ## Failure cases
 
@@ -27554,7 +27544,7 @@ From lowest to highest: framework defaults, workspace, service `pso.config.json`
 
 **PSO AI Context** is a set of generated instructions that tell an AI coding assistant how PSO works: the architecture, directory conventions, the module and route contracts, decorator semantics, the CLI commands that really exist, the security model and the rules for generating code.
 
-For the current `0.2.0-rc.2` distribution the official structures are **mandatory for all new code**: the modular TypeScript orchestrator (`src/.app/`, `src/modules/`, `src/shared/`) and the layered Java service (`application/`, `infrastructure/`, `shared/`; never `providers`, `modules` or `.app` in Java). Only an existing 0.1 project keeps its own layout, and the two are never mixed in one project. New projects include the functional Product CRUD by default; `--template empty` omits it. The [structure migration guide](architecture/structure-migration.md) explains how to inspect an older project without moving its files.
+For the current `0.2.0-rc.3` distribution the official structures are **mandatory for all new code**: the modular TypeScript orchestrator (`src/.app/`, `src/modules/`, `src/shared/`) and the layered Java service (`application/`, `infrastructure/`, `shared/`; never `providers`, `modules` or `.app` in Java). Only an existing 0.1 project keeps its own layout, and the two are never mixed in one project. New projects include the functional Product CRUD by default; `--template empty` omits it. The [structure migration guide](architecture/structure-migration.md) explains how to inspect an older project without moving its files.
 
 ## Why it exists
 
@@ -27689,7 +27679,7 @@ Every documentation build writes these files from the **same sources** as the HT
 
 All of them carry the framework version (0.2.0). They contain no credentials, keys or environment-specific values: the build never reads `.env` files or key material.
 
-The installed `0.2.0-rc.2` distribution reports the CLI/API version `0.2.0`; use the accompanying release label when matching an installed binary to these files. The current contexts describe the [official application structures](architecture/overview.md), [generator destinations](architecture/generators.md), [infrastructure engine](infrastructure/overview.md) and [migration path](reference/migration.md). Regenerate `pso ai:init` files after changing the installed CLI so an older repository instruction file does not override these conventions.
+The installed `0.2.0-rc.3` distribution reports the CLI/API version `0.2.0`; use the accompanying release label when matching an installed binary to these files. The current contexts describe the [official application structures](architecture/overview.md), [generator destinations](architecture/generators.md), [infrastructure engine](infrastructure/overview.md) and [migration path](reference/migration.md). Regenerate `pso ai:init` files after changing the installed CLI so an older repository instruction file does not override these conventions.
 
 Generate your own copy of the site:
 
@@ -29839,13 +29829,13 @@ Only the current documentation version is published; `docs/versions.json` lists 
 ## An upgrade procedure
 
 1. **Commit** your current state so the upgrade is a reviewable diff.
-2. Update an authorized portable installation with a matching, trusted `.psopkg` (`pso update install --package <file.psopkg>`), or update and rebuild an authorized framework checkout. Run `pso java:install` after changing releases if you use Spring services ([installation](getting-started/installation.md)); the installed rc.2 CLI uses `com.pso:*:0.2.0-rc.2`, while this source checkout builds its own `0.1.0-SNAPSHOT` artifacts.
+2. Update an authorized portable installation with a matching, trusted `.psopkg` (`pso update install --package <file.psopkg>`), or update and rebuild an authorized framework checkout. Run `pso java:install` after changing releases if you use Spring services ([installation](getting-started/installation.md)); the installed rc.3 CLI uses `com.pso:*:0.2.0-rc.3`, while this source checkout builds its own `0.1.0-SNAPSHOT` artifacts.
 3. `pso validate` and `pso config:validate`: new rules show up as diagnostics, not as run-time surprises.
 4. Preview changes to generated files with the generators' `--dry-run`, e.g. `pso docker:init --dry-run`. A differing file is reported as a conflict and never overwritten silently.
 5. Apply what you want by hand or with `--force` for files you never edited; review the diff.
 6. Run `pso test` and your own checks, then a short smoke run (`pso dev --smoke`).
 
-An installed distribution keeps its previous verified package for `pso update rollback`. Rolling back the CLI does not automatically undo workspace migrations: back up or commit each workspace before `pso workspace:migrate --apply`, and use [structure:inspect](architecture/structure-migration.md) before manually moving application files. The unsigned rc.2 installer is not an upgrade path.
+An installed distribution keeps its previous verified package for `pso update rollback`. Rolling back the CLI does not automatically undo workspace migrations: back up or commit each workspace before `pso workspace:migrate --apply`, and use [structure:inspect](architecture/structure-migration.md) before manually moving application files. The unsigned rc.3 installer is not an upgrade path.
 
 ## What changed that generated projects may want to adopt
 

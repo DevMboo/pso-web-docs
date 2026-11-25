@@ -9,11 +9,11 @@
 **One ecosystem. Independent teams. Unified architecture.**
 
 > [!NOTE]
-> **The current installed distribution is `0.2.0-rc.2`.** This documentation describes its implemented framework. Its portable candidate exists on the development machine but has not been published in the private releases repository. Documentation deployment does not authorize a software release.
+> **The current installed distribution is `0.2.0-rc.3`.** This documentation describes its implemented framework. Its portable candidate exists on the development machine but has not been published in the private releases repository. Documentation deployment does not authorize a software release.
 
 ## Available private preview
 
-The latest published private download is the earlier **`0.1.0-alpha.2` portable ZIP**. It is for evaluation, not the current `0.2.0-rc.2` framework. The older `0.1.0-alpha.1` installer is encrypted for one validation recipient and should not be used as the general installation path.
+The latest published private download is the earlier **`0.1.0-alpha.2` portable ZIP**. It is for evaluation, not the current `0.2.0-rc.3` framework. The older `0.1.0-alpha.1` installer is encrypted for one validation recipient and should not be used as the general installation path.
 
 | Release detail | Value |
 | --- | --- |
@@ -41,7 +41,7 @@ The Ed25519 signature proves integrity relative to the included key. Because tha
 
 ## Current release candidate and installation limits
 
-The local `0.2.0-rc.2` candidate is a portable Windows x64 ZIP with a bundled Node.js runtime and matching Java artifacts. Its recorded ZIP SHA-256 is `8210ec436748354c424e760d54dbbe1b9dac80347aa9b6a5b30e2fe40ac0c62c`; this is verification information, **not a download link or publication notice**. Only obtain it through an authorized distribution channel with its matching release materials.
+The local `0.2.0-rc.3` candidate is a portable Windows x64 ZIP with a bundled Node.js runtime and matching Java artifacts. Its SHA-256 is listed in the signed `SHA256SUMS` released with it; this is verification information, **not a download link or publication notice**. Only obtain it through an authorized distribution channel with its matching release materials.
 
 For a supplied portable ZIP, follow [Installation](getting-started/installation.md): verify its checksum, extract into a writable folder, run `pso.cmd` from that folder, and optionally add its `bin` directory to your user PATH. It does not install an application or change the system Node.js. Use `pso integrity check --full`, `pso update install --package <file.psopkg>` and `pso update rollback` for maintenance. Spring services additionally need JDK 21 or newer and the matching `com.pso` Java artifacts.
 

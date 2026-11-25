@@ -5,7 +5,7 @@
   "files": [
     {
       "file": "ai/complete.md",
-      "sha256": "1f4065e4dc4bb580abe68ebee8fd2698f66905514154e6a168b42745b5d6ec2d",
+      "sha256": "4b0def8ba9a191f3b3d119a60997efcbd5f3f56c96f77f49c93873f3c6172f27",
       "scopes": [
         "core",
         "architecture",
@@ -70,7 +70,7 @@
     },
     {
       "file": "ai/dispatch.md",
-      "sha256": "2e2f9c756bbf12bdc840a9df84667c05d51a9dab39417c9f412e5af775c4e5f3",
+      "sha256": "33d59d5edfc70cd2eac929be2011134e177bd20e032dbe68eadaf3c8163bfa50",
       "scopes": [
         "core",
         "dispatch"
@@ -207,7 +207,7 @@
     },
     {
       "file": "ai/install-dispatch.md",
-      "sha256": "d2e7ab3f0a83272bf800da56c54c70b5c94d9cf52132d114b1547c0d4a73e4c3",
+      "sha256": "d2c98953698a2902c1b94134fb8aef4f17972d7e559f51f293c01ab2ebc42ebb",
       "scopes": [
         "core",
         "dispatch",
@@ -225,21 +225,21 @@
     },
     {
       "file": "ai/AGENTS.md",
-      "sha256": "e47cba6f6708d5a68e724fd4c35171cd4a21ff2d1513434e0c219c05b54bc0d4",
+      "sha256": "9efa970cdaf620267e240f6a0ee02efb5c9c25f14da313c541a84d2447ba32e5",
       "scopes": [
         "complete"
       ]
     },
     {
       "file": "ai/CLAUDE.md",
-      "sha256": "5122d4b9eee7b79d0c1881224919e2d395f3d242f702348719e420d0d69ed0d9",
+      "sha256": "9e80c0525a025fe86043fbaad02777b31451eb7d8bf64e10ff02f22889bd281e",
       "scopes": [
         "complete"
       ]
     },
     {
       "file": "ai/copilot-instructions.md",
-      "sha256": "6f8a3471fc06255b6715eacb1147d1f8d477e6d93170a76f51856efd9321b112",
+      "sha256": "d69e7bace6baf2e10114df587751bc80e6ac43eb5d60c6ab85320e2b386828a6",
       "scopes": [
         "complete"
       ]

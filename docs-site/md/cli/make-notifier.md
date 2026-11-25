@@ -23,7 +23,7 @@ pso make:notifier candidate --service recruitment-service --channel "candidate.{
 
 ## What it changes
 
-- Writes the event record (events/) and a service that publishes it with `PsoChannelPublisher`; `--durable` selects the transactional outbox.
+- Writes the event record (`application/event/`) and a service that publishes it with `PsoChannelPublisher` (`application/service/`); in a 0.1 service they go to `events/` and `application/`. `--durable` selects the transactional outbox.
 
 ## Failure cases
 
