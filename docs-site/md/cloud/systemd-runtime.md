@@ -3,7 +3,7 @@
 > How PSO keeps Node.js and Java/Spring Boot services running on a plain Linux server with the deploy user's own systemd manager, what privilege it needs (one admin command), and what it guarantees across crashes and reboots.
 
 > [!STATUS]
-> **Implemented and verified** against a real systemd (Debian 12, systemd 252 as PID 1 of a disposable container, reached over SSH) with Node.js, Java 21 and PostgreSQL. It has **not** been run on an external cloud server, and only the **user-manager** scope exists (see [What is not implemented](#what-is-not-implemented)).
+> **Implemented and verified** against a real systemd (Debian 12, systemd 252 as PID 1 of a disposable container, reached over SSH) with Node.js, Java 21 and PostgreSQL. It was also used on an external cloud virtual machine (Ubuntu 24.04, systemd 255) during the owner's [external validation](cloud/external-validation.md), and only the **user-manager** scope exists (see [What is not implemented](#what-is-not-implemented)).
 
 By default PSO keeps your services alive itself: it starts each process, remembers who it is and stops it with the grace period you declared. That works anywhere, but a process the agent started does not come back after a server reboot. When the server runs systemd you can ask for the operating system to do that job:
 

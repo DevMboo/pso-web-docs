@@ -7,12 +7,12 @@ Build the FEI and/or MEIs independently (hashed assets); a MEI also gets its rel
 ## Usage
 
 ```text
-pso frontend:build [<project>] [--base-path /commerce/ | --env <name>] [--version 1.0.0] [--allow-dev-token] [--sign-key <pem-file> --key-id <id>] [--json]
+pso frontend:build [<project>] [--base-path /commerce/ | --env <name>] [--version 1.0.0] [--allow-dev-token] [--signer <name> | --sign-key <pem-file> --key-id <id>] [--json]
 ```
 
 ## Flags
 
-`--base-path`, `--env`, `--version`, `--allow-dev-token`, `--sign-key`, `--key-id`, `--json`.
+`--base-path`, `--env`, `--version`, `--allow-dev-token`, `--signer`, `--sign-key`, `--key-id`, `--json`.
 
 ## Examples
 
