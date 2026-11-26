@@ -21,7 +21,7 @@ Version: 0.2.0. Features marked "not implemented" in a page are design notes, no
 
 ## Downloads
 
-- [Downloads](md/downloads/index.md): Download PSO Web V2 (0.2.0-rc.6) for Windows x64 - the recommended portable ZIP and the experimental, Authenticode-unsigned installer - verify them, install, update and roll back.
+- [Downloads](md/downloads/index.md): Download PSO Web V2 (0.2.0-rc.7) for Windows x64 - the recommended portable ZIP and the experimental, Authenticode-unsigned installer - verify them, install, update and roll back.
 - [Code signing policy](md/downloads/code-signing-policy.md): How PSO Web release executables are to be Authenticode-signed - current status (not signed yet), what is and is not signed, verifiable builds, manual approval of every signing request, team roles and the privacy policy.
 - [Privacy policy](md/downloads/privacy-policy.md): What PSO Web transfers over the network and when - nothing unless you ask for it - what it changes on your machine, and the third-party services your own configuration can involve.
 
@@ -207,6 +207,7 @@ Version: 0.2.0. Features marked "not implemented" in a page are design notes, no
 - [pso deploy:unlock](md/cli/deploy-unlock.md): Remove the deployment lock an interrupted deployment left on the environment's host (only when no deployment is running)
 - [pso deploy:validate](md/cli/deploy-validate.md): Statically check the deployment descriptors (security posture, probes, limits, inline secrets, unfilled placeholders); no cloud is contacted
 - [pso dev](md/cli/dev.md): Validate, start, monitor and gracefully stop the workspace (Ctrl+C stops). Local processes by default; --docker runs the environment's containers instead. --service starts one service (and with --with-dependencies what it depends on: other services, its database and the identity provider), --fei also starts that frontend's development servers
+- [pso dev:env](md/cli/dev-env.md): Show where every variable of a service comes from when `pso dev` starts it (its files, the environment of pso dev, the workspace, the infrastructure environment) and which infrastructure settings are not applied and why. Names and sources only: no value is ever shown, secrets are only reported as resolved
 - [pso dispatch:consumers](md/cli/dispatch-consumers.md): List every declared consumer (event, handler, service, group)
 - [pso dispatch:doctor](md/cli/dispatch-doctor.md): Validate and then really connect to each configured broker; reports up, down or not configured (never claims a connection from configuration alone)
 - [pso dispatch:events](md/cli/dispatch-events.md): List every declared event with its version, channel, owner service, publishers and consumers
