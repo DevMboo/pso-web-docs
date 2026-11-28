@@ -5,7 +5,7 @@
   "files": [
     {
       "file": "ai/complete.md",
-      "sha256": "4b06a83430adbd0e53558f2aa3fe0daaaa9fd50aee80038ae30f67bd67c8ffb8",
+      "sha256": "e1091ab9e53a26a301beaefabaaeef06b7992c6996e93203f1b5814ed1acdd7b",
       "scopes": [
         "core",
         "architecture",
@@ -78,7 +78,7 @@
     },
     {
       "file": "ai/devops.md",
-      "sha256": "d20afc1ca3017368ad58e98cbf0e938823059d0ebc5e67e813406e5a415ee731",
+      "sha256": "24543569180fd542a207bacdc1ecfcb6a6aeaa77670343ead98fa586a710fc39",
       "scopes": [
         "core",
         "devops"
@@ -86,7 +86,7 @@
     },
     {
       "file": "ai/docs-refs.md",
-      "sha256": "8d77ab107a0f08a8a77dd896342f240016824dab452f2bc0ce67602504c502e1",
+      "sha256": "a7c8f918d460c31a8f6cd78ce36a05322a0871f3c277ec86e837d5b85a6fe6f2",
       "scopes": [
         "core",
         "docs-refs"
@@ -121,7 +121,7 @@
     },
     {
       "file": "ai/configure-docker.md",
-      "sha256": "c6b1ff3e1936951537876f572bced36b04644fc674258ccb6e45f3a6ca20863b",
+      "sha256": "d1d7fed60f4f7ac6a6a51fca044cc06e529273430dd39af81d15de1023fc29e4",
       "scopes": [
         "core",
         "devops",
@@ -196,7 +196,7 @@
     },
     {
       "file": "ai/infrastructure.md",
-      "sha256": "78324b864ddaff934344eafffc57bd2ff3a9258cd0e384a89c7d433317271859",
+      "sha256": "4b6cff9e17120a07abb03c64bfbaa80650442694d510fb0f6434bbc84b72e8f1",
       "scopes": [
         "core",
         "orchestrator",
@@ -225,21 +225,21 @@
     },
     {
       "file": "ai/AGENTS.md",
-      "sha256": "65b4abdabe21b189ecfdddb41f738f47268279c19ae36faa051905cc2055d5fa",
+      "sha256": "3f69f667fe98b213128378921480068495d0369ee4738450d6510f010d92f861",
       "scopes": [
         "complete"
       ]
     },
     {
       "file": "ai/CLAUDE.md",
-      "sha256": "b0fbe9824af857f7e1374929a0de93bb954c25b3846a2161a2a8dfd1c32777a3",
+      "sha256": "37c7240992ee15438724927db1b0c9de71c2cfd2396fba7688324e2c07d46a67",
       "scopes": [
         "complete"
       ]
     },
     {
       "file": "ai/copilot-instructions.md",
-      "sha256": "5bd26d609ad65e13cd825f2570e3550037be2587fd83121aa5436878df927c6c",
+      "sha256": "c11d7fe0b052e8c1efdb7eccf9e46f0051217509ebaaf6a0d1ad78f0b3f98e5a",
       "scopes": [
         "complete"
       ]
